@@ -37,7 +37,7 @@ function DocumentPreview({ document }: { document: Document }) {
                     href={document.previewUrl ?? undefined}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-neu-primary-bright inline-flex items-center gap-1 text-sm font-medium"
+                    className="text-neu-link inline-flex items-center gap-1 text-sm font-medium"
                 >
                     <ExternalLink className="size-4" />
                     Open in new tab (some browsers only show the first page

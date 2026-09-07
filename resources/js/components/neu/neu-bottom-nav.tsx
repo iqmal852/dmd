@@ -38,7 +38,7 @@ export function NeuBottomNav({ items }: NeuBottomNavProps) {
                 const className = cn(
                     'flex min-h-14 min-w-14 flex-1 flex-col items-center justify-center gap-0.5 py-2 text-xs font-medium',
                     item.active
-                        ? 'text-neu-primary-bright'
+                        ? 'text-neu-link'
                         : 'text-neu-ink-muted',
                     disabled && 'pointer-events-none opacity-40',
                 );

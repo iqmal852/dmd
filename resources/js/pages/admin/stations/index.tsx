@@ -209,7 +209,7 @@ export default function AdminStationIndex() {
                                                     station: station.publicId,
                                                 }).url
                                             }
-                                            className="text-neu-primary-bright"
+                                            className="text-neu-link"
                                         >
                                             Edit
                                         </Link>
@@ -219,7 +219,7 @@ export default function AdminStationIndex() {
                                                     station: station.publicId,
                                                 }).url
                                             }
-                                            className="text-neu-primary-bright inline-flex items-center gap-1"
+                                            className="text-neu-link inline-flex items-center gap-1"
                                         >
                                             <QrCode className="size-3.5" />
                                             QR
@@ -271,13 +271,13 @@ export default function AdminStationIndex() {
                                     href={
                                         edit({ station: station.publicId }).url
                                     }
-                                    className="text-neu-primary-bright"
+                                    className="text-neu-link"
                                 >
                                     Edit
                                 </Link>
                                 <Link
                                     href={qr({ station: station.publicId }).url}
-                                    className="text-neu-primary-bright"
+                                    className="text-neu-link"
                                 >
                                     QR
                                 </Link>

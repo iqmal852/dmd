@@ -28,5 +28,9 @@ yarn-error.log
 /.vscode
 /.zed
 
+# Claude Code session lock file (not a project asset; .claude/skills/* etc.
+# are intentionally tracked from Phase 00's Boost guideline install)
+/.claude/scheduled_tasks.lock
+
 # Pest browser-testing artifacts
 /tests/Browser/Screenshots

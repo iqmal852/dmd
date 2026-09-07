@@ -59,7 +59,7 @@ export default function Welcome() {
 
             <main className="mx-auto max-w-5xl space-y-12 p-6">
                 <section className="space-y-2 text-center">
-                    <p className="text-neu-primary-bright text-sm font-bold tracking-widest uppercase">
+                    <p className="text-neu-link text-sm font-bold tracking-widest uppercase">
                         Smart Monument — Physical → Digital
                     </p>
                     <h1 className="text-3xl font-bold">
