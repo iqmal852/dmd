@@ -13,11 +13,10 @@ use Symfony\Component\Process\Process;
 /**
  * plan/phases/phase-09-hardening-release.md M9.4 — a daily `pg_dump`,
  * gzipped and pushed through the configured backup disk (see
- * config/backup.php). Pair with `batu:restore`, which this backup's own
- * test proves can read what this command writes. Schedule via
- * `schedule:run` (see docs/DEPLOYMENT.md); not scheduled here since a
- * disk needs to actually be off-site before this is a real backup, not
- * just a copy sitting next to what it protects against.
+ * config/backup.php). Scheduled in routes/console.php; pair with
+ * `batu:restore`, which this backup's own test proves can read what
+ * this command writes. Where it actually lands (local vs. an off-site
+ * disk) is a `.env` concern — see docs/DEPLOYMENT.md.
  */
 class BackupDatabase extends Command
 {
