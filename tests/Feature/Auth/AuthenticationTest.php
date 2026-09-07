@@ -29,7 +29,9 @@ class AuthenticationTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        // The admin console is this app's only authenticated area — see
+        // config('fortify.home') and plan/phases/phase-08-admin-qr.md M8.1.
+        $response->assertRedirect('/admin/stations');
     }
 
     public function test_users_with_two_factor_enabled_are_redirected_to_two_factor_challenge()

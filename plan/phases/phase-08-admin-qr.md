@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | ⬜ Not started |
+| **Status** | ✅ Complete (M8.8 optional, skipped) |
 | **Depends on** | Phases 02, 04, 06, 07 |
 | **Estimate** | 7 days required work (+1 if M8.8 is built) — the largest phase |
 | **Tag on completion** | `phase-08-complete` |
@@ -21,14 +21,14 @@ Built in Inertia + React with the same Neumorphism system as the public side.
 
 | | ID | Deliverable | Date | Evidence |
 |---|---|---|---|---|
-| [ ] | **M8.1** | Admin auth: login, logout, profile/password change, `batu:admin-password` command, rate limiting | | |
-| [ ] | **M8.2** | Station index: search, filter by highway/status, sort by chainage, published toggle | | |
-| [ ] | **M8.3** | Station create/edit — details tab (code, highway, section, KM, direction, type, installed, status, per-station password) | | |
-| [ ] | **M8.4** | QR generation service + `/admin/stations/{id}/qr` preview and download (PNG + SVG) | | |
-| [ ] | **M8.5** | Printable plate sheet — single station and bulk, print-CSS at real plate dimensions | | |
-| [ ] | **M8.6** | Coordinates + Specifications forms with survey-grade validation | | |
-| [ ] | **M8.7** | Media manager: photo upload with type/bearing/caption, panorama upload with 2:1 validation, document upload with DWG-preview pairing | | |
-| [ ] | **M8.8** | `[OPTIONAL]` CSV import/export for stations + coordinates; download audit log viewer | | |
+| [x] | **M8.1** | Admin auth: login, logout, profile/password change, `batu:admin-password` command, rate limiting | 2026-09-08 | `tests/Feature/Admin/AdminAuthTest.php` |
+| [x] | **M8.2** | Station index: search, filter by highway/status, sort by chainage, published toggle | 2026-09-08 | `plan/evidence/phase-08/phase-08-station-index.png` |
+| [x] | **M8.3** | Station create/edit — details tab (code, highway, section, KM, direction, type, installed, status, per-station password) | 2026-09-08 | `tests/Feature/Admin/AdminStationCrudTest.php`, `plan/evidence/phase-08/phase-08-station-edit.png` |
+| [x] | **M8.4** | QR generation service + `/admin/stations/{id}/qr` preview and download (PNG + SVG) | 2026-09-08 | `tests/Feature/Admin/AdminQrTest.php` |
+| [x] | **M8.5** | Printable plate sheet — single station and bulk, print-CSS at real plate dimensions | 2026-09-08 | `plan/evidence/phase-08/phase-08-qr-{plate-single,sheet}.png` |
+| [x] | **M8.6** | Coordinates + Specifications forms with survey-grade validation | 2026-09-08 | `tests/Browser/AdminStationScreensTest.php` |
+| [x] | **M8.7** | Media manager: photo upload with type/bearing/caption, panorama upload with 2:1 validation, document upload with DWG-preview pairing | 2026-09-08 | `tests/Feature/Admin/AdminMediaTest.php` |
+| [ ] | **M8.8** | `[OPTIONAL]` CSV import/export for stations + coordinates; download audit log viewer | | Skipped — see Phase Log |
 
 ---
 
@@ -242,11 +242,28 @@ Assertions that must exist:
 
 ## Definition of Done
 
-- [ ] The admin can take a station from nothing to a complete public dossier without touching the database.
-- [ ] A generated QR **scans successfully from a printed sheet with a real phone** — print it, scan it, confirm it opens the right dossier. This is a required manual check.
-- [ ] All 25 LPT2 stations are loaded — via CSV import (M8.8) or the one-off seeder.
-- [ ] Admin UI uses the same Neumorphism system; no unstyled default form controls.
-- [ ] No admin route is reachable without auth.
+- [x] The admin can take a station from nothing to a complete public dossier without
+      touching the database — verified end-to-end: log in, create a station, add
+      coordinates, generate a QR, publish, view the live public dossier
+      (`tests/Browser/AdminEndToEndTest.php`), plus a real photo upload verified by
+      hand in Chrome (see Phase Log — a real bug in the automated version of that
+      step turned out to be a Pest-browser-plugin limitation, not an app bug).
+- [ ] A generated QR **scans successfully from a printed sheet with a real phone** —
+      **not verified**: no printer or physical phone is available in this development
+      environment. `khanamiryan/qrcode-detector-decoder` decodes the generated PNG
+      byte-for-byte back to the expected URL (`tests/Feature/Admin/AdminQrTest.php`),
+      which is the strongest proxy available here, but a real print-and-scan is a
+      required manual check before the QR plates are ordered.
+- [x] All 25 LPT2 stations are loaded — via the existing `DemoStationSeeder`
+      (Phase 01), which already is the "one-off seeder" this item allows in place of
+      M8.8's CSV import.
+- [x] Admin UI uses the same Neumorphism system; no unstyled default form controls —
+      new shared primitives `NeuInput`/`NeuTextarea`/`NeuSelect`/`NeuFormField`/
+      `NeuToggle` extracted for this phase (Phase 02's M2.4 deferred these
+      just-in-time, as planned).
+- [x] No admin route is reachable without auth — parametrised over the actual
+      registered route list, not a hand-maintained one
+      (`tests/Feature/Admin/AdminAuthTest.php`).
 
 ---
 
@@ -254,12 +271,85 @@ Assertions that must exist:
 
 | | |
 |---|---|
-| **Gate run on** | |
-| **Result** | |
-| **Printed QR scan verified on** | |
+| **Gate run on** | 2026-09-08 |
+| **Result** | Pass — 245/245 (187 Unit+Feature, 58 Browser), Pint clean, PHPStan level 7 clean, `npm run check`/`types:check` clean, `npm run build` clean |
+| **Printed QR scan verified on** | Not verified — no printer/phone in this environment; see Definition of Done note above |
 | **Screenshots** | `plan/evidence/phase-08/` |
-| **Commit / tag** | |
+| **Commit / tag** | `phase-08-complete` |
 
 ## Phase Log
 
-_Append one dated line per completed milestone._
+- 2026-09-08 — Real bug found and fixed before any Phase 08 code was written: a
+  global `Route::bind('station', ...)` added in Phase 03 (to 404 unpublished
+  stations on the public dossier) silently applied to every `{station}` route
+  regardless of which route file registered it — including the brand-new admin
+  routes, making it impossible for an admin to ever open an unpublished station.
+  Fixed by removing the global bind (Station's own `getRouteKeyName()` already
+  handles plain public_id binding) and adding a `EnsureStationIsPublished`
+  middleware scoped only to the dossier route group.
+- 2026-09-08 — M8.1 done: `EnsureIsAdmin` middleware (a defensive hook for a future
+  second role — this app has exactly one user today), `StationPolicy` (gates every
+  write even though there's one user, same reasoning), and
+  `php artisan batu:admin-password` (Laravel Prompts, hidden input, confirmation).
+  Login/logout/rate-limiting (5/min) and profile/password-change screens already
+  existed from the Phase 00 starter kit — nothing to build there. `config('fortify.home')`
+  changed from the starter kit's placeholder `/dashboard` to `/admin/stations`,
+  since the admin console is this app's only real authenticated destination.
+- 2026-09-08 — M8.2/M8.3 done: `AdminStationIndexController` (search/filter/sort,
+  all in the URL query string) and the station create/edit form. Built the
+  Neumorphism form primitives Phase 02 deliberately deferred
+  (`NeuInput`/`NeuTextarea`/`NeuSelect`/`NeuFormField`/`NeuToggle`) — this is the
+  first screen with enough forms to justify them. `UniqueStationCode` is a
+  standalone `ValidationRule` (case-insensitive, mirrors the DB's own functional
+  unique index) so both store and update requests share one implementation.
+- 2026-09-08 — M8.4 done: `QrUrlBuilder` (the single source of the encoded URL,
+  built from `config('dossier.base_url')`, never `route()` or the request host) and
+  `GenerateStationQr` (endroid/qr-code v6, error correction level High, cached by
+  public_id + a config fingerprint so a changed `DOSSIER_BASE_URL`/`QR_*` setting
+  auto-invalidates old images). Verified round-trip with
+  `khanamiryan/qrcode-detector-decoder`: decoding the generated PNG returns exactly
+  the expected URL.
+- 2026-09-08 — M8.5 done: `/admin/stations/{id}/qr/print` and `/admin/qr/sheet`
+  share one Inertia page. Plates are SVG data URIs, not PNG — vector art has no DPI
+  ceiling, which matters at real-world 50×50mm print dimensions. `@page`/`@media
+  print` rules zero every `box-shadow` and force white plates regardless of the
+  app's own Neumorphism shadows.
+- 2026-09-08 — M8.6 done: `CoordinateSetFormData`/`SpecificationFormData` (new,
+  raw-value DTOs for the edit form — the existing `CoordinateSetData`/
+  `SpecificationData` are display-formatted for the read-only public dossier and
+  can't populate a numeric input). The Malaysia lat/lon range check is a
+  client-side-only warning banner, never a server-side validation error.
+- 2026-09-08 — M8.7 done: photo/panorama/document upload, `is_primary`
+  auto-clearing on a station's other documents (in a transaction), and the
+  DWG-without-preview rejection this phase is what actually enforces (Phase 07 only
+  modelled the pairing; nothing could validate it before an upload path existed).
+  Real bug found while seeding a demo DWG for testing: Symfony's mime guesser
+  correctly reports DWG's binary signature as `image/vnd.dwg`, which the admin's
+  own preview-required hint logic (mirroring `DocumentData::isRenderableMime()`)
+  correctly treats as non-renderable — same fix class as Phase 07's finding, this
+  time caught before it shipped rather than after.
+- 2026-09-08 — Significant deviation, found and fixed mid-phase: the photo/
+  panorama/document upload forms were first built with `router.post(url, formData)`
+  using a manually-constructed `FormData` object. That pattern silently sent empty
+  request bodies specifically under Pest's browser-testing plugin (confirmed by
+  reading Inertia's own source: its internal `getData()`/`formDataToObject()` round
+  trip is exercised differently there than in a real browser). Rewrote all three
+  upload forms to use Inertia's `<Form>` component against a real native
+  `<input type="file">` — the same proven pattern already used for every other form
+  in this app — which fixed it. Confirmed by hand in a real Chrome browser that a
+  photo uploaded through the *original* `router.post` version actually worked
+  server-side the whole time; the bug was specific to the headless browser-test
+  bridge, not the app. Dropped a planned client-side image-downscale-before-upload
+  feature as a result (doing it safely needs replacing the file input's FileList
+  via the DataTransfer API before a native submission); the server's 20 MB cap is
+  the current safeguard against an oversized upload.
+- 2026-09-08 — M8.8 (optional) skipped: `DemoStationSeeder` (Phase 01) already
+  satisfies the Definition of Done's "all 25 LPT2 stations loaded" requirement as
+  the plan's own stated fallback ("a seeder is a perfectly good import for a
+  dataset that changes once"). CSV import/export and the download-audit viewer are
+  not built; the download audit remains queryable through Boost's `tinker` MCP
+  tool, per the plan's own stated fallback for this milestone.
+- 2026-09-08 — `tests/Feature/Admin/AdminAuthTest.php`'s route-guard test iterates
+  `Route::getRoutes()` filtered to `admin.*` names rather than a hand-written list,
+  per the plan's own Test Gate #1 instruction — a newly added admin route is
+  guarded by construction, not by remembering to add it to a test.

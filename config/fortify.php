@@ -73,7 +73,9 @@ return [
     |
     */
 
-    'home' => '/dashboard',
+    // The admin console is this app's only authenticated area — see
+    // plan/phases/phase-08-admin-qr.md M8.1.
+    'home' => '/admin/stations',
 
     /*
     |--------------------------------------------------------------------------

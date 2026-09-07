@@ -1,7 +1,7 @@
 # Build Status Board
 
-**Last updated:** 2026-09-07
-**Current phase:** Phase 07 complete. Phase 08 (Admin Console & QR Generation) starting next.
+**Last updated:** 2026-09-08
+**Current phase:** Phase 08 complete. Phase 09 (Hardening & Release) starting next.
 
 Update this file every time a milestone is completed. See §3 of [`README.md`](README.md).
 
@@ -15,12 +15,12 @@ Update this file every time a milestone is completed. See §3 of [`README.md`](R
 | 05 | [Location Map](phases/phase-05-location-map.md) | 5/5 | ✅ Complete | 2026-09-07 | — |
 | 06 | [Site Photos & 360°](phases/phase-06-photos-360.md) | 6/6 | ✅ Complete (1 DoD item unverified — no real photography) | 2026-09-07 | `phase-06-complete` |
 | 07 | [As-Built Drawings & Downloads](phases/phase-07-asbuilt-files.md) | 5/5 | ✅ Complete (1 DoD item unverified — no real DWG/CAD software) | 2026-09-07 | `phase-07-complete` |
-| 08 | [Admin Console & QR Generation](phases/phase-08-admin-qr.md) | 0/8 (1 optional) | ⬜ Not started | — | — |
+| 08 | [Admin Console & QR Generation](phases/phase-08-admin-qr.md) | 7/8 (1 optional, skipped) | ✅ Complete (1 DoD item unverified — no printer/phone) | 2026-09-08 | `phase-08-complete` |
 | 09 | [Hardening & Release](phases/phase-09-hardening-release.md) | 0/7 | ⬜ Not started | — | — |
 
 **Legend:** ⬜ Not started · 🟡 In progress · 🔴 Blocked · ✅ Complete
 
-**Total: 43 / 62 milestones** (Phase 02's M2.5/M2.6 will be re-counted once M2.3/M2.4 fully land in later phases) — 60 required, 2 fully `[OPTIONAL]` (M5.5, M8.8). Dark theme (M2.1), station switcher (M4.2) and clipboard (M4.4) are optional *parts* of otherwise required milestones.
+**Total: 50 / 62 milestones** (Phase 02's M2.5/M2.6 will be re-counted once M2.3/M2.4 fully land in later phases) — 60 required, 2 fully `[OPTIONAL]` (M5.5, M8.8). Dark theme (M2.1), station switcher (M4.2) and clipboard (M4.4) are optional *parts* of otherwise required milestones.
 
 ---
 
@@ -58,11 +58,11 @@ desktop-Chromium browser test suite, same constraint as the other real-device it
 above.
 
 **Photo transfer size budget (Phase 06)** — the Definition of Done's "< 400 KB largest
-image @ 390px" target cannot be verified against real content: there is no GCP
+image @ 390px" target still cannot be verified against real content: there is no GCP
 monument photography available in this project, so every seeded photo is a flat-colour
 GD placeholder that compresses to 2-3 KB as WebP regardless of pipeline settings.
-Re-verify once Phase 08's admin upload flow lets real photographs through the same
-`preview` conversion.
+Phase 08's admin upload flow now exists and would let a real photograph through the
+same `preview` conversion — re-verify once one is actually uploaded.
 
 **DWG round-trip (Phase 07)** — "a downloaded DWG opens correctly in CAD software" is
 not verified: there is no real as-built survey drawing or CAD software available in
@@ -71,10 +71,18 @@ to exercise the pairing/download-headers logic but not a genuine file round-trip
 Verify with a real drawing before the QR plates are printed.
 
 **Panorama aspect-ratio upload validation (Phase 06) and DWG-without-preview upload
-rejection (Phase 07)** — neither is implemented, because neither phase has a real
-upload path yet; media is attached only via seeders calling `addMedia()` directly,
-which bypasses form validation entirely. Both belong with Phase 08's real admin
-upload form and should be added there, not deferred again.
+rejection (Phase 07)** — now implemented in Phase 08's admin upload forms
+(`StorePanoramaRequest`'s `dimensions:ratio=2/1` rule and `StoreDocumentRequest`'s
+preview-required check). This item is resolved; kept here only as a pointer to
+where the enforcement actually landed.
+
+**Printed QR scan (Phase 08)** — "a generated QR scans successfully from a printed
+sheet with a real phone" is not verified: no printer or phone is available in this
+development environment. `khanamiryan/qrcode-detector-decoder` decodes the
+generated PNG byte-for-byte back to the expected URL
+(`tests/Feature/Admin/AdminQrTest.php`), the strongest available proxy, but a real
+print-and-scan is a required manual check before the QR plates are ordered — same
+category as the other real-device items above.
 
 ---
 
@@ -115,6 +123,15 @@ upload form and should be added there, not deferred again.
 | 2026-09-07 | 07 | `DocumentData::isRenderableMime()` uses an explicit allowlist, not `str_starts_with($mime, 'image/')` | Real bug found while seeding a demo DWG: Symfony's mime guesser correctly identifies DWG's binary signature and reports its real registered mime, `image/vnd.dwg` — which the naive prefix check wrongly treated as browser-renderable |
 | 2026-09-07 | 07 | Download/preview controllers are typed to return Symfony's `StreamedResponse`, not `BinaryFileResponse` | PHPStan caught the mismatch immediately — `Storage::disk()->download()`/`->response()` return `StreamedResponse` in this Laravel version regardless of disk driver |
 | 2026-09-07 | 07 | Non-primary documents render as download-only compact rows with no preview (even when their mime is renderable) | Matches the plan's own wireframe (only the primary document gets the large card with a preview); a demo station was seeded with an image as its *primary* document specifically so the lightbox path still has a real scenario to exercise |
+| 2026-09-08 | 08 | Removed the global `Route::bind('station', ...)` (Phase 03) in favour of default implicit binding + a new `EnsureStationIsPublished` middleware scoped only to the dossier route group | The global bind silently made every admin `{station}` route 404 for any not-yet-published station too — found immediately when the very first admin CRUD test tried to publish one |
+| 2026-09-08 | 08 | `config('fortify.home')` changed from the starter kit's `/dashboard` to `/admin/stations` | The admin console is this app's only real authenticated destination; the starter kit's placeholder dashboard page is left in place but unreachable via normal navigation |
+| 2026-09-08 | 08 | Built the Neumorphism form primitives (`NeuInput`/`NeuTextarea`/`NeuSelect`/`NeuFormField`/`NeuToggle`) Phase 02's M2.4 deferred | This is the first screen with enough forms to justify them, exactly as Phase 02 planned ("build just-in-time") |
+| 2026-09-08 | 08 | `UniqueStationCode` is a standalone `Illuminate\Contracts\Validation\ValidationRule`, not a closure repeated in both form requests | One implementation shared by create and update, mirroring the database's own case-insensitive functional unique index |
+| 2026-09-08 | 08 | QR plates are SVG data URIs in the print/sheet pages, not PNG | Vector art has no DPI ceiling — matters at real-world 50×50mm print dimensions per the plan's own "≥300 DPI effective resolution" requirement |
+| 2026-09-08 | 08 | `CoordinateSetFormData`/`SpecificationFormData` are new raw-value DTOs, not a reuse of the existing display-formatted `CoordinateSetData`/`SpecificationData` | The public DTOs format values with units/thousands separators for read-only display; a numeric `<input>` needs the raw decimal string instead |
+| 2026-09-08 | 08 | Photo/panorama/document upload forms use Inertia's `<Form>` component against a real `<input type="file">`, not `router.post()` with a manually-built `FormData` | The manual approach silently sent empty request bodies specifically under Pest's browser-testing plugin (confirmed as a test-harness quirk, not an app bug, by uploading a photo through the original version by hand in a real Chrome browser and watching it succeed) |
+| 2026-09-08 | 08 | Dropped the planned client-side image-downscale-before-upload for photos | Doing it safely with a native `<Form>` submission needs replacing the file input's FileList via the DataTransfer API, real added complexity for a nice-to-have the Test Gate doesn't require; the server's 20 MB cap is the current safeguard |
+| 2026-09-08 | 08 | M8.8 (CSV import/export + download audit viewer) skipped entirely | `DemoStationSeeder` (Phase 01) already satisfies the Definition of Done's "all 25 stations loaded," which is the plan's own explicitly-stated fallback for skipping this optional milestone |
 
 ---
 
