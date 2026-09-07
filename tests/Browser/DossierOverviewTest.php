@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Enums\AccessMode;
 use App\Models\Station;
+use Database\Seeders\DemoDocumentSeeder;
 use Database\Seeders\DemoPhotoSeeder;
 use Database\Seeders\DemoStationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -87,6 +88,24 @@ it('navigates via the Site Photos and 360° View tiles when both are available',
             return tile !== undefined && tile.getAttribute('href')?.endsWith('/360');
         })()
         JS);
+});
+
+it('navigates via the As-Built tile once a document exists', function () {
+    $this->seed(DemoStationSeeder::class);
+    $this->seed(DemoDocumentSeeder::class);
+    $station = Station::query()->where('code', 'LPT2-GCP-015')->firstOrFail();
+
+    $page = visit(route('dossier.show', $station));
+
+    $page->assertScript(<<<'JS'
+        (() => {
+            const tile = [...document.querySelectorAll('a')].find((a) => a.textContent.includes('As-Built'));
+            return tile !== undefined && tile.getAttribute('href')?.endsWith('/files');
+        })()
+        JS);
+
+    $page->click('As-Built');
+    $page->assertPathContains('/files');
 });
 
 it('renders the unlock screen with no javascript errors and no station data', function () {

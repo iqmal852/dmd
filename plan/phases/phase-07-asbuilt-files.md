@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | ⬜ Not started |
+| **Status** | ✅ Complete |
 | **Depends on** | Phase 03 |
 | **Estimate** | 2 days |
 | **Tag on completion** | `phase-07-complete` |
@@ -19,11 +19,11 @@ a slogan.
 
 | | ID | Deliverable | Date | Evidence |
 |---|---|---|---|---|
-| [ ] | **M7.1** | `documents` media collection, `DocumentType` enum, DWG-plus-preview pairing rule | | |
-| [ ] | **M7.2** | `DocumentData` DTO + `/d/{code}/files` listing | | |
-| [ ] | **M7.3** | Inline preview: PDF via `<object>`/`<iframe>`, image via zoomable viewer | | |
-| [ ] | **M7.4** | Gated, streamed download controller with correct headers | | |
-| [ ] | **M7.5** | `download_logs` written asynchronously; retention pruning scheduled | | |
+| [x] | **M7.1** | `documents` media collection, `DocumentType` enum, DWG-plus-preview pairing rule | 2026-09-07 | `tests/Feature/Data/DocumentDataTest.php` |
+| [x] | **M7.2** | `DocumentData` DTO + `/d/{code}/files` listing | 2026-09-07 | `tests/Feature/Dossier/FilesTest.php` |
+| [x] | **M7.3** | Inline preview: PDF via `<object>`/`<iframe>`, image via zoomable viewer | 2026-09-07 | `plan/evidence/phase-07/phase-07-files-{mobile,desktop}.png` |
+| [x] | **M7.4** | Gated, streamed download controller with correct headers | 2026-09-07 | `tests/Feature/Dossier/FilesTest.php` |
+| [x] | **M7.5** | `download_logs` written asynchronously; retention pruning scheduled | 2026-09-07 | `tests/Feature/Dossier/FilesTest.php` |
 
 ---
 
@@ -160,10 +160,23 @@ Assertions that must exist:
 
 ## Definition of Done
 
-- [ ] The as-built drawing can be read on a phone screen (zoomable) and downloaded intact.
-- [ ] A downloaded DWG opens correctly in CAD software — **verify with a real file once**.
-- [ ] No file is reachable without passing the access gate.
-- [ ] Downloads are audited without storing personal data.
+- [x] The as-built drawing can be read on a phone screen (zoomable) and downloaded intact
+      — verified for PDF (native pinch-zoom) and image (lightbox) previews; a real
+      curl download round-tripped as a valid PDF (`file` reports "PDF document,
+      version 1.4, 1 pages").
+- [ ] A downloaded DWG opens correctly in CAD software — **not verified**: there is no
+      real DWG file or CAD software available in this environment. The seeded "DWG" is
+      arbitrary bytes with a `.dwg` extension, sufficient to exercise the pairing and
+      download-headers logic but not an actual round-trip. Verify with a real file
+      before go-live.
+- [x] No file is reachable without passing the access gate — `documents` lives on the
+      `local` disk (no `storage:link` target); both `files.preview` and
+      `files.download` sit behind `EnsureDossierUnlocked`; a direct `/storage/...`
+      guess 403/404s.
+- [x] Downloads are audited without storing personal data — `LogDocumentDownload` is a
+      queued listener storing only `hash_hmac('sha256', $ip, config('app.key'))`,
+      verified end-to-end against a real dev queue worker (not just `QUEUE_CONNECTION=sync`
+      in tests).
 
 ---
 
@@ -171,12 +184,57 @@ Assertions that must exist:
 
 | | |
 |---|---|
-| **Gate run on** | |
-| **Result** | |
-| **DWG round-trip verified** | |
+| **Gate run on** | 2026-09-07 |
+| **Result** | Pass — 213/213 (160 Unit+Feature, 53 Browser), Pint clean, PHPStan level 7 clean, `npm run check`/`types:check` clean, `npm run build` clean |
+| **DWG round-trip verified** | No — see Definition of Done note above |
 | **Screenshots** | `plan/evidence/phase-07/` |
-| **Commit / tag** | |
+| **Commit / tag** | `phase-07-complete` |
 
 ## Phase Log
 
-_Append one dated line per completed milestone._
+- 2026-09-07 — M7.1 done: `documents` media collection added to `Station`, on the
+  `local` disk (not the package-default `public` disk photos/panoramas use) — as-built
+  drawings are never publicly reachable by URL. `DocumentType` enum already existed
+  from Phase 01. The DWG-plus-preview pairing is two media rows: the original (any
+  type) carries `document_type`/`title`/`revision`/`is_primary`, and — only when the
+  original can't be rendered — a `preview_media_id` custom property pointing at a
+  second, separately-uploaded row. A row with no `document_type` is a preview-only
+  companion and is filtered out of the Files listing and the Overview's document count.
+- 2026-09-07 — Real bug found and fixed while seeding the demo DWG: Symfony's mime
+  guesser correctly identifies a DWG file's binary signature (`AC10...`) and reports
+  its real registered mime type, `image/vnd.dwg` — which a naive `str_starts_with($mime,
+  'image/')` renderability check wrongly treated as a browser-renderable image. Fixed
+  by replacing that check with an explicit allowlist of genuinely renderable mimes
+  (`DocumentData::isRenderableMime()`, shared with `PreviewDocumentController`), rather
+  than trusting the `image/` prefix.
+- 2026-09-07 — M7.2 done: `DocumentData` DTO and `DossierFilesController` built. Every
+  URL on the DTO (`previewUrl`, `downloadUrl`) points at this app's own gated
+  controllers, never a medialibrary-generated disk URL. Unit-tested in
+  `tests/Feature/Data/DocumentDataTest.php`.
+- 2026-09-07 — M7.3 done: `/d/{code}/files` built — a large primary-document card
+  (PDF via `<object>` with an always-visible "Open in new tab" link, since iOS Safari
+  renders the `<object>` successfully but only shows the first page) plus compact rows
+  for other documents. Deviation: only the *primary* document gets an inline preview;
+  non-primary documents are download-only rows with no preview, per the plan's own
+  wireframe — the image lightbox therefore only had a scenario to exercise once a demo
+  station was seeded with an image as its *primary* document.
+- 2026-09-07 — M7.4 done: `DownloadDocumentController` and `PreviewDocumentController`,
+  both bound via `{station}/{media:uuid}` + `scopeBindings()` so a media row from
+  another station 404s. Filenames are `Str::slug()`-sanitised per part
+  (`{station-code}-{document-type}-rev-{revision}.{ext}`), never from user input.
+  Streams via `Storage::disk()->download()`/`->response()` (Symfony `StreamedResponse`,
+  not `BinaryFileResponse` — PHPStan caught the wrong return-type hint immediately).
+- 2026-09-07 — M7.5 done: `DocumentDownloaded` event + `LogDocumentDownload` (a
+  `ShouldQueue` listener) write the audit row, gated by
+  `config('dossier.downloads.log_enabled')`. `model:prune` scheduled daily in
+  `routes/console.php` against `DownloadLog`'s existing `prunable()` scope (built in
+  Phase 01). Verified against a real `php artisan queue:work` in dev, not just the
+  test suite's `QUEUE_CONNECTION=sync` — confirmed the job actually queues (visible in
+  the `jobs` table) and, once processed, writes a row with a 64-char hash and no raw IP.
+- 2026-09-07 — Found and fixed two bugs left over from Phase 06 while wiring this
+  phase's own Overview tile: the bottom nav's "Photos" tab and the Overview's "Site
+  Photos"/"360° View" tiles had never been given an `href`, so both rendered
+  permanently disabled regardless of whether photo/panorama data existed (`NeuTile` and
+  `NeuBottomNav` both treat a missing `href` as disabled). Fixed as a separate commit
+  before starting this phase's own work, with a browser regression test; the same
+  wiring was then extended to the As-Built tile and Files nav item.

@@ -8,7 +8,7 @@ import {
     Signpost,
 } from 'lucide-react';
 import { MetaChip } from '@/components/neu/meta-chip';
-import { coordinates, map as mapRoute, photos } from '@/routes/dossier';
+import { coordinates, files, map as mapRoute, photos } from '@/routes/dossier';
 import { method360 } from '@/routes/dossier/photos';
 import { NeuGroup } from '@/components/neu/neu-group';
 import { NeuPill } from '@/components/neu/neu-pill';
@@ -162,6 +162,8 @@ export default function DossierOverview() {
                             color="green"
                             icon={<FileText />}
                             label="As-Built"
+                            href={files({ station: station.publicId }).url}
+                            prefetch
                             disabled={station.modules.documentCount === 0}
                         />
                         <NeuTile

@@ -127,6 +127,13 @@ final class Station extends Model implements HasMedia
      * nothing to declare and Phase 07 will use it as-is. Panoramas get
      * no image conversions — resampling an equirectangular image breaks
      * the projection. See plan/phases/phase-06-photos-360.md M6.1.
+     *
+     * `documents` lives on the `local` disk (private, no `storage:link`
+     * target) rather than the package default `public` disk that photos
+     * and panoramas use — as-built drawings are never publicly reachable
+     * by URL; every byte is served through DownloadDocumentController /
+     * PreviewDocumentController instead. See
+     * plan/phases/phase-07-asbuilt-files.md M7.1/M7.4.
      */
     public function registerMediaCollections(): void
     {
@@ -138,6 +145,7 @@ final class Station extends Model implements HasMedia
             ->acceptsMimeTypes(['image/jpeg', 'image/webp']);
 
         $this->addMediaCollection('documents')
+            ->useDisk('local')
             ->acceptsMimeTypes(['application/pdf', 'image/png', 'image/jpeg', 'application/acad', 'image/vnd.dwg', 'application/octet-stream']);
     }
 
@@ -156,8 +164,15 @@ final class Station extends Model implements HasMedia
             ->format('webp')
             ->quality(78);
 
+        // 'documents' deliberately has no generated conversion: a preview is
+        // either the original file itself (a PDF/image rendered as-is) or a
+        // second, separately-uploaded media row (for DWG/DXF originals) —
+        // never a derived resize. Both are streamed at full resolution
+        // through PreviewDocumentController, since a resized engineering
+        // drawing can hide the detail a field crew needs. See
+        // plan/phases/phase-07-asbuilt-files.md M7.1.
         $this->addMediaConversion('preview')
-            ->performOnCollections('photos', 'documents')
+            ->performOnCollections('photos')
             ->queued()
             ->width(1200)
             ->format('webp')

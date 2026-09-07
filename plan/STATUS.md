@@ -1,7 +1,7 @@
 # Build Status Board
 
 **Last updated:** 2026-09-07
-**Current phase:** Phase 06 complete. Phase 07 (As-Built Drawings & Downloads) starting next.
+**Current phase:** Phase 07 complete. Phase 08 (Admin Console & QR Generation) starting next.
 
 Update this file every time a milestone is completed. See §3 of [`README.md`](README.md).
 
@@ -14,13 +14,13 @@ Update this file every time a milestone is completed. See §3 of [`README.md`](R
 | 04 | [Coordinates & Specs Modules](phases/phase-04-coordinates-specs.md) | 5/5 | ✅ Complete | 2026-09-07 | — |
 | 05 | [Location Map](phases/phase-05-location-map.md) | 5/5 | ✅ Complete | 2026-09-07 | — |
 | 06 | [Site Photos & 360°](phases/phase-06-photos-360.md) | 6/6 | ✅ Complete (1 DoD item unverified — no real photography) | 2026-09-07 | `phase-06-complete` |
-| 07 | [As-Built Drawings & Downloads](phases/phase-07-asbuilt-files.md) | 0/5 | ⬜ Not started | — | — |
+| 07 | [As-Built Drawings & Downloads](phases/phase-07-asbuilt-files.md) | 5/5 | ✅ Complete (1 DoD item unverified — no real DWG/CAD software) | 2026-09-07 | `phase-07-complete` |
 | 08 | [Admin Console & QR Generation](phases/phase-08-admin-qr.md) | 0/8 (1 optional) | ⬜ Not started | — | — |
 | 09 | [Hardening & Release](phases/phase-09-hardening-release.md) | 0/7 | ⬜ Not started | — | — |
 
 **Legend:** ⬜ Not started · 🟡 In progress · 🔴 Blocked · ✅ Complete
 
-**Total: 38 / 62 milestones** (Phase 02's M2.5/M2.6 will be re-counted once M2.3/M2.4 fully land in later phases) — 60 required, 2 fully `[OPTIONAL]` (M5.5, M8.8). Dark theme (M2.1), station switcher (M4.2) and clipboard (M4.4) are optional *parts* of otherwise required milestones.
+**Total: 43 / 62 milestones** (Phase 02's M2.5/M2.6 will be re-counted once M2.3/M2.4 fully land in later phases) — 60 required, 2 fully `[OPTIONAL]` (M5.5, M8.8). Dark theme (M2.1), station switcher (M4.2) and clipboard (M4.4) are optional *parts* of otherwise required milestones.
 
 ---
 
@@ -64,6 +64,18 @@ GD placeholder that compresses to 2-3 KB as WebP regardless of pipeline settings
 Re-verify once Phase 08's admin upload flow lets real photographs through the same
 `preview` conversion.
 
+**DWG round-trip (Phase 07)** — "a downloaded DWG opens correctly in CAD software" is
+not verified: there is no real as-built survey drawing or CAD software available in
+this environment. The seeded "DWG" is arbitrary bytes with a `.dwg` extension, enough
+to exercise the pairing/download-headers logic but not a genuine file round-trip.
+Verify with a real drawing before the QR plates are printed.
+
+**Panorama aspect-ratio upload validation (Phase 06) and DWG-without-preview upload
+rejection (Phase 07)** — neither is implemented, because neither phase has a real
+upload path yet; media is attached only via seeders calling `addMedia()` directly,
+which bypasses form validation entirely. Both belong with Phase 08's real admin
+upload form and should be added there, not deferred again.
+
 ---
 
 ## Deviations from plan
@@ -96,6 +108,13 @@ Re-verify once Phase 08's admin upload flow lets real photographs through the sa
 | 2026-09-07 | 06 | Test Gate assertion #5 (panorama aspect-ratio upload validation) not implemented | No upload path exists yet in this phase — media is attached only via the seeder's `addMedia()`, bypassing form validation entirely; belongs with Phase 08's real admin upload form |
 | 2026-09-07 | 06 | `DatabaseSeeder` now also calls `DemoPhotoSeeder` | It existed but wasn't wired in; without it, a plain `db:seed` showed no photos/panorama despite the seeder being fully built |
 | 2026-09-07 | 06 | Fixed a latent weakness in Phase 03's `OverviewTest` (empty `X-Inertia-Version` header masked a 409 conflict, making its assertions pass vacuously against empty content) | Found while writing the analogous Phase 06 photos test, which caught the same pattern failing for real; both tests now use a plain full-page `GET` instead |
+| 2026-09-07 | 06→07 | Fixed the bottom nav's "Photos" tab and the Overview's "Site Photos"/"360° View" tiles, which had no `href` since Phase 06 built their routes and rendered permanently disabled regardless of data | `NeuTile`/`NeuBottomNav` treat a missing `href` as disabled by design (route doesn't exist yet); the routes existed, the wiring was just never added — caught while wiring Phase 07's own Overview tile and fixed as its own commit first |
+| 2026-09-07 | 07 | `documents` media collection lives on the `local` disk, not the package-default `public` disk photos/panoramas use | As-built drawings must never be publicly reachable by URL (unlike photos, which are non-sensitive once a station is already unlocked); `local` has no `storage:link` target |
+| 2026-09-07 | 07 | Every document URL (`previewUrl`, `downloadUrl`) is built via this app's own `route()` helper to gated controllers, never a medialibrary-generated disk URL | Consistent with the `local`-disk decision above — nothing about a document's storage location should ever leak into a URL a client can see |
+| 2026-09-07 | 07 | `documents` gets no derived "preview" conversion (unlike photos) | The plan's own pairing model is two full-resolution media rows, not a resize; a downsized engineering drawing can hide the detail a field crew needs, and Ghostscript (needed for medialibrary's own PDF-to-image conversion) isn't installed anyway |
+| 2026-09-07 | 07 | `DocumentData::isRenderableMime()` uses an explicit allowlist, not `str_starts_with($mime, 'image/')` | Real bug found while seeding a demo DWG: Symfony's mime guesser correctly identifies DWG's binary signature and reports its real registered mime, `image/vnd.dwg` — which the naive prefix check wrongly treated as browser-renderable |
+| 2026-09-07 | 07 | Download/preview controllers are typed to return Symfony's `StreamedResponse`, not `BinaryFileResponse` | PHPStan caught the mismatch immediately — `Storage::disk()->download()`/`->response()` return `StreamedResponse` in this Laravel version regardless of disk driver |
+| 2026-09-07 | 07 | Non-primary documents render as download-only compact rows with no preview (even when their mime is renderable) | Matches the plan's own wireframe (only the primary document gets the large card with a preview); a demo station was seeded with an image as its *primary* document specifically so the lightbox path still has a real scenario to exercise |
 
 ---
 

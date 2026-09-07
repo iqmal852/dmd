@@ -74,6 +74,21 @@ export type Photo = {
     height: number;
 };
 
+/** Mirrors App\Data\DocumentData exactly. */
+export type Document = {
+    id: string;
+    type: string;
+    typeLabel: string;
+    title: string;
+    revision: string | null;
+    extension: string;
+    size: string;
+    isPrimary: boolean;
+    previewUrl: string | null;
+    previewKind: 'pdf' | 'image' | 'none';
+    downloadUrl: string;
+};
+
 /** Mirrors App\Data\StationMapData exactly. */
 export type StationMap = {
     code: string;

@@ -3,10 +3,13 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Dossier\DossierCoordinatesController;
+use App\Http\Controllers\Dossier\DossierFilesController;
 use App\Http\Controllers\Dossier\DossierMapController;
 use App\Http\Controllers\Dossier\DossierOverviewController;
 use App\Http\Controllers\Dossier\DossierPanoramaController;
 use App\Http\Controllers\Dossier\DossierPhotosController;
+use App\Http\Controllers\Dossier\DownloadDocumentController;
+use App\Http\Controllers\Dossier\PreviewDocumentController;
 use App\Http\Controllers\Dossier\UnlockFormController;
 use App\Http\Controllers\Dossier\UnlockSubmitController;
 use App\Http\Middleware\AddNoindexHeader;
@@ -41,6 +44,16 @@ Route::prefix(config('dossier.route_prefix'))
             Route::get('{station}/map', DossierMapController::class)->name('map');
             Route::get('{station}/photos', DossierPhotosController::class)->name('photos');
             Route::get('{station}/photos/360', DossierPanoramaController::class)->name('photos.360');
-            // files added in Phase 07.
+            Route::get('{station}/files', DossierFilesController::class)->name('files');
+
+            // {media:uuid} + scopeBindings() means a media row belonging to a
+            // different station 404s here rather than being served — see
+            // plan/phases/phase-07-asbuilt-files.md M7.4.
+            Route::get('{station}/files/{media:uuid}/preview', PreviewDocumentController::class)
+                ->scopeBindings()
+                ->name('files.preview');
+            Route::get('{station}/files/{media:uuid}/download', DownloadDocumentController::class)
+                ->scopeBindings()
+                ->name('files.download');
         });
     });
