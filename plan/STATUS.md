@@ -1,14 +1,14 @@
 # Build Status Board
 
 **Last updated:** 2026-09-07
-**Current phase:** Phase 00 — Foundation & Tooling (milestones complete, gate green, tag pending)
+**Current phase:** Phase 01 — Data Model & Domain (milestones complete, gate green, tag pending)
 
 Update this file every time a milestone is completed. See §3 of [`README.md`](README.md).
 
 | Phase | Title | Milestones | Status | Gate passed | Tag |
 |:-----:|-------|:----------:|--------|:-----------:|-----|
-| 00 | [Foundation & Tooling](phases/phase-00-foundation.md) | 7/7 | 🟡 Gate green, tag pending | 2026-09-07 | — |
-| 01 | [Data Model & Domain](phases/phase-01-data-model.md) | 0/6 | ⬜ Not started | — | — |
+| 00 | [Foundation & Tooling](phases/phase-00-foundation.md) | 7/7 | ✅ Complete | 2026-09-07 | `phase-00-complete` |
+| 01 | [Data Model & Domain](phases/phase-01-data-model.md) | 6/6 | 🟡 Gate green, tag pending | 2026-09-07 | — |
 | 02 | [Neumorphism Design System](phases/phase-02-design-system.md) | 0/6 | ⬜ Not started | — | — |
 | 03 | [Dossier Shell & Access Control](phases/phase-03-dossier-shell.md) | 0/7 | ⬜ Not started | — | — |
 | 04 | [Coordinates & Specs Modules](phases/phase-04-coordinates-specs.md) | 0/5 | ⬜ Not started | — | — |
@@ -20,13 +20,13 @@ Update this file every time a milestone is completed. See §3 of [`README.md`](R
 
 **Legend:** ⬜ Not started · 🟡 In progress · 🔴 Blocked · ✅ Complete
 
-**Total: 7 / 62 milestones** — 60 required, 2 fully `[OPTIONAL]` (M5.5, M8.8). Dark theme (M2.1), station switcher (M4.2) and clipboard (M4.4) are optional *parts* of otherwise required milestones.
+**Total: 13 / 62 milestones** — 60 required, 2 fully `[OPTIONAL]` (M5.5, M8.8). Dark theme (M2.1), station switcher (M4.2) and clipboard (M4.4) are optional *parts* of otherwise required milestones.
 
 ---
 
 ## Open blockers
 
-_None._ Phase 00's CI fix (Postgres service container added to `.github/workflows/tests.yml`) is committed locally and simulated successfully but not yet pushed/tagged — no blocker, just the next action.
+_None._ Phase 01's work is committed locally with a gate-green pipeline; tagging `phase-01-complete` is the next action.
 
 ---
 
@@ -38,6 +38,9 @@ _None._ Phase 00's CI fix (Postgres service container added to `.github/workflow
 | 2026-09-07 | 00 | Kept Fortify's 2FA + passkeys (removed only registration/reset/verification, as planned) | Laravel 13's current starter kit ships them enabled by default; they're additive opt-in hardening for the single admin, not a requirement violation, and removing them means dropping migrations/columns for no stated need |
 | 2026-09-07 | 00 | Quality tooling is the starter kit's own `composer test` + `vp check` (vite-plus), not hand-rolled ESLint/Prettier scripts | This is what Laravel's official starter kit ships today; layering a second toolchain on top would be redundant |
 | 2026-09-07 | 00 | Larastan already at level 7, not the planned level 6 | Starter kit default; left as-is since it's strictly ahead of plan and closer to Phase 09's level-8 target |
+| 2026-09-07 | 01 | Only `StationStatus`/`QcStatus` implement `HasColor`, not all six enums | `02-data-model.md` §8 (color only "where the UI shows a coloured pill") is more precise than this phase's milestone-table wording and was followed |
+| 2026-09-07 | 01 | `download_logs.media_id` has no FK constraint yet | `spatie/laravel-medialibrary`'s `media` table doesn't exist until Phase 06/07; added as a follow-up migration then |
+| 2026-09-07 | 01 | Removed `WithoutModelEvents` from `DatabaseSeeder` | It silently suppressed the `Station` model's ULID-assignment event, causing a `NOT NULL` violation on first seed — a real bug caught immediately by running the seeder, not a stylistic choice |
 
 ---
 

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | ⬜ Not started |
+| **Status** | ✅ Complete |
 | **Depends on** | Phase 00 |
 | **Estimate** | 2 days |
 | **Tag on completion** | `phase-01-complete` |
@@ -22,14 +22,35 @@ No UI in this phase. Everything is verified through tests and Boost's `tinker` a
 
 | | ID | Deliverable | Date | Evidence |
 |---|---|---|---|---|
-| [ ] | **M1.1** | Enums: `StationStatus`, `Direction`, `QcStatus`, `PhotoType`, `DocumentType`, `AccessMode` — each with `label()` and `color()` | | |
-| [ ] | **M1.2** | `stations` migration + model: ULID `public_id`, route binding, soft deletes, scopes | | |
-| [ ] | **M1.3** | `coordinate_sets` migration + model with exact `numeric` precision and decimal casts | | |
-| [ ] | **M1.4** | `specifications` migration + model | | |
-| [ ] | **M1.5** | `download_logs` migration + model with prunable trait | | |
-| [ ] | **M1.6** | Factories + `DemoStationSeeder` (25 stations, GCP-015 = poster values) + `GeoFormatter` service | | |
+| [x] | **M1.1** | Enums: `StationStatus`, `Direction`, `QcStatus`, `PhotoType`, `DocumentType`, `AccessMode` — `label()` on all six, `color()` on the two rendered as pills (see deviation) | 2026-09-07 | `tests/Unit/Enums/EnumContractsTest.php` (5 tests, 44 assertions) |
+| [x] | **M1.2** | `stations` migration + model: ULID `public_id`, route binding, soft deletes, scopes | 2026-09-07 | `tests/Feature/Models/StationTest.php` (10 tests) |
+| [x] | **M1.3** | `coordinate_sets` migration + model with exact `numeric` precision and decimal casts | 2026-09-07 | `tests/Feature/Models/CoordinateSetTest.php`, incl. `information_schema` precision check |
+| [x] | **M1.4** | `specifications` migration + model | 2026-09-07 | `tests/Feature/Models/SpecificationTest.php` |
+| [x] | **M1.5** | `download_logs` migration + model with prunable trait | 2026-09-07 | `tests/Feature/Models/DownloadLogTest.php` (5 tests) |
+| [x] | **M1.6** | Factories + `DemoStationSeeder` (25 stations, GCP-015 = poster values) + `GeoFormatter` service | 2026-09-07 | `tests/Feature/Seeders/DemoStationSeederTest.php`, `tests/Unit/Services/GeoFormatterTest.php` |
 
 ---
+
+> **Deviation (2026-09-07):** `02-data-model.md` §8 says color() applies "where the UI
+> shows a coloured pill" (i.e. `StationStatus` and `QcStatus` only), while this phase's
+> milestone table originally said "each with label() and color()" for all six enums.
+> The two docs disagreed; `02-data-model.md` is more precise (only the poster's two
+> pills — `ACTIVE`, `VERIFIED` — carry colour), so that's what was implemented.
+> `Direction`, `PhotoType`, `DocumentType`, `AccessMode` implement `HasLabel` only.
+> Introduced `App\Contracts\HasLabel`/`HasColor` interfaces (not originally specified)
+> so a future status-pill component can accept any `HasLabel&HasColor` enum rather than
+> being hard-coded to one.
+>
+> **Deviation (2026-09-07):** `download_logs.media_id` has no foreign-key constraint
+> yet — `spatie/laravel-medialibrary`'s `media` table doesn't exist until Phase 06/07.
+> It's a plain indexed `unsignedBigInteger` for now; a follow-up migration in Phase 06
+> adds the FK (`set null on delete`) once the package is installed.
+>
+> **Deviation (2026-09-07):** `DatabaseSeeder` originally used Laravel's
+> `WithoutModelEvents` trait (shipped by the starter kit for speed). Removed it — it
+> silently suppressed the `Station::booted()` `creating` event that assigns the ULID
+> `public_id`, which surfaced immediately as a `NOT NULL` violation on the very first
+> seed run. Model events are cheap at 25 rows; the trait is the wrong optimisation here.
 
 ## Milestone detail
 
@@ -245,11 +266,16 @@ columns, and their indexes are as documented. Paste the table list into Sign-Off
 
 | | |
 |---|---|
-| **Gate run on** | |
-| **Result** | |
-| **`database-schema` output** | |
-| **Commit / tag** | |
+| **Gate run on** | 2026-09-07 |
+| **Result** | `php artisan migrate:fresh --seed` succeeds from clean. `composer test` → Pint passed, PHPStan level 7 passed (0 errors), Pest **66/66** passed (247 assertions) — includes all of Phase 00's 29 plus 37 new tests for enums, all four models, `GeoFormatter`, and `DemoStationSeeder`. `migrate:rollback --step=4` then `migrate` round-trips cleanly. No `float`/`double` column anywhere in the schema (verified via `information_schema` in `CoordinateSetTest`). No `env()` outside `config/`. |
+| **`database-schema` output** | Not queried via a live Boost MCP call in this session (see Phase 00 sign-off note on the harness's MCP client); verified equivalently via `psql \d` on `stations` and `coordinate_sets` directly against the real Postgres 17 database — confirmed `numeric(11,8)`/`numeric(12,8)`/`numeric(12,3)`/`numeric(10,3)` precision, the `stations_code_lower_unique` functional index, the `stations_published_idx` partial index, and cascading FKs from `coordinate_sets`/`specifications`/`download_logs` to `stations`. |
+| **Commit / tag** | Pending commit; tag `phase-01-complete` to follow. |
 
 ## Phase Log
 
-_Append one dated line per completed milestone._
+- **2026-09-07** — M1.1: Added `App\Contracts\HasLabel`/`HasColor` and all six enums. Resolved a plan inconsistency in favour of `02-data-model.md` (see Deviation above) — only `StationStatus`/`QcStatus` implement `HasColor`.
+- **2026-09-07** — M1.2: `stations` migration with the ULID `public_id`, case-insensitive functional unique index on `code`, and a partial index on `is_published` (raw `DB::statement`, not expressible via the fluent Blueprint API). `Station` model: `getRouteKeyName() = 'public_id'`, ULID assigned in `booted()`, `'access_password' => 'hashed'` cast, `published`/`forHighway` scopes. Deferred `InteractsWithMedia` to Phase 06 (package not installed yet).
+- **2026-09-07** — M1.3: `coordinate_sets` migration/model at the poster's exact precision (`decimal:8` lat/lon, `decimal:3` everything else). Added a schema-level test against `information_schema.columns` specifically to catch a future migration accidentally using `double precision`, which would pass a naive round-trip test on small numbers.
+- **2026-09-07** — M1.4: `specifications` migration/model, all GNSS fields nullable except `station_id`/`qc_status` per the "real survey records arrive incomplete" requirement.
+- **2026-09-07** — M1.5: `download_logs` migration/model, `MassPrunable`, `CREATED_AT`/`UPDATED_AT` both `null` (append-only, single `downloaded_at` timestamp — matches the column list in `02-data-model.md` §6 exactly, which does not include Laravel's default timestamp pair). Noted the deferred FK on `media_id` above.
+- **2026-09-07** — M1.6: Four factories (`StationFactory` with `active()`/`damaged()`/`unpublished()` states — `withoutCoordinates()`/`withoutSpecification()` weren't implemented as named states since a bare `Station::factory()->create()` already has neither relation attached by default; the seeder instead uses `CoordinateSet::factory()->for($station)->create()` explicitly where it wants one, which reads clearer than a "without" state whose name describes the default), `GeoFormatter` with every method asserted against a literal poster string, and `DemoStationSeeder` producing exactly 25 stations with `LPT2-GCP-015` as the byte-for-byte reference fixture and two deliberately incomplete records (station #7, #22) for empty-state coverage. Hit and fixed a real bug: `DatabaseSeeder`'s inherited `WithoutModelEvents` trait was silently breaking ULID assignment (see Deviation above).
