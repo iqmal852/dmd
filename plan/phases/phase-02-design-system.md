@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | ⬜ Not started |
+| **Status** | 🟡 In progress — M2.1/M2.2 done, M2.5/M2.6 green for current primitives, M2.3/M2.4 deferred per the just-in-time rule below |
 | **Depends on** | Phase 00 |
 | **Estimate** | 3 days |
 | **Tag on completion** | `phase-02-complete` |
@@ -20,12 +20,12 @@ Reference: [`../03-design-system.md`](../03-design-system.md).
 
 | | ID | Deliverable | Date | Evidence |
 |---|---|---|---|---|
-| [ ] | **M2.1** | Tailwind v4 `@theme` token layer: colours, shadows, radii, spacing, motion — light theme required, dark theme `[OPTIONAL]` | | |
-| [ ] | **M2.2** | Core primitives: `NeuCard`, `NeuButton`, `NeuIconButton`, `NeuPill`, `NeuStat`, `NeuGroup` | | |
-| [ ] | **M2.3** | Navigation + layout: `DossierLayout`, `AdminLayout`, `GuestLayout`, `NeuBottomNav`, `NeuTabs`, `MetaChip` | | |
-| [ ] | **M2.4** | Form + feedback: `NeuInput`, `NeuSelect`, `NeuTextarea`, `NeuSheet`, `NeuSkeleton`, `NeuEmptyState`; reduced-motion and high-contrast modes | | |
-| [ ] | **M2.5** | Automated contrast + a11y audit over every token pair and every primitive | | |
-| [ ] | **M2.6** | `/dev/ui` kitchen-sink page (local only) + browser tests at 390px and 1280px, light and dark | | |
+| [x] | **M2.1** | Tailwind v4 `@theme` token layer: colours, shadows, radii, spacing, motion — light theme required, dark theme built too (reusing the starter kit's existing `.dark` toggle, see deviation) | 2026-09-07 | `resources/css/app.css`, `tests/Unit/DesignSystem/ContrastTest.php` |
+| [x] | **M2.2** | Core primitives: `NeuCard`, `NeuButton`, `NeuIconButton`, `NeuPill`, `NeuStat`, `NeuGroup` | 2026-09-07 | `resources/js/components/neu/*.tsx`, all on `/dev/ui` |
+| [ ] | **M2.3** | Navigation + layout: `DossierLayout`, `AdminLayout`, `GuestLayout`, `NeuBottomNav`, `NeuTabs`, `MetaChip` | | Deferred — built during Phase 03 when the dossier shell needs them |
+| [ ] | **M2.4** | Form + feedback: `NeuInput`, `NeuSelect`, `NeuTextarea`, `NeuSheet`, `NeuSkeleton`, `NeuEmptyState`; reduced-motion and high-contrast modes | | Deferred — built during Phases 04-08 as each is first needed |
+| [~] | **M2.5** | Automated contrast + a11y audit over every token pair and every primitive | 2026-09-07 | `tests/Unit/DesignSystem/ContrastTest.php` (5 tests, 56 assertions) green for all tokens; re-run/extend as M2.3/M2.4 primitives land |
+| [~] | **M2.6** | `/dev/ui` kitchen-sink page (local only) + browser tests at 390px and 1280px, light and dark | 2026-09-07 | `tests/Browser/DevUiKitchenSinkTest.php` (9 tests) green for current primitives; extend as M2.3/M2.4 land |
 
 ---
 
@@ -34,6 +34,53 @@ Reference: [`../03-design-system.md`](../03-design-system.md).
 > primitive must land on `/dev/ui` with its tests the moment it is created, and M2.5/M2.6
 > must be green before Phase 08 begins. This avoids three days of building components that
 > may never be used.
+
+> **Deviation (2026-09-07):** The starter kit already ships a full shadcn/ui token
+> system (`--background`, `--foreground`, `--primary`, `--accent`, `--radius-*`, etc.)
+> powering the pre-existing auth/settings pages, plus a working light/dark toggle
+> (`useAppearance()` / `.dark` class on `<html>`, no flash on load). Rather than the
+> `data-theme` attribute mechanism and unprefixed token names originally drafted here,
+> every Neumorphism token is namespaced `--neu-*` / `--color-neu-*` so it can never
+> collide with the shadcn slots, and dark mode reuses the existing `.dark` class
+> toggle instead of inventing a second mechanism. Dark theme was therefore built now
+> rather than left `[OPTIONAL]`, since it was nearly free given the reused toggle.
+>
+> **Deviation (2026-09-07):** The literal hex values drafted in `03-design-system.md`
+> were not all AA-compliant once actually contrast-checked. White text on the poster's
+> own accent green (#12b981) is 2.54:1, on its amber warning (#e0a13a) is 2.25:1, on
+> its info cyan (#17a3c7) is 2.96:1 — all real AA failures, not edge cases. Fixed by
+> pairing each solid-fill semantic colour with ONE deliberately-chosen fixed
+> foreground (`--color-neu-on-*`): dark ink for accent/info/warning, white for
+> primary/primary-bright/violet/danger (danger's hex nudged from #d94b4b to #d33f3f
+> so white on it clears 4.5:1). `neu-primary-bright` was found unsafe as body text on
+> the surface in either theme (4.18:1 light, 2.98:1 dark) — a new theme-swapping
+> `--neu-link` token carries "safe text on surface" instead (navy in light, a lighter
+> blue in dark, since navy-on-dark-surface is only 1.39:1). Full ratios are documented
+> inline in `resources/css/app.css`. This is exactly what M2.5's gate exists to catch,
+> and it caught real problems.
+>
+> **Deviation (2026-09-07):** `resources/js/components/ui/` is already the shadcn
+> component folder (button.tsx, card.tsx, input.tsx, etc.), so every Neu primitive
+> lives in a new `resources/js/components/neu/` folder instead, to avoid filename
+> collisions and import ambiguity. `01-architecture.md`'s repository layout should be
+> read as `components/neu/` for these, not `components/ui/`.
+>
+> **Deviation (2026-09-07):** `pestphp/pest-plugin-browser` was not yet installed
+> (not in the starter kit, and Boost's own testing-best-practices skill explicitly
+> said not to write browser tests without it). Installed it plus `playwright` +
+> Chromium (`npx playwright install chromium`) to satisfy M2.6's literal requirement
+> for real browser tests. `phpunit.xml` did not declare a `Browser` testsuite at all
+> — `composer test` was silently running 0 of the 9 browser tests until this was
+> fixed; `.github/workflows/tests.yml` gained a Playwright install step to match.
+> This is the single most important catch of this phase: a test suite that silently
+> doesn't run is worse than no test suite, because it looks green.
+>
+> **A real bug the a11y test caught:** `NeuPill`'s `ink-muted` tone originally paired
+> `--color-neu-ink-muted` text with a `--color-neu-surface-sunken` background at
+> **4.49:1** — under the 4.5:1 floor by a hair, invisible to a manual read, caught
+> immediately by `assertNoAccessibilityIssues()` on the first browser-test run. Fixed
+> by using plain `ink` (12.18:1) for that tone instead; pinned with a regression test
+> in `ContrastTest::test_ink_muted_on_surface_sunken_meets_aa`.
 
 ## Milestone detail
 
@@ -212,16 +259,19 @@ Assertions that must exist:
 
 ---
 
-## Sign-Off
+## Sign-Off — partial (M2.1, M2.2, M2.5, M2.6 for current primitives)
 
 | | |
 |---|---|
-| **Gate run on** | |
-| **Result** | |
-| **Contrast report** | |
-| **Screenshots** | `plan/evidence/phase-02/` |
-| **Commit / tag** | |
+| **Gate run on** | 2026-09-07 |
+| **Result** | `composer test` → Pint passed, PHPStan level 7 (0 errors), Pest **82/82** passed (315 assertions) — includes 5 new token-level contrast tests (56 assertions) and 9 new real-Chromium browser tests against `/dev/ui` (axe-core in both themes, viewport overflow at 390/1280, tap targets, focus visibility, JS-error-free render). `npm run check`/`types:check`/`build` all clean. Full CI sequence (`composer setup` → Playwright install → `composer ci:check`) simulated locally against a scratch `batu_test` database. |
+| **Contrast report** | Computed programmatically in `tests/Unit/DesignSystem/ContrastTest.php` directly from `resources/css/app.css`; every ratio is also documented inline in the CSS file next to the tokens it describes. Light ink/surface 13.11:1, ink-muted/surface 4.84:1, ink-subtle/surface 3.00:1, link/surface 8.96:1; dark equivalents 12.46:1 / 6.55:1 / 4.29:1 / 5.43:1; all seven solid-fill semantic colours ≥4.5:1 with their paired foreground. |
+| **Screenshots** | `plan/evidence/phase-02/phase-02-dev-ui-desktop.png`, `plan/evidence/phase-02/phase-02-dev-ui-mobile.png` |
+| **Commit / tag** | Pending commit. **Not tagging `phase-02-complete` yet** — by design, per the "build just-in-time" rule: M2.3/M2.4 and the rest of M2.5/M2.6 close out just before Phase 08. |
 
 ## Phase Log
 
-_Append one dated line per completed milestone._
+- **2026-09-07** — M2.1: Full `--neu-*`/`--color-neu-*` token layer added to `resources/css/app.css` alongside (not replacing) the shadcn tokens the starter kit already ships. Computed real WCAG ratios before committing to hex values, found and fixed several AA failures in the values drafted in `03-design-system.md` (see Deviations). Reused the existing `.dark`-class appearance toggle rather than building a second theme mechanism.
+- **2026-09-07** — M2.2: `NeuCard`, `NeuButton`, `NeuIconButton`, `NeuPill`, `NeuStat`, `NeuGroup` built in a new `components/neu/` folder (see Deviation on why not `components/ui/`), using `cva` for variants exactly as `01-architecture.md` ADR-005 specified. `NeuPill`'s tone names match `App\Contracts\HasColor::color()` output verbatim, so a status pill is `<NeuPill tone={station.statusColor}>`.
+- **2026-09-07** — M2.5/M2.6: Installed `pestphp/pest-plugin-browser` + Playwright + Chromium (none of which existed in the project yet), built `/dev/ui` exercising every M2.2 primitive at three widths with a light/dark toggle (reusing `useAppearance()`), and wrote both the token-level contrast audit and the real-browser a11y/overflow/tap-target/focus suite. Caught and fixed a real contrast bug (`NeuPill`'s `ink-muted` tone, 4.49:1) and a real test-infrastructure bug (`phpunit.xml` had no `Browser` testsuite, so 9 browser tests were silently not running under `composer test`) — both are the kind of finding this milestone exists to produce. Screenshots saved to `plan/evidence/phase-02/`.
+- **Remaining for this phase, deferred to Phases 03-08 per the just-in-time rule:** M2.3 (`DossierLayout`, `AdminLayout`, `GuestLayout`, `NeuBottomNav`, `NeuTabs`, `MetaChip`) and M2.4 (`NeuInput`, `NeuSelect`, `NeuTextarea`, `NeuSheet`, `NeuSkeleton`, `NeuEmptyState`). Each lands on `/dev/ui` with its own tests the moment it's built; M2.5/M2.6 are re-run and extended each time. This phase's tag and final sign-off come right before Phase 08.

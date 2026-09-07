@@ -59,6 +59,65 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+
+    /*
+     | Neumorphism design system (plan/03-design-system.md). Fully namespaced
+     | under `neu-` so it never collides with the shadcn token slots above,
+     | which still power the pre-existing auth/settings pages. Every pair
+     | below is contrast-verified — see the "why these exact hexes" note
+     | further down before changing any of them.
+     */
+    --color-neu-surface: var(--neu-surface);
+    --color-neu-surface-raised: var(--neu-surface-raised);
+    --color-neu-surface-sunken: var(--neu-surface-sunken);
+    --color-neu-ink: var(--neu-ink);
+    --color-neu-ink-muted: var(--neu-ink-muted);
+    --color-neu-ink-subtle: var(--neu-ink-subtle);
+    --color-neu-link: var(--neu-link);
+
+    --color-neu-primary: var(--neu-primary);
+    --color-neu-primary-bright: var(--neu-primary-bright);
+    --color-neu-accent: var(--neu-accent);
+    --color-neu-info: var(--neu-info);
+    --color-neu-violet: var(--neu-violet);
+    --color-neu-warning: var(--neu-warning);
+    --color-neu-danger: var(--neu-danger);
+
+    /*
+     | Each solid-fill semantic colour above has one fixed foreground that
+     | keeps it at >=4.5:1, chosen per-colour (not uniformly white) because a
+     | uniform white failed AA on accent/info/warning at their poster hues.
+     | Fixed across both themes on purpose: a pill's own contrast must not
+     | depend on the page theme around it.
+     */
+    --color-neu-on-primary: #ffffff;
+    --color-neu-on-primary-bright: #ffffff;
+    --color-neu-on-accent: #1b2436;
+    --color-neu-on-info: #1b2436;
+    --color-neu-on-violet: #ffffff;
+    --color-neu-on-warning: #1b2436;
+    --color-neu-on-danger: #ffffff;
+
+    --radius-neu-sm: 12px;
+    --radius-neu-md: 18px;
+    --radius-neu-lg: 26px;
+    --radius-neu-pill: 999px;
+
+    --shadow-neu-sm:
+        3px 3px 6px var(--neu-shadow-dark),
+        -3px -3px 6px var(--neu-shadow-light);
+    --shadow-neu-md:
+        6px 6px 12px var(--neu-shadow-dark),
+        -6px -6px 12px var(--neu-shadow-light);
+    --shadow-neu-lg:
+        10px 10px 20px var(--neu-shadow-dark),
+        -10px -10px 20px var(--neu-shadow-light);
+    --shadow-neu-inset-sm:
+        inset 2px 2px 5px var(--neu-shadow-dark),
+        inset -2px -2px 5px var(--neu-shadow-light);
+    --shadow-neu-inset-md:
+        inset 4px 4px 8px var(--neu-shadow-dark),
+        inset -4px -4px 8px var(--neu-shadow-light);
 }
 
 :root {
@@ -95,6 +154,42 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.87 0 0);
+
+    /*
+     | Light theme Neumorphism tokens. Contrast ratios verified against these
+     | exact hexes (WCAG 2.1, sRGB relative luminance):
+     |   neu-ink / neu-surface           13.11:1
+     |   neu-ink-muted / neu-surface      4.84:1  (>= 4.5 body-text floor)
+     |   neu-ink-subtle / neu-surface     3.00:1  (large text / hints only)
+     |   neu-link / neu-surface           8.96:1
+     | Do not edit these without re-running the Phase 02 contrast check.
+     */
+    --neu-surface: #e8ecf3;
+    --neu-surface-raised: #eef1f7;
+    --neu-surface-sunken: #dfe4ee;
+    --neu-ink: #1b2436;
+    --neu-ink-muted: #5a6683;
+    --neu-ink-subtle: #7c88a3;
+    --neu-link: #0f3d7c;
+
+    --neu-shadow-light: #ffffff;
+    --neu-shadow-dark: #b8c1d1;
+
+    /*
+     | Solid-fill brand/semantic colours, fixed across both themes — see the
+     | --color-neu-on-* foregrounds above for why accent/info/warning pair
+     | with dark ink rather than white (white-on-poster-green is only
+     | 2.5:1; white-on-poster-amber is 2.3:1 — both fail AA outright).
+     | danger is nudged from the poster's #d94b4b to #d33f3f so white text
+     | on it clears 4.5:1 (4.61:1); every other hue is exactly the poster's.
+     */
+    --neu-primary: #0f3d7c;
+    --neu-primary-bright: #1f6fd0;
+    --neu-accent: #12b981;
+    --neu-info: #17a3c7;
+    --neu-violet: #6d5ce7;
+    --neu-warning: #e0a13a;
+    --neu-danger: #d33f3f;
 }
 
 .dark {
@@ -130,6 +225,32 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(0.269 0 0);
     --sidebar-ring: oklch(0.439 0 0);
+
+    /*
+     | Dark theme Neumorphism tokens. The "light" shadow is a lifted grey,
+     | not white, or every raised surface would glow. Ratios verified:
+     |   neu-ink / neu-surface           12.46:1
+     |   neu-ink-muted / neu-surface      6.55:1
+     |   neu-ink-subtle / neu-surface     4.29:1
+     |   neu-link / neu-surface           5.43:1
+     | neu-link is a different hex from the light theme (a lighter blue,
+     | not the light theme's navy) because navy-on-dark-surface is only
+     | 1.39:1 — the same colour cannot serve as safe text in both themes.
+     | Brand/semantic solid-fill colours (accent, danger, etc.) are NOT
+     | redefined here: they keep their light-theme hex in both themes,
+     | since each is always paired with its own fixed --color-neu-on-*
+     | foreground rather than read against the page surface.
+     */
+    --neu-surface: #232833;
+    --neu-surface-raised: #282e3b;
+    --neu-surface-sunken: #1c2028;
+    --neu-ink: #e8ecf3;
+    --neu-ink-muted: #a3adc2;
+    --neu-ink-subtle: #7f8ba1;
+    --neu-link: #5aa0f0;
+
+    --neu-shadow-light: #2e3542;
+    --neu-shadow-dark: #171a21;
 }
 
 @layer base {
@@ -139,5 +260,35 @@
 
     body {
         @apply bg-background text-foreground;
+    }
+}
+
+/*
+ | Neumorphism first-class accessible modes — not an afterthought, see
+ | plan/03-design-system.md §1.1. Elements opt in with the `.neu` class
+ | (applied by the Neu* primitives themselves in Phase 02 M2.2+).
+ */
+@media (prefers-contrast: more) {
+    :root,
+    .dark {
+        --shadow-neu-sm: none;
+        --shadow-neu-md: none;
+        --shadow-neu-lg: none;
+        --shadow-neu-inset-sm: none;
+        --shadow-neu-inset-md: none;
+    }
+
+    .neu {
+        border: 1px solid var(--color-neu-ink-muted);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }

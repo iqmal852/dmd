@@ -1,15 +1,15 @@
 # Build Status Board
 
 **Last updated:** 2026-09-07
-**Current phase:** Phase 01 — Data Model & Domain (milestones complete, gate green, tag pending)
+**Current phase:** Phase 02 — Neumorphism Design System (M2.1/M2.2 done; M2.3/M2.4 deferred to Phases 03-08 by design; Phase 03 starting next)
 
 Update this file every time a milestone is completed. See §3 of [`README.md`](README.md).
 
 | Phase | Title | Milestones | Status | Gate passed | Tag |
 |:-----:|-------|:----------:|--------|:-----------:|-----|
 | 00 | [Foundation & Tooling](phases/phase-00-foundation.md) | 7/7 | ✅ Complete | 2026-09-07 | `phase-00-complete` |
-| 01 | [Data Model & Domain](phases/phase-01-data-model.md) | 6/6 | 🟡 Gate green, tag pending | 2026-09-07 | — |
-| 02 | [Neumorphism Design System](phases/phase-02-design-system.md) | 0/6 | ⬜ Not started | — | — |
+| 01 | [Data Model & Domain](phases/phase-01-data-model.md) | 6/6 | ✅ Complete | 2026-09-07 | `phase-01-complete` |
+| 02 | [Neumorphism Design System](phases/phase-02-design-system.md) | 2/6 done, 2/6 ongoing | 🟡 In progress (deliberately spans through Phase 08) | — | — |
 | 03 | [Dossier Shell & Access Control](phases/phase-03-dossier-shell.md) | 0/7 | ⬜ Not started | — | — |
 | 04 | [Coordinates & Specs Modules](phases/phase-04-coordinates-specs.md) | 0/5 | ⬜ Not started | — | — |
 | 05 | [Location Map](phases/phase-05-location-map.md) | 0/5 (1 optional) | ⬜ Not started | — | — |
@@ -20,13 +20,16 @@ Update this file every time a milestone is completed. See §3 of [`README.md`](R
 
 **Legend:** ⬜ Not started · 🟡 In progress · 🔴 Blocked · ✅ Complete
 
-**Total: 13 / 62 milestones** — 60 required, 2 fully `[OPTIONAL]` (M5.5, M8.8). Dark theme (M2.1), station switcher (M4.2) and clipboard (M4.4) are optional *parts* of otherwise required milestones.
+**Total: 15 / 62 milestones** (M2.1, M2.2 done; M2.5, M2.6 green for current scope and will be re-counted once M2.3/M2.4 land) — 60 required, 2 fully `[OPTIONAL]` (M5.5, M8.8). Dark theme (M2.1), station switcher (M4.2) and clipboard (M4.4) are optional *parts* of otherwise required milestones.
 
 ---
 
 ## Open blockers
 
-_None._ Phase 01's work is committed locally with a gate-green pipeline; tagging `phase-01-complete` is the next action.
+_None._ Phase 02 is intentionally left open (M2.3/M2.4 deferred, see its phase file's
+"build just-in-time" rule) — this is not a blocker, it's the plan working as designed.
+Phase 03 starts next and will build the M2.3 primitives (`DossierLayout`,
+`NeuBottomNav`, `MetaChip`, etc.) it actually needs, as it needs them.
 
 ---
 
@@ -41,6 +44,10 @@ _None._ Phase 01's work is committed locally with a gate-green pipeline; tagging
 | 2026-09-07 | 01 | Only `StationStatus`/`QcStatus` implement `HasColor`, not all six enums | `02-data-model.md` §8 (color only "where the UI shows a coloured pill") is more precise than this phase's milestone-table wording and was followed |
 | 2026-09-07 | 01 | `download_logs.media_id` has no FK constraint yet | `spatie/laravel-medialibrary`'s `media` table doesn't exist until Phase 06/07; added as a follow-up migration then |
 | 2026-09-07 | 01 | Removed `WithoutModelEvents` from `DatabaseSeeder` | It silently suppressed the `Station` model's ULID-assignment event, causing a `NOT NULL` violation on first seed — a real bug caught immediately by running the seeder, not a stylistic choice |
+| 2026-09-07 | 02 | All Neumorphism tokens namespaced `--neu-*`/`--color-neu-*`; components live in `components/neu/`, not `components/ui/` | The starter kit already owns the shadcn token names and the `ui/` folder for the pre-existing auth/settings pages; namespacing avoids silently breaking them |
+| 2026-09-07 | 02 | Several poster-literal colours adjusted (danger hex, and per-colour text foreground instead of uniform white) | White text on the poster's own green/amber/cyan fails AA outright (2.3-3.0:1); computed real contrast ratios before committing to any hex |
+| 2026-09-07 | 02 | Installed `pestphp/pest-plugin-browser` + Playwright + Chromium, and added a `Browser` testsuite to `phpunit.xml` | Needed for real-browser a11y/overflow/tap-target testing; `phpunit.xml` had no `Browser` suite at all, so browser tests were silently not running under `composer test` — fixed alongside |
+| 2026-09-07 | 02 | Dark theme built now rather than left `[OPTIONAL]` | The starter kit's existing `.dark` toggle made it nearly free to wire up alongside the light theme |
 
 ---
 
