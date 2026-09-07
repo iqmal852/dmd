@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 
 /**
  * The single place any survey number becomes a display string. Every value
@@ -95,7 +96,7 @@ final class GeoFormatter
     /**
      * A date (or date-like string) → "15/03/2025"
      */
-    public function installedDate(Carbon|string|null $value): ?string
+    public function installedDate(CarbonInterface|string|null $value): ?string
     {
         if ($value === null) {
             return null;

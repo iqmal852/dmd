@@ -1,7 +1,7 @@
 # Build Status Board
 
 **Last updated:** 2026-09-07
-**Current phase:** Phase 02 — Neumorphism Design System (M2.1/M2.2 done; M2.3/M2.4 deferred to Phases 03-08 by design; Phase 03 starting next)
+**Current phase:** Phase 03 complete. Phase 04 (Coordinates & Specs) starting next.
 
 Update this file every time a milestone is completed. See §3 of [`README.md`](README.md).
 
@@ -9,8 +9,8 @@ Update this file every time a milestone is completed. See §3 of [`README.md`](R
 |:-----:|-------|:----------:|--------|:-----------:|-----|
 | 00 | [Foundation & Tooling](phases/phase-00-foundation.md) | 7/7 | ✅ Complete | 2026-09-07 | `phase-00-complete` |
 | 01 | [Data Model & Domain](phases/phase-01-data-model.md) | 6/6 | ✅ Complete | 2026-09-07 | `phase-01-complete` |
-| 02 | [Neumorphism Design System](phases/phase-02-design-system.md) | 2/6 done, 2/6 ongoing | 🟡 In progress (deliberately spans through Phase 08) | — | — |
-| 03 | [Dossier Shell & Access Control](phases/phase-03-dossier-shell.md) | 0/7 | ⬜ Not started | — | — |
+| 02 | [Neumorphism Design System](phases/phase-02-design-system.md) | 4/6 (2 ongoing) | 🟡 In progress (deliberately spans through Phase 08) | — | — |
+| 03 | [Dossier Shell & Access Control](phases/phase-03-dossier-shell.md) | 7/7 | ✅ Complete (2 DoD items unverified — no physical device) | 2026-09-07 | — |
 | 04 | [Coordinates & Specs Modules](phases/phase-04-coordinates-specs.md) | 0/5 | ⬜ Not started | — | — |
 | 05 | [Location Map](phases/phase-05-location-map.md) | 0/5 (1 optional) | ⬜ Not started | — | — |
 | 06 | [Site Photos & 360°](phases/phase-06-photos-360.md) | 0/6 | ⬜ Not started | — | — |
@@ -20,7 +20,7 @@ Update this file every time a milestone is completed. See §3 of [`README.md`](R
 
 **Legend:** ⬜ Not started · 🟡 In progress · 🔴 Blocked · ✅ Complete
 
-**Total: 15 / 62 milestones** (M2.1, M2.2 done; M2.5, M2.6 green for current scope and will be re-counted once M2.3/M2.4 land) — 60 required, 2 fully `[OPTIONAL]` (M5.5, M8.8). Dark theme (M2.1), station switcher (M4.2) and clipboard (M4.4) are optional *parts* of otherwise required milestones.
+**Total: 22 / 62 milestones** (Phase 02's M2.5/M2.6 will be re-counted once M2.3/M2.4 fully land in later phases) — 60 required, 2 fully `[OPTIONAL]` (M5.5, M8.8). Dark theme (M2.1), station switcher (M4.2) and clipboard (M4.4) are optional *parts* of otherwise required milestones.
 
 ---
 
@@ -28,8 +28,16 @@ Update this file every time a milestone is completed. See §3 of [`README.md`](R
 
 _None._ Phase 02 is intentionally left open (M2.3/M2.4 deferred, see its phase file's
 "build just-in-time" rule) — this is not a blocker, it's the plan working as designed.
-Phase 03 starts next and will build the M2.3 primitives (`DossierLayout`,
-`NeuBottomNav`, `MetaChip`, etc.) it actually needs, as it needs them.
+Phase 03 built `NeuTile`, `MetaChip`, and `DossierLayout` just-in-time as it needed
+them; `NeuBottomNav` and the form/feedback primitives (M2.4) are still owed and will
+land in Phase 04+.
+
+**Not yet verified, flagged for before the QR plates are printed:** a real phone
+scanning a real QR code, and the unlock flow inside WhatsApp/Telegram/WeChat/Facebook
+in-app browsers on iOS and Android. No physical device is available in this
+development environment — coverage today is a real-Chromium browser test suite
+hitting the exact same URLs, which is a good proxy but not a substitute for the real
+thing.
 
 ---
 
@@ -48,6 +56,9 @@ Phase 03 starts next and will build the M2.3 primitives (`DossierLayout`,
 | 2026-09-07 | 02 | Several poster-literal colours adjusted (danger hex, and per-colour text foreground instead of uniform white) | White text on the poster's own green/amber/cyan fails AA outright (2.3-3.0:1); computed real contrast ratios before committing to any hex |
 | 2026-09-07 | 02 | Installed `pestphp/pest-plugin-browser` + Playwright + Chromium, and added a `Browser` testsuite to `phpunit.xml` | Needed for real-browser a11y/overflow/tap-target testing; `phpunit.xml` had no `Browser` suite at all, so browser tests were silently not running under `composer test` — fixed alongside |
 | 2026-09-07 | 02 | Dark theme built now rather than left `[OPTIONAL]` | The starter kit's existing `.dark` toggle made it nearly free to wire up alongside the light theme |
+| 2026-09-07 | 03 | Unlock redirect uses a validated `redirect` query/form field, not session-flashed `intended_url` | Flash data survives exactly one request; this flow is GET-then-POST, so the flash would already be gone by the time the form submits |
+| 2026-09-07 | 03 | `GeoFormatter::installedDate()` widened to accept `CarbonInterface`, not just `Carbon` | `Date::use(CarbonImmutable::class)` (already in the starter kit) means every Eloquent date cast is actually a `CarbonImmutable` — a real TypeError caught by manually curling the route before any test existed |
+| 2026-09-07 | 03 | Module tiles (`NeuTile`) render with no `href` for now | Coordinates/Map/Photos/Files routes don't exist until Phases 04-07; each phase adds its own tile's real link when its route lands |
 
 ---
 

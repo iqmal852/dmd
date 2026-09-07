@@ -18,3 +18,4 @@ if (app()->environment(['local', 'testing'])) {
 }
 
 require __DIR__.'/settings.php';
+require __DIR__.'/dossier.php';
