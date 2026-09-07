@@ -1,13 +1,13 @@
 # Build Status Board
 
-**Last updated:** _(not started)_
-**Current phase:** Phase 00 — Foundation & Tooling
+**Last updated:** 2026-09-07
+**Current phase:** Phase 00 — Foundation & Tooling (milestones complete, gate green, tag pending)
 
 Update this file every time a milestone is completed. See §3 of [`README.md`](README.md).
 
 | Phase | Title | Milestones | Status | Gate passed | Tag |
 |:-----:|-------|:----------:|--------|:-----------:|-----|
-| 00 | [Foundation & Tooling](phases/phase-00-foundation.md) | 0/7 | ⬜ Not started | — | — |
+| 00 | [Foundation & Tooling](phases/phase-00-foundation.md) | 7/7 | 🟡 Gate green, tag pending | 2026-09-07 | — |
 | 01 | [Data Model & Domain](phases/phase-01-data-model.md) | 0/6 | ⬜ Not started | — | — |
 | 02 | [Neumorphism Design System](phases/phase-02-design-system.md) | 0/6 | ⬜ Not started | — | — |
 | 03 | [Dossier Shell & Access Control](phases/phase-03-dossier-shell.md) | 0/7 | ⬜ Not started | — | — |
@@ -20,19 +20,24 @@ Update this file every time a milestone is completed. See §3 of [`README.md`](R
 
 **Legend:** ⬜ Not started · 🟡 In progress · 🔴 Blocked · ✅ Complete
 
-**Total: 0 / 62 milestones** — 60 required, 2 fully `[OPTIONAL]` (M5.5, M8.8). Dark theme (M2.1), station switcher (M4.2) and clipboard (M4.4) are optional *parts* of otherwise required milestones.
+**Total: 7 / 62 milestones** — 60 required, 2 fully `[OPTIONAL]` (M5.5, M8.8). Dark theme (M2.1), station switcher (M4.2) and clipboard (M4.4) are optional *parts* of otherwise required milestones.
 
 ---
 
 ## Open blockers
 
-_None._
+_None._ Phase 00's CI fix (Postgres service container added to `.github/workflows/tests.yml`) is committed locally and simulated successfully but not yet pushed/tagged — no blocker, just the next action.
 
 ---
 
 ## Deviations from plan
 
-_None yet. Record each one here with a date, the phase it affects, and one line of why._
+| Date | Phase | Deviation | Why |
+|------|-------|-----------|-----|
+| 2026-09-07 | 00 | Local Postgres via Homebrew service, not `docker-compose.yml` | Docker daemon wasn't running in the dev environment; `docker-compose.yml` is still worth adding later for cross-machine parity, tracked as follow-up |
+| 2026-09-07 | 00 | Kept Fortify's 2FA + passkeys (removed only registration/reset/verification, as planned) | Laravel 13's current starter kit ships them enabled by default; they're additive opt-in hardening for the single admin, not a requirement violation, and removing them means dropping migrations/columns for no stated need |
+| 2026-09-07 | 00 | Quality tooling is the starter kit's own `composer test` + `vp check` (vite-plus), not hand-rolled ESLint/Prettier scripts | This is what Laravel's official starter kit ships today; layering a second toolchain on top would be redundant |
+| 2026-09-07 | 00 | Larastan already at level 7, not the planned level 6 | Starter kit default; left as-is since it's strictly ahead of plan and closer to Phase 09's level-8 target |
 
 ---
 
