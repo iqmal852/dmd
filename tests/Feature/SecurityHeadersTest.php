@@ -7,6 +7,7 @@ namespace Tests\Feature;
 use App\Models\Station;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 /**
@@ -77,5 +78,31 @@ class SecurityHeadersTest extends TestCase
         $this->assertTrue($columnNames->contains('ip_hash'));
         $this->assertFalse($columnNames->contains('ip'));
         $this->assertFalse($columnNames->contains('ip_address'));
+    }
+
+    /**
+     * Station::registerMediaCollections() uses the `local` disk
+     * (config/filesystems.php) for photos, panoramas, and documents. Its
+     * root is storage/app/private — a sibling of, not inside, the
+     * storage/app/public directory the `storage:link` symlink exposes —
+     * so nothing in it is reachable except through
+     * DossierFilesController's gated download route. This asserts that
+     * boundary rather than trusting the config comment.
+     */
+    public function test_uploaded_media_lives_outside_the_publicly_served_disk(): void
+    {
+        $station = Station::factory()->create(['is_published' => true]);
+        $media = $station->addMediaFromString('%PDF-1.4')
+            ->usingFileName('a.pdf')
+            ->withCustomProperties(['document_type' => 'as_built', 'title' => 'A', 'is_primary' => true])
+            ->toMediaCollection('documents');
+
+        $localRoot = Storage::disk('local')->path('');
+        $publicRoot = Storage::disk('public')->path('');
+
+        $this->assertStringStartsWith($localRoot, $media->getPath());
+        $this->assertStringNotContainsString($publicRoot, $media->getPath());
+
+        $this->get(str_replace(public_path(), '', $media->getPath()))->assertNotFound();
     }
 }

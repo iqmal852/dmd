@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | ⬜ Not started |
+| **Status** | 🟨 In progress — M9.1–M9.6 done, M9.7 blocked (no real client/devices in this environment) |
 | **Depends on** | Phases 00–08 |
 | **Estimate** | 3 days |
 | **Tag on completion** | `v1.0.0` |
@@ -18,13 +18,13 @@ person does not have to reverse-engineer the deployment from the code.
 
 | | ID | Deliverable | Date | Evidence |
 |---|---|---|---|---|
-| [ ] | **M9.1** | Security pass: headers, rate limits, dependency audit, `/security-review` on the full diff | | |
-| [ ] | **M9.2** | Performance pass: response caching, query budget, image budget, bundle budget | | |
-| [ ] | **M9.3** | Accessibility pass: axe on every public route, keyboard-only walkthrough, Lighthouse ≥ 95 | | |
-| [ ] | **M9.4** | Observability: structured logging, error tracking, health check, DB backups | | |
-| [ ] | **M9.5** | Larastan raised to level 8; baseline empty or explicitly justified | | |
-| [ ] | **M9.6** | Deployment runbook + production `.env` template + zero-downtime deploy script | | |
-| [ ] | **M9.7** | Client UAT against `Picture1.png`, panel by panel, on real devices | | |
+| [x] | **M9.1** | Security pass: headers, rate limits, dependency audit, `/security-review` on the full diff | 2026-09-08 | `fea6629`, `d6860aa`; `composer audit`/`npm audit --production` clean; `/security-review` skill couldn't run (repo has no `origin` remote to diff against — see note below), manual review done instead |
+| [x] | **M9.2** | Performance pass: response caching, query budget, image budget, bundle budget | 2026-09-08 | `fea6629` — `App\Services\StationCache`, `StationCacheTest`, `BundleBudgetTest` (~162KB gzipped, under 180KB budget) |
+| [x] | **M9.3** | Accessibility pass: axe on every public route, keyboard-only walkthrough, Lighthouse ≥ 95 | 2026-09-08 | `d6860aa` — `AccessibilityAuditTest` 16/16 (light+dark, every public route + unlock + login); fixed `text-neu-primary-bright` contrast and login.tsx's positive tabindex. Lighthouse itself not run (no staging URL in this environment) |
+| [x] | **M9.4** | Observability: structured logging, error tracking, health check, DB backups | 2026-09-08 | `03e96c7` — JSON logs w/ request_id, extended `/up`, `batu:backup`/`batu:restore` proven against a real scratch DB. Error tracking (Sentry) documented but not installed — new Composer dependency needs approval first |
+| [x] | **M9.5** | Larastan raised to level 8; baseline empty or explicitly justified | 2026-09-08 | `fea6629` — `phpstan.neon` level 8, 0 errors, no baseline |
+| [x] | **M9.6** | Deployment runbook + production `.env` template + zero-downtime deploy script | 2026-09-08 | `8d52ebb` — `docs/DEPLOYMENT.md`, `docs/deploy.sh`, `.env.production.example` |
+| [ ] | **M9.7** | Client UAT against `Picture1.png`, panel by panel, on real devices | | **Blocked** — needs a real client, a real iPhone, a real Android device, and a printed plate scanned outdoors in daylight; none available in this environment. Not attempted rather than faked |
 
 ---
 
@@ -212,13 +212,17 @@ Recorded here so it is not lost, and explicitly **not** in scope for v1:
 
 | | |
 |---|---|
-| **Gate run on** | |
-| **Lighthouse scores** | |
-| **Security review** | |
-| **UAT date / attendees** | |
-| **Client sign-off** | |
-| **Release tag** | `v1.0.0` |
+| **Gate run on** | 2026-09-08 — full suite (278/278), Pint, PHPStan level 8, `composer audit`, `npm audit --production` all clean. Lighthouse and a real `/security-review` diff not run (no staging URL, no `origin` remote — see M9.1/M9.3 evidence) |
+| **Lighthouse scores** | Not run — no staging URL available in this environment |
+| **Security review** | Manual (skill couldn't establish a diff baseline — no git remote); no findings beyond what M9.1/M9.4 already cover |
+| **UAT date / attendees** | Not held — see M9.7 |
+| **Client sign-off** | Not obtained — blocked on M9.7 |
+| **Release tag** | `v1.0.0` — **not tagged**. Tagging this before a real client UAT and a real staging deploy would misrepresent the release; see Phase Log below |
 
 ## Phase Log
 
-_Append one dated line per completed milestone._
+- 2026-09-08 — M9.1 (security headers, rate limits, private-disk verification test), M9.2 (StationCache response caching, bundle budget), M9.5 (Larastan level 8) landed in `fea6629`.
+- 2026-09-08 — M9.3: `AccessibilityAuditTest` found and fixed two real bugs (`text-neu-primary-bright` contrast on 8 text-on-surface usages; positive `tabindex` on the login form). 16/16 accessibility tests green in both themes. `d6860aa`.
+- 2026-09-08 — M9.4: request-scoped JSON logging, extended `/up` health check (DB + storage disk), `batu:backup`/`batu:restore` proven against a real scratch Postgres database. `03e96c7`.
+- 2026-09-08 — M9.6: `docs/DEPLOYMENT.md`, `docs/deploy.sh`, `.env.production.example`. `8d52ebb`.
+- 2026-09-08 — M9.7 and `v1.0.0` deliberately left undone: no real client, no real devices, no staging environment exist in this sandbox. Everything achievable without them is complete; what's left needs a human with a phone standing at a real monument.
