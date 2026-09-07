@@ -1,5 +1,6 @@
 <?php
 
+use Monolog\Formatter\JsonFormatter;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -70,6 +71,20 @@ return [
             'path' => storage_path('logs/laravel.log'),
             'level' => env('LOG_LEVEL', 'debug'),
             'max_files' => env('LOG_DAILY_DAYS', 14),
+            'replace_placeholders' => true,
+        ],
+
+        // plan/phases/phase-09-hardening-release.md M9.4 — one JSON object
+        // per line (request_id included automatically via Context, see
+        // App\Http\Middleware\AssignRequestId), for a log aggregator to
+        // parse without a custom grok pattern. Set LOG_CHANNEL=json in
+        // production; see docs/DEPLOYMENT.md.
+        'json' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/laravel.log'),
+            'level' => env('LOG_LEVEL', 'info'),
+            'days' => env('LOG_DAILY_DAYS', 14),
+            'formatter' => JsonFormatter::class,
             'replace_placeholders' => true,
         ],
 
