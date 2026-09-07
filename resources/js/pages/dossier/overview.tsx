@@ -8,7 +8,8 @@ import {
     Signpost,
 } from 'lucide-react';
 import { MetaChip } from '@/components/neu/meta-chip';
-import { coordinates, map as mapRoute } from '@/routes/dossier';
+import { coordinates, map as mapRoute, photos } from '@/routes/dossier';
+import { method360 } from '@/routes/dossier/photos';
 import { NeuGroup } from '@/components/neu/neu-group';
 import { NeuPill } from '@/components/neu/neu-pill';
 import { NeuStat } from '@/components/neu/neu-stat';
@@ -167,12 +168,15 @@ export default function DossierOverview() {
                             color="cyan"
                             icon={<Camera />}
                             label="Site Photos"
+                            href={photos({ station: station.publicId }).url}
+                            prefetch
                             disabled={station.modules.photoCount === 0}
                         />
                         <NeuTile
                             color="violet"
                             icon={<RotateCw />}
                             label="360° View"
+                            href={method360({ station: station.publicId }).url}
                             disabled={!station.modules.hasPanorama}
                         />
                     </div>

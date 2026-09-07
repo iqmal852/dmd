@@ -1,14 +1,14 @@
 import { Camera, FileText, MapPin, Home } from 'lucide-react';
-import { coordinates, show } from '@/routes/dossier';
+import { coordinates, photos, show } from '@/routes/dossier';
 import type { NeuBottomNavItem } from '@/components/neu/neu-bottom-nav';
 
 export type DossierSection = 'overview' | 'coordinates' | 'files' | 'photos';
 
 /**
  * Builds the persistent Overview/Coordinates/Files/Photos bar items shared
- * by every dossier page. Files and Photos have no `href` yet — their
- * routes land in Phases 06/07 — so they render disabled, same convention
- * as NeuTile. See plan/phases/phase-04-coordinates-specs.md M4.5.
+ * by every dossier page. Files has no `href` yet — its route lands in
+ * Phase 07 — so it renders disabled, same convention as NeuTile. See
+ * plan/phases/phase-04-coordinates-specs.md M4.5.
  */
 export function buildDossierNavItems(
     stationPublicId: string,
@@ -39,6 +39,7 @@ export function buildDossierNavItems(
             key: 'photos',
             label: 'Photos',
             icon: <Camera className="size-5" />,
+            href: photos({ station: stationPublicId }).url,
             active: active === 'photos',
         },
     ];

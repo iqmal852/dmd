@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Enums\AccessMode;
 use App\Models\Station;
+use Database\Seeders\DemoPhotoSeeder;
 use Database\Seeders\DemoStationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -59,6 +60,33 @@ it('renders the overview with no javascript errors', function () {
     $station = Station::query()->where('code', 'LPT2-GCP-015')->firstOrFail();
 
     visit(route('dossier.show', $station))->assertNoJavaScriptErrors();
+});
+
+it('navigates via the Site Photos and 360° View tiles when both are available', function () {
+    $this->seed(DemoStationSeeder::class);
+    $this->seed(DemoPhotoSeeder::class);
+    $station = Station::query()->where('code', 'LPT2-GCP-015')->firstOrFail();
+
+    $page = visit(route('dossier.show', $station));
+
+    $page->assertScript(<<<'JS'
+        (() => {
+            const tile = [...document.querySelectorAll('a')].find((a) => a.textContent.includes('Site Photos'));
+            return tile !== undefined && tile.getAttribute('href')?.endsWith('/photos');
+        })()
+        JS);
+
+    $page->click('Site Photos');
+    $page->assertPathContains('/photos');
+
+    $page = visit(route('dossier.show', $station));
+
+    $page->assertScript(<<<'JS'
+        (() => {
+            const tile = [...document.querySelectorAll('a')].find((a) => a.textContent.includes('360° View'));
+            return tile !== undefined && tile.getAttribute('href')?.endsWith('/360');
+        })()
+        JS);
 });
 
 it('renders the unlock screen with no javascript errors and no station data', function () {

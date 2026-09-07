@@ -105,7 +105,7 @@ export default function DossierPanorama() {
         <DossierLayout
             operator={branding.operator}
             title={branding.title}
-            navItems={buildDossierNavItems(stationPublicId, 'coordinates')}
+            navItems={buildDossierNavItems(stationPublicId, 'photos')}
         >
             <Head title={`360° View — ${stationCode}`} />
 
