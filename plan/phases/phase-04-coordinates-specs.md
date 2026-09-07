@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | ⬜ Not started |
+| **Status** | ✅ Complete |
 | **Depends on** | Phase 03 |
 | **Estimate** | 2 days |
 | **Tag on completion** | `phase-04-complete` |
@@ -19,13 +19,41 @@ exists to deliver — precision and legibility matter more here than anywhere el
 
 | | ID | Deliverable | Date | Evidence |
 |---|---|---|---|---|
-| [ ] | **M4.1** | `CoordinateSetData` + `SpecificationData` DTOs, all values pre-formatted by `GeoFormatter` | | |
-| [ ] | **M4.2** | `/d/{code}/coordinates` — WGS 84, GDM 2000 (TM), MyGEOID groups | | |
-| [ ] | **M4.3** | Specs & QC section — GNSS Observation + Accuracy (RMS) + verified pill | | |
-| [ ] | **M4.4** | Empty states for incomplete records; `[OPTIONAL]` copy-to-clipboard per value and per group | | |
-| [ ] | **M4.5** | Bottom-tab navigation wired across Overview ↔ Coordinates ↔ Files ↔ Photos | | |
+| [x] | **M4.1** | `CoordinateSetData` + `SpecificationData` DTOs, all values pre-formatted by `GeoFormatter` | 2026-09-07 | `app/Data/CoordinateSetData.php`, `app/Data/SpecificationData.php`, `tests/Feature/Data/*` |
+| [x] | **M4.2** | `/d/{code}/coordinates` — WGS 84, GDM 2000 (TM), MyGEOID groups | 2026-09-07 | `resources/js/pages/dossier/coordinates.tsx`, verified live in Chrome (station switcher chevron skipped — see deviation) |
+| [x] | **M4.3** | Specs & QC section — GNSS Observation + Accuracy (RMS) + verified pill | 2026-09-07 | Same page; `CoordinatesTest::test_every_value_matches_the_poster_exactly` |
+| [x] | **M4.4** | Empty states for incomplete records; `[OPTIONAL]` copy-to-clipboard per value and per group | 2026-09-07 | `NeuEmptyState`; copy-to-clipboard built for lat/lon (not every value/group — see deviation), verified live in Chrome |
+| [x] | **M4.5** | Bottom-tab navigation wired across Overview ↔ Coordinates ↔ Files ↔ Photos | 2026-09-07 | `NeuBottomNav`, `buildDossierNavItems()`; Files/Photos disabled until Phases 06/07 |
 
 ---
+
+> **Deviation (2026-09-07):** `GeoFormatter` needed two more methods than Phase 01
+> anticipated — `degrees(int|string)` (for `elevation_cutoff_deg`, e.g. "15 °") and
+> `plainNumber(string)` (trims trailing zeros with no unit, for PDOP: "1.60" → "1.6").
+> Both were added with their own poster-literal unit tests before being used here,
+> keeping the "every number formatted exactly once, server-side" rule from ADR-010
+> intact.
+>
+> **Deviation (2026-09-07):** The `[OPTIONAL]` station-switcher chevron (M4.2) was
+> skipped — the row renders as static text with no chevron, exactly as the plan's own
+> fallback describes for skipping it.
+>
+> **Deviation (2026-09-07):** The `[OPTIONAL]` copy-to-clipboard was built, but scoped
+> down from "any `NeuStat` value, plus a per-group copy-all" to just the two values
+> that actually have a `*Raw` counterpart in the DTO — Latitude and Longitude. Every
+> other value on this screen (easting, northing, heights, antenna specs) is already
+> unit-free of formatting a surveyor would need to strip (metres are metres in survey
+> software too), so a raw/display split only matters for the two values a poster
+> shows with a degree sign. No "copy all" block and no `document.execCommand`
+> fallback for older Android WebViews — `navigator.clipboard` only, with a graceful
+> "not supported" toast when it's unavailable, using the starter kit's existing
+> `useClipboard` hook and `sonner` toaster rather than new infrastructure.
+>
+> **Deviation (2026-09-07):** `NeuBottomNav` renders as a fixed bottom bar at every
+> breakpoint, not a top tab strip at ≥640px (`NeuTabs`, a separate, still-unbuilt
+> component per `03-design-system.md` §3). M4.5's own wording only requires
+> `NeuBottomNav`, not `NeuTabs` — the desktop-specific variant is deferred as a later
+> polish, consistent with Phase 02's "build just-in-time" rule.
 
 ## Milestone detail
 
@@ -174,10 +202,10 @@ Assertions that must exist:
 
 ## Definition of Done
 
-- [ ] Screens 2a and 2b of the poster are reproduced faithfully at 390px.
-- [ ] Not one number is formatted in TypeScript — all formatting comes from `GeoFormatter`.
-- [ ] *(Optional)* Copy-to-clipboard yields values a surveyor can paste straight into survey software.
-- [ ] Incomplete records render gracefully.
+- [x] Screens 2a and 2b of the poster are reproduced faithfully at 390px. Verified by automated browser test and interactively in Chrome; screenshots saved.
+- [x] Not one number is formatted in TypeScript — all formatting comes from `GeoFormatter`. Every displayed string in `coordinates.tsx` comes straight from a prop; the page does no numeric formatting itself.
+- [x] *(Optional)* Copy-to-clipboard yields values a surveyor can paste straight into survey software. Verified interactively — clicking Latitude/Longitude copies the bare `latitudeRaw`/`longitudeRaw` value with no degree sign; confirmed visually via the "Latitude copied" toast (the automated browser test could not fully confirm the OS clipboard receives the value, since Chromium's automation clipboard-permission model doesn't match a real user session — see the note in `DossierCoordinatesTest`).
+- [x] Incomplete records render gracefully. `NeuEmptyState` renders for both missing coordinate sets and missing specifications; covered by both Feature and Browser tests.
 
 ---
 
@@ -185,11 +213,14 @@ Assertions that must exist:
 
 | | |
 |---|---|
-| **Gate run on** | |
-| **Result** | |
-| **Screenshots** | `plan/evidence/phase-04/` |
-| **Commit / tag** | |
+| **Gate run on** | 2026-09-07 |
+| **Result** | `composer test` → Pint clean, PHPStan level 7 (0 errors), Pest **133/133** passed (611 assertions) — 7 Coordinates Feature tests (prop shape, poster-exact values, query count, access gate), 3 DTO unit tests, and 5 real-Chromium browser tests (poster values at 390×844, tabular-nums, no overflow, copy interaction, bottom-nav state, empty states, screenshots at both breakpoints). `npm run check`/`types:check`/`build` all clean. Full flow walked through interactively in Chrome: Coordinates page, copy-to-clipboard toast, and Overview↔Coordinates navigation via the bottom nav. |
+| **Screenshots** | `plan/evidence/phase-04/phase-04-coordinates-mobile.png`, `phase-04-coordinates-desktop.png` |
+| **Commit / tag** | Pending commit; tag `phase-04-complete` to follow. |
 
 ## Phase Log
 
-_Append one dated line per completed milestone._
+- **2026-09-07** — M4.1: `CoordinateSetData`/`SpecificationData` DTOs. Extended `GeoFormatter` with `degrees()` and `plainNumber()` (see Deviation above), each covered by a poster-literal unit test before use.
+- **2026-09-07** — M4.2/M4.3: `DossierCoordinatesController` + `dossier/coordinates.tsx` reproducing both poster panels on one scrolling page, exactly as specified (one scroll beats a hidden second tab). Verified every value live in Chrome against the poster, field by field — an exact match, including the previously-untested Specs & QC values (Elevation Cut-off, Antenna Type/Height/Point).
+- **2026-09-07** — M4.4: `NeuEmptyState` built and wired for both missing coordinate sets and missing specifications. Copy-to-clipboard built for lat/lon using the starter kit's existing `useClipboard` hook and `sonner` toaster (see Deviation above for the scoping-down from the plan's fuller "any value, copy-all" spec).
+- **2026-09-07** — M4.5: `NeuBottomNav` + `buildDossierNavItems()` shared helper, wired into both `overview.tsx` and `coordinates.tsx`. Files/Photos nav items and the As-Built/Site-Photos/360° tiles remain disabled (no route yet) until Phases 06/07; the Coordinates tile is now a real, prefetched link. Confirmed navigation both directions live in Chrome.

@@ -1,23 +1,29 @@
 import { ShieldCheck } from 'lucide-react';
 import * as React from 'react';
+import {
+    NeuBottomNav,
+    type NeuBottomNavItem,
+} from '@/components/neu/neu-bottom-nav';
 
 export type DossierLayoutProps = {
     operator: string;
     title: string;
+    navItems?: NeuBottomNavItem[];
     children: React.ReactNode;
 };
 
 /**
  * The public dossier's shell — sticky header carrying the brand lockup
  * (from config('dossier.branding'), never hard-coded) and the security
- * affordance shown in Picture1.png's header bar. Read-only: no forms, no
- * destructive actions, nothing implying editability. The bottom nav
- * (Overview/Coordinates/Files/Photos) is added in Phase 04 once there is
- * more than one screen to navigate between.
+ * affordance shown in Picture1.png's header bar, plus the persistent
+ * Overview/Coordinates/Files/Photos bar once there's more than one screen
+ * to navigate between. Read-only: no forms, no destructive actions,
+ * nothing implying editability.
  */
 export default function DossierLayout({
     operator,
     title,
+    navItems,
     children,
 }: DossierLayoutProps) {
     return (
@@ -30,7 +36,13 @@ export default function DossierLayout({
                 <ShieldCheck className="size-5 opacity-90" aria-hidden="true" />
             </header>
 
-            <main className="mx-auto max-w-5xl p-4">{children}</main>
+            <main
+                className={`mx-auto max-w-5xl p-4 ${navItems ? 'pb-20' : ''}`}
+            >
+                {children}
+            </main>
+
+            {navItems && <NeuBottomNav items={navItems} />}
         </div>
     );
 }

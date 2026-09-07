@@ -65,4 +65,20 @@ class GeoFormatterTest extends TestCase
     {
         $this->assertNull($this->formatter->installedDate(null));
     }
+
+    public function test_degrees_matches_the_poster_for_elevation_cutoff(): void
+    {
+        $this->assertSame('15 °', $this->formatter->degrees(15));
+    }
+
+    public function test_minutes_matches_the_poster(): void
+    {
+        $this->assertSame('120 min', $this->formatter->minutes(120));
+    }
+
+    public function test_plain_number_trims_trailing_zeros_for_pdop(): void
+    {
+        $this->assertSame('1.6', $this->formatter->plainNumber('1.60'));
+        $this->assertSame('10', $this->formatter->plainNumber('10.00'));
+    }
 }

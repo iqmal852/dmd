@@ -17,6 +17,7 @@ export type NeuTileProps = {
     label: string;
     href?: string;
     disabled?: boolean;
+    prefetch?: boolean;
 };
 
 /**
@@ -29,7 +30,14 @@ export type NeuTileProps = {
  * add them one at a time) renders as a non-interactive, disabled-looking
  * tile rather than a link to a 404.
  */
-export function NeuTile({ color, icon, label, href, disabled }: NeuTileProps) {
+export function NeuTile({
+    color,
+    icon,
+    label,
+    href,
+    disabled,
+    prefetch,
+}: NeuTileProps) {
     const isDisabled = disabled || !href;
 
     const content = (
@@ -58,7 +66,7 @@ export function NeuTile({ color, icon, label, href, disabled }: NeuTileProps) {
     }
 
     return (
-        <Link href={href} className={className}>
+        <Link href={href} prefetch={prefetch} className={className}>
             {content}
         </Link>
     );

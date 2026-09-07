@@ -8,12 +8,14 @@ import {
     Signpost,
 } from 'lucide-react';
 import { MetaChip } from '@/components/neu/meta-chip';
+import { coordinates } from '@/routes/dossier';
 import { NeuGroup } from '@/components/neu/neu-group';
 import { NeuPill } from '@/components/neu/neu-pill';
 import { NeuStat } from '@/components/neu/neu-stat';
 import { NeuTile } from '@/components/neu/neu-tile';
 import type { NeuPillTone } from '@/components/neu/neu-pill';
 import DossierLayout from '@/layouts/dossier/dossier-layout';
+import { buildDossierNavItems } from '@/lib/dossier-nav';
 import type { StationSummary } from '@/types/dossier';
 
 type PageProps = {
@@ -28,7 +30,11 @@ export default function DossierOverview() {
     const { station, branding } = usePage<PageProps>().props;
 
     return (
-        <DossierLayout operator={branding.operator} title={branding.title}>
+        <DossierLayout
+            operator={branding.operator}
+            title={branding.title}
+            navItems={buildDossierNavItems(station.publicId, 'overview')}
+        >
             <Head title={`GCP Station ${station.code}`} />
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
@@ -111,6 +117,10 @@ export default function DossierOverview() {
                             color="blue"
                             icon={<MapPin />}
                             label="Coordinates"
+                            href={
+                                coordinates({ station: station.publicId }).url
+                            }
+                            prefetch
                             disabled={!station.modules.hasCoordinates}
                         />
                         <NeuTile

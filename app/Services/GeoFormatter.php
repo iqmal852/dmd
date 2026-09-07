@@ -32,7 +32,11 @@ final class GeoFormatter
         return $this->degrees($value);
     }
 
-    private function degrees(string $value): string
+    /**
+     * "15" → "15 °" — also used for whole-degree specs values (e.g.
+     * elevation cut-off), not just lat/lon.
+     */
+    public function degrees(int|string $value): string
     {
         return "{$value} °";
     }
@@ -91,6 +95,24 @@ final class GeoFormatter
     public function km(string $value): string
     {
         return "KM {$value}";
+    }
+
+    /**
+     * "120" → "120 min"
+     */
+    public function minutes(int|string $value): string
+    {
+        return "{$value} min";
+    }
+
+    /**
+     * A bare decimal with no unit and no trailing zeros — e.g. PDOP
+     * "1.60" → "1.6". Unlike tolerance(), this carries no "≤" prefix: a
+     * PDOP value is a measurement, not a tolerance.
+     */
+    public function plainNumber(string $value): string
+    {
+        return $this->trimTrailingZeros($value);
     }
 
     /**

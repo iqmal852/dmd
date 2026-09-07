@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Dossier\DossierCoordinatesController;
 use App\Http\Controllers\Dossier\DossierOverviewController;
 use App\Http\Controllers\Dossier\UnlockFormController;
 use App\Http\Controllers\Dossier\UnlockSubmitController;
@@ -33,6 +34,7 @@ Route::prefix(config('dossier.route_prefix'))
 
         Route::middleware(EnsureDossierUnlocked::class)->group(function (): void {
             Route::get('{station}', DossierOverviewController::class)->name('show');
-            // coordinates / map / photos / files added in Phases 04-07.
+            Route::get('{station}/coordinates', DossierCoordinatesController::class)->name('coordinates');
+            // map / photos / files added in Phases 05-07.
         });
     });
