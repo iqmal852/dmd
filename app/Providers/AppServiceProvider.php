@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Station;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -42,6 +43,13 @@ class AppServiceProvider extends ServiceProvider
             app()->isProduction(),
         );
 
+        // Catches N+1s at development time rather than in production — see
+        // plan/phases/phase-09-hardening-release.md M9.2. Never strict in
+        // production: a missed eager-load there should degrade gracefully
+        // (an extra query), not 500.
+        Model::preventLazyLoading(! app()->isProduction());
+        Model::preventSilentlyDiscardingAttributes(! app()->isProduction());
+
         Password::defaults(fn (): ?Password => app()->isProduction()
             ? Password::min(12)
                 ->mixedCase()
@@ -66,6 +74,11 @@ class AppServiceProvider extends ServiceProvider
 
             return Limit::perMinute((int) config('dossier.unlock_throttle'))
                 ->by($request->ip().'|'.$stationKey);
+        });
+
+        RateLimiter::for('dossier-download', function (Request $request) {
+            return Limit::perMinute((int) config('dossier.downloads.download_throttle'))
+                ->by((string) $request->ip());
         });
     }
 }

@@ -52,6 +52,7 @@ Route::prefix(config('dossier.route_prefix'))
                 ->scopeBindings()
                 ->name('files.preview');
             Route::get('{station}/files/{media:uuid}/download', DownloadDocumentController::class)
+                ->middleware('throttle:dossier-download')
                 ->scopeBindings()
                 ->name('files.download');
         });

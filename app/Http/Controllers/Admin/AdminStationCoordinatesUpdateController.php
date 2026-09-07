@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateCoordinateSetRequest;
 use App\Models\Station;
+use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
 
 /**
@@ -21,6 +22,8 @@ class AdminStationCoordinatesUpdateController extends Controller
             ['station_id' => $station->id],
             $request->validated(),
         );
+
+        StationCache::bump($station);
 
         return back()->with('status', 'Coordinates updated.');
     }

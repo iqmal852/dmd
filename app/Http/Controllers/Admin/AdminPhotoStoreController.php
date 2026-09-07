@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StorePhotoRequest;
 use App\Models\Station;
+use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
 
 class AdminPhotoStoreController extends Controller
@@ -26,6 +27,8 @@ class AdminPhotoStoreController extends Controller
                 'height' => $dimensions[1] ?? null,
             ])
             ->toMediaCollection('photos');
+
+        StationCache::bump($station);
 
         return back()->with('status', 'Photo uploaded.');
     }

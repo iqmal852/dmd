@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateSpecificationRequest;
 use App\Models\Station;
+use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
 
 /**
@@ -20,6 +21,8 @@ class AdminSpecificationUpdateController extends Controller
             ['station_id' => $station->id],
             $request->validated(),
         );
+
+        StationCache::bump($station);
 
         return back()->with('status', 'Specification updated.');
     }

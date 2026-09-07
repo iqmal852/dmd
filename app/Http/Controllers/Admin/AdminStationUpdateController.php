@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateStationRequest;
 use App\Models\Station;
+use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
 
 /**
@@ -39,6 +40,8 @@ class AdminStationUpdateController extends Controller
         }
 
         $station->save();
+
+        StationCache::bump($station);
 
         return to_route('admin.stations.edit', $station)
             ->with('status', 'Station updated.');

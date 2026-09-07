@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StorePanoramaRequest;
 use App\Models\Station;
+use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
 
 /**
@@ -25,6 +26,8 @@ class AdminPanoramaStoreController extends Controller
                 'hfov' => $request->validated('hfov', 100),
             ])
             ->toMediaCollection('panoramas');
+
+        StationCache::bump($station);
 
         return back()->with('status', 'Panorama uploaded.');
     }

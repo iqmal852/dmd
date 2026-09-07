@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdateDocumentRequest;
 use App\Models\Station;
+use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -36,6 +37,8 @@ class AdminDocumentUpdateController extends Controller
             $media->setCustomProperty('is_primary', $isPrimary);
             $media->save();
         });
+
+        StationCache::bump($station);
 
         return back()->with('status', 'Document updated.');
     }

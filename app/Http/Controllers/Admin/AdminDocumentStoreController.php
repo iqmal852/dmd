@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreDocumentRequest;
 use App\Models\Station;
+use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -44,6 +45,8 @@ class AdminDocumentStoreController extends Controller
                 ])
                 ->toMediaCollection('documents');
         });
+
+        StationCache::bump($station);
 
         return back()->with('status', 'Document uploaded.');
     }

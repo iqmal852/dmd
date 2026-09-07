@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Station;
+use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -19,6 +20,8 @@ class AdminPhotoDestroyController extends Controller
         abort_unless($media->collection_name === 'photos', 404);
 
         $media->delete();
+
+        StationCache::bump($station);
 
         return back()->with('status', 'Photo deleted.');
     }

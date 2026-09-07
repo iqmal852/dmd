@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Station;
+use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
@@ -22,6 +23,8 @@ class AdminStationPublishController extends Controller
         Gate::authorize('update', $station);
 
         $station->update(['is_published' => $request->boolean('is_published')]);
+
+        StationCache::bump($station);
 
         return back();
     }

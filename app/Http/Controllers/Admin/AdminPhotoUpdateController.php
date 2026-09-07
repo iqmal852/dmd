@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UpdatePhotoRequest;
 use App\Models\Station;
+use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
@@ -20,6 +21,8 @@ class AdminPhotoUpdateController extends Controller
         $media->setCustomProperty('bearing', $request->validated('bearing'));
         $media->setCustomProperty('caption', $request->validated('caption'));
         $media->save();
+
+        StationCache::bump($station);
 
         return back()->with('status', 'Photo updated.');
     }

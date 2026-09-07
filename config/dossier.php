@@ -61,5 +61,10 @@ return [
     'downloads' => [
         'log_enabled' => (bool) env('DOWNLOAD_LOG_ENABLED', true),
         'retention_days' => (int) env('DOWNLOAD_LOG_RETENTION_DAYS', 365),
+        // Per-IP, across all stations — a document download is a heavier
+        // operation than a page view and the plates are public, so this
+        // guards against bulk scraping of as-built drawings, not normal
+        // field use. See plan/phases/phase-09-hardening-release.md M9.1.
+        'download_throttle' => (int) env('DOSSIER_DOWNLOAD_THROTTLE', 30),
     ],
 ];
