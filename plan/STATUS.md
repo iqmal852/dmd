@@ -1,7 +1,7 @@
 # Build Status Board
 
 **Last updated:** 2026-09-07
-**Current phase:** Phase 04 complete. Phase 05 (Location Map) starting next.
+**Current phase:** Phase 05 complete. Phase 06 (Site Photos & 360°) starting next.
 
 Update this file every time a milestone is completed. See §3 of [`README.md`](README.md).
 
@@ -12,7 +12,7 @@ Update this file every time a milestone is completed. See §3 of [`README.md`](R
 | 02 | [Neumorphism Design System](phases/phase-02-design-system.md) | 4/6 (2 ongoing) | 🟡 In progress (deliberately spans through Phase 08) | — | — |
 | 03 | [Dossier Shell & Access Control](phases/phase-03-dossier-shell.md) | 7/7 | ✅ Complete (2 DoD items unverified — no physical device) | 2026-09-07 | — |
 | 04 | [Coordinates & Specs Modules](phases/phase-04-coordinates-specs.md) | 5/5 | ✅ Complete | 2026-09-07 | — |
-| 05 | [Location Map](phases/phase-05-location-map.md) | 0/5 (1 optional) | ⬜ Not started | — | — |
+| 05 | [Location Map](phases/phase-05-location-map.md) | 5/5 | ✅ Complete | 2026-09-07 | — |
 | 06 | [Site Photos & 360°](phases/phase-06-photos-360.md) | 0/6 | ⬜ Not started | — | — |
 | 07 | [As-Built Drawings & Downloads](phases/phase-07-asbuilt-files.md) | 0/5 | ⬜ Not started | — | — |
 | 08 | [Admin Console & QR Generation](phases/phase-08-admin-qr.md) | 0/8 (1 optional) | ⬜ Not started | — | — |
@@ -20,7 +20,7 @@ Update this file every time a milestone is completed. See §3 of [`README.md`](R
 
 **Legend:** ⬜ Not started · 🟡 In progress · 🔴 Blocked · ✅ Complete
 
-**Total: 27 / 62 milestones** (Phase 02's M2.5/M2.6 will be re-counted once M2.3/M2.4 fully land in later phases) — 60 required, 2 fully `[OPTIONAL]` (M5.5, M8.8). Dark theme (M2.1), station switcher (M4.2) and clipboard (M4.4) are optional *parts* of otherwise required milestones.
+**Total: 32 / 62 milestones** (Phase 02's M2.5/M2.6 will be re-counted once M2.3/M2.4 fully land in later phases) — 60 required, 2 fully `[OPTIONAL]` (M5.5, M8.8). Dark theme (M2.1), station switcher (M4.2) and clipboard (M4.4) are optional *parts* of otherwise required milestones.
 
 ---
 
@@ -39,12 +39,17 @@ development environment — coverage today is a real-Chromium browser test suite
 hitting the exact same URLs, which is a good proxy but not a substitute for the real
 thing.
 
-**Copy-to-clipboard (Phase 04, optional)** works when verified by hand in Chrome (a
-"Latitude copied" toast appears and the OS clipboard receives the bare value), but the
+**Copy-to-clipboard (Phase 04/05, optional)** works when verified by hand in Chrome (a
+"copied" toast appears and the OS clipboard receives the bare value), but the
 automated browser test can only confirm the click handler runs without erroring —
 Chromium's automation clipboard-permission model doesn't grant clipboard-write the
 way a real user session does, so the test can't independently confirm the OS
 clipboard content.
+
+**"Navigate to station" (Phase 05, optional)** — the URL construction and button are
+built and verified live in Chrome, but opening an actual native map app (Apple Maps /
+Google Maps) cannot be exercised from a desktop browser and needs a real device to
+fully confirm, same constraint as the QR/in-app-browser items above.
 
 ---
 
@@ -69,6 +74,9 @@ clipboard content.
 | 2026-09-07 | 04 | Copy-to-clipboard scoped to lat/lon only, no "copy all", no `execCommand` fallback | Every other value on the Coordinates screen has no raw/display distinction worth stripping; reused the starter kit's existing `useClipboard` hook + `sonner` toaster instead of new infrastructure |
 | 2026-09-07 | 04 | `NeuBottomNav` is a fixed bottom bar at all breakpoints, no desktop top-tab variant (`NeuTabs`) yet | M4.5 only requires `NeuBottomNav`; `NeuTabs` is a separate, still-unbuilt component deferred as a later polish |
 | 2026-09-07 | 04 | Station-switcher chevron (M4.2, optional) skipped | Row renders as static text, matching the plan's own stated fallback for skipping it |
+| 2026-09-07 | 05 | Layer toggle uses two persistent tile layers + add/remove, not `setUrl()` on one | `setUrl()` doesn't update Leaflet's attribution control text — would have silently broken the "correct attribution per layer" requirement |
+| 2026-09-07 | 05 | M5.4's tile math cross-checked against an independent Python implementation | A first-draft test used a guessed expected tile coordinate that was wrong; ground truth was computed a second way before being trusted |
+| 2026-09-07 | 05 | M5.5 ("Navigate here") built in full rather than left optional-and-skipped | Cheap to add given Phase 04's clipboard infrastructure already existed; directly serves the field-crew persona the app is for |
 
 ---
 

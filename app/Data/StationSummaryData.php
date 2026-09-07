@@ -27,6 +27,7 @@ final readonly class StationSummaryData
         public string $status,
         public string $statusColor,
         public ?QuickViewData $quickView,
+        public ?MapPreviewData $mapPreview,
         public ModuleAvailability $modules,
     ) {}
 
@@ -46,6 +47,7 @@ final readonly class StationSummaryData
             quickView: $station->coordinateSet !== null
                 ? QuickViewData::from($station->coordinateSet, $formatter)
                 : null,
+            mapPreview: MapPreviewData::from($station, $formatter),
             modules: ModuleAvailability::from($station),
         );
     }

@@ -36,7 +36,7 @@ class OverviewTest extends TestCase
                 ->hasAll([
                     'publicId', 'code', 'highway', 'section', 'km', 'direction',
                     'monumentType', 'installedAt', 'status', 'statusColor',
-                    'quickView', 'modules',
+                    'quickView', 'mapPreview', 'modules',
                 ])
                 ->missing('id')
                 ->missing('accessPassword')

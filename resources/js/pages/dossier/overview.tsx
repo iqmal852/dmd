@@ -1,4 +1,4 @@
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import {
     Camera,
     Compass,
@@ -8,7 +8,7 @@ import {
     Signpost,
 } from 'lucide-react';
 import { MetaChip } from '@/components/neu/meta-chip';
-import { coordinates } from '@/routes/dossier';
+import { coordinates, map as mapRoute } from '@/routes/dossier';
 import { NeuGroup } from '@/components/neu/neu-group';
 import { NeuPill } from '@/components/neu/neu-pill';
 import { NeuStat } from '@/components/neu/neu-stat';
@@ -70,6 +70,40 @@ export default function DossierOverview() {
                             value={station.direction}
                         />
                     </div>
+
+                    {station.mapPreview && (
+                        <Link
+                            href={mapRoute({ station: station.publicId }).url}
+                            className="neu shadow-neu-md block overflow-hidden rounded-[var(--radius-neu-lg)]"
+                        >
+                            <div className="bg-neu-surface-sunken relative h-40 w-full overflow-hidden">
+                                <img
+                                    src={station.mapPreview.tileUrl}
+                                    alt=""
+                                    className="h-full w-full object-cover"
+                                    loading="lazy"
+                                    width={256}
+                                    height={256}
+                                />
+                                <span
+                                    className="text-neu-primary-bright absolute -translate-x-1/2 -translate-y-full"
+                                    style={{
+                                        left: `${station.mapPreview.pinLeftPercent}%`,
+                                        top: `${station.mapPreview.pinTopPercent}%`,
+                                    }}
+                                    aria-hidden="true"
+                                >
+                                    <MapPin className="size-7" />
+                                </span>
+                                <span className="bg-neu-surface/90 text-neu-ink-muted absolute top-2 left-2 rounded-[var(--radius-neu-pill)] px-2 py-0.5 text-[0.65rem] font-bold">
+                                    {station.mapPreview.kmBefore}
+                                </span>
+                                <span className="bg-neu-surface/90 text-neu-ink-muted absolute top-2 right-2 rounded-[var(--radius-neu-pill)] px-2 py-0.5 text-[0.65rem] font-bold">
+                                    {station.mapPreview.kmAfter}
+                                </span>
+                            </div>
+                        </Link>
+                    )}
 
                     {station.quickView ? (
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:grid-cols-1">

@@ -8,6 +8,16 @@ export type QuickView = {
     orthometricHeight: string;
 };
 
+/** Mirrors App\Data\MapPreviewData exactly. */
+export type MapPreview = {
+    tileUrl: string;
+    attribution: string;
+    pinLeftPercent: number;
+    pinTopPercent: number;
+    kmBefore: string;
+    kmAfter: string;
+};
+
 /** Mirrors App\Data\ModuleAvailability exactly. */
 export type ModuleAvailability = {
     hasCoordinates: boolean;
@@ -48,6 +58,19 @@ export type Specification = {
     qcStatusColor: string;
 };
 
+/** Mirrors App\Data\StationMapData exactly. */
+export type StationMap = {
+    code: string;
+    latitude: number;
+    longitude: number;
+    highway: string;
+    km: string;
+    direction: string;
+    section: string | null;
+    monumentType: string;
+    installedAt: string | null;
+};
+
 /** Mirrors App\Data\StationSummaryData exactly. */
 export type StationSummary = {
     publicId: string;
@@ -61,5 +84,6 @@ export type StationSummary = {
     status: string;
     statusColor: string;
     quickView: QuickView | null;
+    mapPreview: MapPreview | null;
     modules: ModuleAvailability;
 };
