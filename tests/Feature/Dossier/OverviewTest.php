@@ -53,17 +53,27 @@ class OverviewTest extends TestCase
             'access_password' => 'super-secret',
         ]);
 
-        $response = $this->withHeaders(['X-Inertia' => 'true', 'X-Inertia-Version' => ''])
-            ->get(route('dossier.show', $station));
+        $response = $this->get(route('dossier.show', $station));
 
         $content = $response->getContent();
 
+        $this->assertNotEmpty($content);
+        $this->assertStringContainsString($station->public_id, (string) $content);
         $this->assertStringNotContainsString('access_password', (string) $content);
         $this->assertStringNotContainsString('accessPassword', (string) $content);
         $this->assertStringNotContainsString('super-secret', (string) $content);
     }
 
-    public function test_overview_issues_at_most_three_queries(): void
+    /**
+     * The budget was originally 3 (station, coordinateSet, specification).
+     * Phase 06 added a real ModuleAvailability check against the station's
+     * media, which needs its own query — 4 is the genuine floor once photo/
+     * panorama counts are real rather than hard-coded zeros, and
+     * DossierOverviewController eager-loads 'media' once so both
+     * getMedia('photos') and getFirstMedia('panoramas') reuse it in-memory
+     * rather than costing two extra queries.
+     */
+    public function test_overview_issues_at_most_four_queries(): void
     {
         $station = Station::factory()->create(['is_published' => true]);
         CoordinateSet::factory()->for($station)->create();
@@ -76,7 +86,7 @@ class OverviewTest extends TestCase
 
         $this->get(route('dossier.show', $station))->assertOk();
 
-        Assert::assertLessThanOrEqual(3, $queryCount, "Overview issued {$queryCount} queries, expected <= 3");
+        Assert::assertLessThanOrEqual(4, $queryCount, "Overview issued {$queryCount} queries, expected <= 4");
     }
 
     public function test_overview_renders_empty_states_for_a_station_with_no_coordinates(): void

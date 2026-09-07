@@ -15,6 +15,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Str;
+use Spatie\Image\Enums\Fit;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * A physical GCP monument. The aggregate root of the dossier.
@@ -36,10 +40,10 @@ use Illuminate\Support\Str;
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
  */
-final class Station extends Model
+final class Station extends Model implements HasMedia
 {
     /** @use HasFactory<StationFactory> */
-    use HasFactory, SoftDeletes;
+    use HasFactory, InteractsWithMedia, SoftDeletes;
 
     protected $fillable = [
         'code', 'highway', 'section', 'km', 'direction', 'monument_type',
@@ -115,5 +119,55 @@ final class Station extends Model
     public function scopeForHighway(Builder $query, string $highway): Builder
     {
         return $query->where('highway', $highway);
+    }
+
+    /**
+     * Photos and panoramas are used from Phase 06; the `documents`
+     * collection (as-built drawings) is registered now too since it costs
+     * nothing to declare and Phase 07 will use it as-is. Panoramas get
+     * no image conversions — resampling an equirectangular image breaks
+     * the projection. See plan/phases/phase-06-photos-360.md M6.1.
+     */
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('photos')
+            ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
+
+        $this->addMediaCollection('panoramas')
+            ->singleFile()
+            ->acceptsMimeTypes(['image/jpeg', 'image/webp']);
+
+        $this->addMediaCollection('documents')
+            ->acceptsMimeTypes(['application/pdf', 'image/png', 'image/jpeg', 'application/acad', 'image/vnd.dwg', 'application/octet-stream']);
+    }
+
+    public function registerMediaConversions(?Media $media = null): void
+    {
+        // Conversion-native methods (performOnCollections, queued/nonQueued)
+        // come before the image-manipulation ones (fit/format/quality/etc):
+        // those are magic-forwarded to Spatie\Image's ImageDriver via
+        // Conversion's @mixin, which is where PHPStan's static type for the
+        // chain "leaves" Conversion — calling them last keeps every
+        // Conversion-specific method call correctly typed.
+        $this->addMediaConversion('thumb')
+            ->performOnCollections('photos')
+            ->queued()
+            ->fit(Fit::Crop, 320, 320)
+            ->format('webp')
+            ->quality(78);
+
+        $this->addMediaConversion('preview')
+            ->performOnCollections('photos', 'documents')
+            ->queued()
+            ->width(1200)
+            ->format('webp')
+            ->quality(82);
+
+        $this->addMediaConversion('placeholder')
+            ->performOnCollections('photos')
+            ->nonQueued()
+            ->width(24)
+            ->blur(8)
+            ->format('webp');
     }
 }

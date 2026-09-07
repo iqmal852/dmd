@@ -5,6 +5,8 @@ declare(strict_types=1);
 use App\Http\Controllers\Dossier\DossierCoordinatesController;
 use App\Http\Controllers\Dossier\DossierMapController;
 use App\Http\Controllers\Dossier\DossierOverviewController;
+use App\Http\Controllers\Dossier\DossierPanoramaController;
+use App\Http\Controllers\Dossier\DossierPhotosController;
 use App\Http\Controllers\Dossier\UnlockFormController;
 use App\Http\Controllers\Dossier\UnlockSubmitController;
 use App\Http\Middleware\AddNoindexHeader;
@@ -37,6 +39,8 @@ Route::prefix(config('dossier.route_prefix'))
             Route::get('{station}', DossierOverviewController::class)->name('show');
             Route::get('{station}/coordinates', DossierCoordinatesController::class)->name('coordinates');
             Route::get('{station}/map', DossierMapController::class)->name('map');
-            // photos / files added in Phases 06-07.
+            Route::get('{station}/photos', DossierPhotosController::class)->name('photos');
+            Route::get('{station}/photos/360', DossierPanoramaController::class)->name('photos.360');
+            // files added in Phase 07.
         });
     });

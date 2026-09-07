@@ -58,6 +58,22 @@ export type Specification = {
     qcStatusColor: string;
 };
 
+/** Mirrors App\Data\PhotoData exactly. */
+export type Photo = {
+    id: string;
+    type: string;
+    typeLabel: string;
+    caption: string;
+    bearing: number | null;
+    capturedAt: string | null;
+    thumbUrl: string;
+    previewUrl: string;
+    srcset: string;
+    placeholder: string;
+    width: number;
+    height: number;
+};
+
 /** Mirrors App\Data\StationMapData exactly. */
 export type StationMap = {
     code: string;

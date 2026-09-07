@@ -1,7 +1,7 @@
 # Build Status Board
 
 **Last updated:** 2026-09-07
-**Current phase:** Phase 05 complete. Phase 06 (Site Photos & 360°) starting next.
+**Current phase:** Phase 06 complete. Phase 07 (As-Built Drawings & Downloads) starting next.
 
 Update this file every time a milestone is completed. See §3 of [`README.md`](README.md).
 
@@ -13,14 +13,14 @@ Update this file every time a milestone is completed. See §3 of [`README.md`](R
 | 03 | [Dossier Shell & Access Control](phases/phase-03-dossier-shell.md) | 7/7 | ✅ Complete (2 DoD items unverified — no physical device) | 2026-09-07 | — |
 | 04 | [Coordinates & Specs Modules](phases/phase-04-coordinates-specs.md) | 5/5 | ✅ Complete | 2026-09-07 | — |
 | 05 | [Location Map](phases/phase-05-location-map.md) | 5/5 | ✅ Complete | 2026-09-07 | — |
-| 06 | [Site Photos & 360°](phases/phase-06-photos-360.md) | 0/6 | ⬜ Not started | — | — |
+| 06 | [Site Photos & 360°](phases/phase-06-photos-360.md) | 6/6 | ✅ Complete (1 DoD item unverified — no real photography) | 2026-09-07 | `phase-06-complete` |
 | 07 | [As-Built Drawings & Downloads](phases/phase-07-asbuilt-files.md) | 0/5 | ⬜ Not started | — | — |
 | 08 | [Admin Console & QR Generation](phases/phase-08-admin-qr.md) | 0/8 (1 optional) | ⬜ Not started | — | — |
 | 09 | [Hardening & Release](phases/phase-09-hardening-release.md) | 0/7 | ⬜ Not started | — | — |
 
 **Legend:** ⬜ Not started · 🟡 In progress · 🔴 Blocked · ✅ Complete
 
-**Total: 32 / 62 milestones** (Phase 02's M2.5/M2.6 will be re-counted once M2.3/M2.4 fully land in later phases) — 60 required, 2 fully `[OPTIONAL]` (M5.5, M8.8). Dark theme (M2.1), station switcher (M4.2) and clipboard (M4.4) are optional *parts* of otherwise required milestones.
+**Total: 38 / 62 milestones** (Phase 02's M2.5/M2.6 will be re-counted once M2.3/M2.4 fully land in later phases) — 60 required, 2 fully `[OPTIONAL]` (M5.5, M8.8). Dark theme (M2.1), station switcher (M4.2) and clipboard (M4.4) are optional *parts* of otherwise required milestones.
 
 ---
 
@@ -51,6 +51,19 @@ built and verified live in Chrome, but opening an actual native map app (Apple M
 Google Maps) cannot be exercised from a desktop browser and needs a real device to
 fully confirm, same constraint as the QR/in-app-browser items above.
 
+**360° panorama touch-drag (Phase 06)** — Pannellum's own drag/touch handling is
+exercised indirectly (the WebGL canvas mounts with non-zero dimensions and no console
+errors), but touch-drag gesture navigation itself isn't independently driven by the
+desktop-Chromium browser test suite, same constraint as the other real-device items
+above.
+
+**Photo transfer size budget (Phase 06)** — the Definition of Done's "< 400 KB largest
+image @ 390px" target cannot be verified against real content: there is no GCP
+monument photography available in this project, so every seeded photo is a flat-colour
+GD placeholder that compresses to 2-3 KB as WebP regardless of pipeline settings.
+Re-verify once Phase 08's admin upload flow lets real photographs through the same
+`preview` conversion.
+
 ---
 
 ## Deviations from plan
@@ -77,6 +90,12 @@ fully confirm, same constraint as the QR/in-app-browser items above.
 | 2026-09-07 | 05 | Layer toggle uses two persistent tile layers + add/remove, not `setUrl()` on one | `setUrl()` doesn't update Leaflet's attribution control text — would have silently broken the "correct attribution per layer" requirement |
 | 2026-09-07 | 05 | M5.4's tile math cross-checked against an independent Python implementation | A first-draft test used a guessed expected tile coordinate that was wrong; ground truth was computed a second way before being trusted |
 | 2026-09-07 | 05 | M5.5 ("Navigate here") built in full rather than left optional-and-skipped | Cheap to add given Phase 04's clipboard infrastructure already existed; directly serves the field-crew persona the app is for |
+| 2026-09-07 | 06 | Conversion chain orders `performOnCollections()`/`queued()`/`nonQueued()` before `fit()/format()/quality()` | Larastan resolves `Conversion`'s `@mixin ImageDriver` as leaving the fluent `Conversion` type after any manipulation call is chained first; reordering keeps the native methods' return type intact |
+| 2026-09-07 | 06 | Pannellum's viewer container has its explicit height on an outer wrapper div, not the ref'd element Pannellum takes over | Pannellum's own CSS sets `.pnlm-container{height:100%}` directly on the element passed to `viewer()`; that collided with this app's `h-[70dvh]` utility on the same element (equal specificity, Pannellum's CSS loads later and wins), collapsing the viewer to 0 height — a real production bug, reproduced independently of React before being fixed |
+| 2026-09-07 | 06 | Pinch-zoom in the photo lightbox relies on native browser pinch-to-zoom, not a custom gesture handler | Simpler, and free coverage for double-tap/two-finger-pan too, at the cost of not being a bespoke in-app zoom UI |
+| 2026-09-07 | 06 | Test Gate assertion #5 (panorama aspect-ratio upload validation) not implemented | No upload path exists yet in this phase — media is attached only via the seeder's `addMedia()`, bypassing form validation entirely; belongs with Phase 08's real admin upload form |
+| 2026-09-07 | 06 | `DatabaseSeeder` now also calls `DemoPhotoSeeder` | It existed but wasn't wired in; without it, a plain `db:seed` showed no photos/panorama despite the seeder being fully built |
+| 2026-09-07 | 06 | Fixed a latent weakness in Phase 03's `OverviewTest` (empty `X-Inertia-Version` header masked a 409 conflict, making its assertions pass vacuously against empty content) | Found while writing the analogous Phase 06 photos test, which caught the same pattern failing for real; both tests now use a plain full-page `GET` instead |
 
 ---
 

@@ -19,7 +19,12 @@ class DossierOverviewController extends Controller
 {
     public function __invoke(Station $station, GeoFormatter $formatter): Response
     {
-        $station->loadMissing(['coordinateSet', 'specification']);
+        // 'media' is loaded once here so ModuleAvailability's getMedia('photos')
+        // and getFirstMedia('panoramas') both read the same cached Eloquent
+        // relation in-memory instead of issuing a query each — see
+        // plan/phases/phase-06-photos-360.md M6.1 and the query-count budget
+        // in plan/phases/phase-03-dossier-shell.md's Test Gate.
+        $station->loadMissing(['coordinateSet', 'specification', 'media']);
 
         return Inertia::render('dossier/overview', [
             'station' => StationSummaryData::from($station, $formatter),

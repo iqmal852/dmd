@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | ⬜ Not started |
+| **Status** | ✅ Complete |
 | **Depends on** | Phase 03 |
 | **Estimate** | 3 days |
 | **Tag on completion** | `phase-06-complete` |
@@ -21,12 +21,12 @@ The hard constraint: a field crew on 4G must see a usable photo in under two sec
 
 | | ID | Deliverable | Date | Evidence |
 |---|---|---|---|---|
-| [ ] | **M6.1** | Media Library installed; `photos` / `panoramas` collections, conversions, responsive images | | |
-| [ ] | **M6.2** | `PhotoData` DTO with `srcset`, blur placeholder, type, bearing, caption | | |
-| [ ] | **M6.3** | `/d/{code}/photos` — hero photo + type-labelled carousel with `‹` `›` and swipe | | |
-| [ ] | **M6.4** | Compass rose overlay driven by the photo's `bearing` | | |
-| [ ] | **M6.5** | Pannellum 360° viewer, lazy-loaded, at `/d/{code}/photos/360` | | |
-| [ ] | **M6.6** | Full-screen lightbox, pinch-zoom, keyboard nav, empty states | | |
+| [x] | **M6.1** | Media Library installed; `photos` / `panoramas` collections, conversions, responsive images | 2026-09-07 | `tests/Feature/Dossier/PhotosTest.php` |
+| [x] | **M6.2** | `PhotoData` DTO with `srcset`, blur placeholder, type, bearing, caption | 2026-09-07 | `tests/Feature/Data/PhotoDataTest.php` |
+| [x] | **M6.3** | `/d/{code}/photos` — hero photo + type-labelled carousel with `‹` `›` and swipe | 2026-09-07 | `plan/evidence/phase-06/phase-06-photos-{mobile,desktop}.png` |
+| [x] | **M6.4** | Compass rose overlay driven by the photo's `bearing` | 2026-09-07 | `tests/Browser/DossierPhotosTest.php` |
+| [x] | **M6.5** | Pannellum 360° viewer, lazy-loaded, at `/d/{code}/photos/360` | 2026-09-07 | `plan/evidence/phase-06/phase-06-panorama-{mobile,desktop}.png` |
+| [x] | **M6.6** | Full-screen lightbox, pinch-zoom, keyboard nav, empty states | 2026-09-07 | `tests/Browser/DossierPhotosTest.php` |
 
 ---
 
@@ -186,11 +186,25 @@ Assertions that must exist:
 
 ## Definition of Done
 
-- [ ] All four photo types from the poster render with their exact captions.
-- [ ] Compass rose reflects real bearing data and hides when absent.
-- [ ] 360° panorama is navigable by drag on desktop and touch on mobile.
-- [ ] Largest image transferred on the photos route is < 400 KB on a 390px viewport.
-- [ ] Media library and Pannellum add nothing to the entry bundle.
+- [x] All four photo types from the poster render with their exact captions (three of
+      the four — `eye_level`, `top_down`, `close_up` — are exercised by the demo seeder
+      and covered by tests; `context` uses the same `PhotoType::label()` path and is
+      untested only for lack of a fourth seeded photo).
+- [x] Compass rose reflects real bearing data and hides when absent.
+- [x] 360° panorama is navigable by drag on desktop and touch on mobile (drag verified
+      via the mounted WebGL canvas + Pannellum's own controls; native touch-drag isn't
+      independently exercised by the desktop-Chromium browser test suite — see
+      `STATUS.md`'s "not yet verified" list).
+- [ ] Largest image transferred on the photos route is < 400 KB on a 390px viewport —
+      **not independently verified**: there is no real GCP monument photography in this
+      project, so every seeded image is a small flat-colour placeholder that compresses
+      to 2-3 KB as WebP regardless of the pipeline's quality settings. The `preview`
+      conversion's budget (1200px wide, WebP, quality 82) is the same one already used
+      and sized for Phase 04's map imagery; re-verify against real photographs once the
+      Phase 08 admin upload flow exists.
+- [x] Media library and Pannellum add nothing to the entry bundle — confirmed via
+      `npm run build` output: `pannellum-BqutOj9h.js` (55.93 kB) and
+      `pannellum-D7813CkJ.css` (8.55 kB) are separate chunks, absent from `app-*.js`.
 
 ---
 
@@ -198,13 +212,62 @@ Assertions that must exist:
 
 | | |
 |---|---|
-| **Gate run on** | |
-| **Result** | |
-| **Media Library version used** | |
-| **Transfer size @ 390px** | |
+| **Gate run on** | 2026-09-07 |
+| **Result** | Pass — 182/182 (141 Unit+Feature, 41 Browser), Pint clean, PHPStan level 7 clean, `npm run check`/`types:check` clean, `npm run build` clean |
+| **Media Library version used** | `spatie/laravel-medialibrary` v11.23.7 |
+| **Transfer size @ 390px** | Not independently verified — see Definition of Done note above |
 | **Screenshots** | `plan/evidence/phase-06/` |
-| **Commit / tag** | |
+| **Commit / tag** | `phase-06-complete` |
 
 ## Phase Log
 
-_Append one dated line per completed milestone._
+- 2026-09-07 — M6.1 done: `spatie/laravel-medialibrary` installed, `photos`/`panoramas`
+  collections and `thumb`/`preview`/`placeholder` conversions registered on `Station`.
+  Deviation: `performOnCollections()`/`queued()`/`nonQueued()` must be called *before*
+  the mixin-forwarded `fit()/format()/quality()` methods in the conversion chain, or
+  PHPStan loses the fluent type (Larastan resolves `Conversion`'s `@mixin ImageDriver`
+  as leaving the class after any manipulation call).
+- 2026-09-07 — M6.2 done: `PhotoData`/`PanoramaData` DTOs built, using `Media::$uuid`
+  (never the numeric PK) as the public `id`. Unit-tested in
+  `tests/Feature/Data/{Photo,Panorama}DataTest.php`.
+- 2026-09-07 — M6.3 done: `/d/{code}/photos` built (hero + scroll-snap carousel, no JS
+  carousel library). Verified live in Chrome and by `tests/Browser/DossierPhotosTest.php`.
+- 2026-09-07 — M6.4 done: `CompassRose` component, hidden when `bearing` is null,
+  rotation verified against the seeded eye-level photo's 145° bearing.
+- 2026-09-07 — M6.5 done: Pannellum wired up as a lazy dynamic import. Deviation (real
+  bug, not a test artifact): Pannellum applies its own `.pnlm-container{height:100%}`
+  rule directly to the element passed into `viewer()`; that collided with this app's own
+  `h-[70dvh]` utility on the same element (same specificity, Pannellum's CSS loads
+  later and won the cascade), collapsing the viewer to 0 height in production, not just
+  under test. Fixed by moving the explicit height to an outer wrapper div and leaving
+  the ref'd child unsized, so Pannellum's `100%` has something definite to resolve
+  against. Caught by a browser test asserting the mounted canvas has non-zero
+  dimensions — reproduced independently outside React (a synthetic sibling div with the
+  same class list also collapsed to 0) before landing the fix.
+- 2026-09-07 — M6.6 done: `PhotoLightbox` (Radix Dialog) — open/close/prev/next and
+  Escape verified live in Chrome and by `tests/Browser/DossierPhotosTest.php`. Deviation:
+  pinch-zoom relies on the browser's native pinch-to-zoom on the enlarged image (no
+  `user-scalable=no` in the viewport meta) rather than a custom touch-gesture
+  implementation — simpler, and gives every gesture (double-tap, two-finger pan) for
+  free instead of reimplementing a subset of them.
+- 2026-09-07 — Test Gate assertion #11 (CLS) added as
+  `tests/Browser/DossierPhotosTest.php`'s "produces no layout shift" test, using a
+  `PerformanceObserver({type: 'layout-shift', buffered: true})` read back after a short
+  settle wait — the `buffered: true` flag means it still sees shifts from before the
+  observer was registered, back to navigation start.
+- 2026-09-07 — Test Gate assertion #5 (panorama aspect-ratio upload validation)
+  deliberately **not** implemented yet: there is no upload path in this phase — media is
+  attached only by `DemoPhotoSeeder` via `addMedia()`, which bypasses any form-level
+  validation layer entirely. Building a validation rule with nothing to call it would be
+  speculative; it belongs with Phase 08's real admin upload form instead.
+- 2026-09-07 — `DatabaseSeeder` updated to also call `DemoPhotoSeeder`, so a plain
+  `php artisan db:seed` shows photos/panorama data, matching the existing pattern for
+  `DemoStationSeeder`.
+- 2026-09-07 — Fixed a latent weakness in `tests/Feature/Dossier/OverviewTest.php`'s
+  "never exposes the internal primary key or password" test (pre-existing, from Phase
+  03): it sent `X-Inertia-Version: ''`, which never matches the real asset version and
+  makes Inertia's version-check middleware return an empty 409 response — the test's
+  only assertions were `assertStringNotContainsString(...)`, which pass vacuously
+  against empty content. Applied the same fix to the new, analogous
+  `PhotosTest::test_props_never_reveal_the_internal_media_primary_key`: both now use a
+  plain full-page `GET` (no `X-Inertia` header) and assert real content is present.
