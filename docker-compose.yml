@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: batu
+      POSTGRES_USER: batu
+      POSTGRES_PASSWORD: secret
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # Creates the `batu_test` database alongside `batu` on first boot —
+      # the app and test suites share one Postgres instance, two
+      # databases (see phpunit.xml, ADR-003 in plan/01-architecture.md).
+      - ./postgres-init.sql:/docker-entrypoint-initdb.d/10-create-test-db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U batu"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:

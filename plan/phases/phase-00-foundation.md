@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Status** | 🟡 In progress |
+| **Status** | 🟡 In progress — all M0.1–M0.7 milestones checked, but M0.4's Telescope install and the Definition of Done's `README.md` are outstanding (see Definition of Done) |
 | **Depends on** | — |
 | **Estimate** | 2 days |
 | **Tag on completion** | `phase-00-complete` |
@@ -21,7 +21,7 @@ that every later phase has a real gate to pass.
 | | ID | Deliverable | Date | Evidence |
 |---|---|---|---|---|
 | [x] | **M0.1** | Laravel 13 React starter kit scaffolded, boots, `/` renders | 2026-09-07 | `composer.json`, `resources/js/pages/welcome.tsx`, live `GET /` → 200 |
-| [x] | **M0.2** | PostgreSQL 17 (Homebrew service, not Docker — see deviation) via app + test DBs connected | 2026-09-07 | `tests/Feature/FoundationTest.php::test_the_database_connection_is_postgresql`, `phpunit.xml` |
+| [x] | **M0.2** | PostgreSQL 17 via app + test DBs connected — now via `docker-compose.yml` (see deviation, resolved 2026-09-08) | 2026-09-08 | `tests/Feature/FoundationTest.php::test_the_database_connection_is_postgresql`, `phpunit.xml`, `docker-compose.yml`, `postgres-init.sql` |
 | [x] | **M0.3** | Starter-kit registration / password-reset / verification routes removed; single-admin seeder in place | 2026-09-07 | `config/fortify.php`, `database/seeders/AdminUserSeeder.php`, `FoundationTest::test_registration_and_password_reset_routes_do_not_exist` |
 | [x] | **M0.4** | Laravel Boost installed, `boost:install` run, MCP server reachable from the editor | 2026-09-07 | `.mcp.json`, `boost.json`, 7 skills committed under `.claude/.cursor/.agents/skills/` |
 | [x] | **M0.5** | Pest 5, Larastan level 7 (ahead of plan), Pint, `vp check` (lint+format, ships instead of ESLint/Prettier — see deviation), TypeScript strict — all configured and passing | 2026-09-07 | `composer test`, `npm run check`, `npm run types:check` all green |
@@ -30,13 +30,15 @@ that every later phase has a real gate to pass.
 
 ---
 
-> **Deviation (2026-09-07):** Docker Desktop's daemon was not running in the dev
-> environment and starting it was out of scope for this session, so local Postgres 17
-> runs via the Homebrew service (`brew services start postgresql@17`) instead of
-> `docker-compose.yml`, with a `batu` role and `batu`/`batu_test` databases created
-> directly. `docker-compose.yml` is still worth adding for parity across machines and
-> onboarding new developers — tracked as follow-up, not blocking any later phase since
-> nothing depends on Docker specifically, only on a reachable Postgres 17 instance.
+> **Deviation (2026-09-07), resolved (2026-09-08):** Docker Desktop's daemon was not
+> running in the dev environment and starting it was out of scope for that session, so
+> local Postgres 17 ran via the Homebrew service instead of `docker-compose.yml`. On
+> 2026-09-08, `docker-compose.yml` (postgres:17-alpine, matching M0.2's original spec)
+> and `postgres-init.sql` (creates `batu_test` alongside `batu` on first boot) were
+> added, the Homebrew service was stopped (`brew services stop postgresql@17`), and the
+> app + full test suite were re-verified end to end against the Dockerized instance
+> (279/279 passing). Docker is now the actual local Postgres story, not just a
+> follow-up.
 >
 > **Deviation (2026-09-07):** `laravel new --react --pest` (Laravel 13's current
 > starter kit) ships with `laravel/fortify` including **two-factor authentication and
@@ -282,3 +284,4 @@ Paste the `application-info` output into the Sign-Off block.
 - **2026-09-07** — M0.5: Adopted the starter kit's own `composer test`/`composer ci:check` scripts rather than hand-rolling new ones (see Deviation above). Fixed one gap: `phpstan analyse` crashed at the default 128M memory limit under this project's size — added `--memory-limit=1G` to the `types:check` composer script.
 - **2026-09-07** — M0.6: Wrote `config/dossier.php`, `config/batu.php`, `App\Enums\AccessMode`, and `tests/Feature/FoundationTest.php` covering Postgres connectivity, absent auth routes, idempotent admin seeding, the `dossier.base_url` trailing-slash contract, and the env()-outside-config guard. Updated `.env` / `.env.example` with every key from `plan/04-env-configuration.md`.
 - **2026-09-07** — M0.7: Added a `postgres:17-alpine` service container to the starter kit's existing `.github/workflows/tests.yml` (it shipped with no database service, which would have failed against our Postgres-only `.env.example`). Verified the exact CI sequence (`composer setup` → `composer ci:check`) locally against a scratch `batu_test` database before trusting it to a push.
+- **2026-09-08** — M0.2 deviation resolved: added `docker-compose.yml` (`postgres:17-alpine`, `batu`/`secret`, port 5432) and `postgres-init.sql` (creates `batu_test` on first boot via `docker-entrypoint-initdb.d`). Started Docker Desktop, stopped the Homebrew `postgresql@17` service to free port 5432, brought the container up, ran `migrate:fresh --seed` against it, and re-ran the full suite end to end (279/279) against the Dockerized instance. Local dev now matches the original M0.2 spec exactly.
