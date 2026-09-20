@@ -15,8 +15,12 @@ void createInertiaApp({
             case name === 'welcome':
             case name === 'dev/ui':
             case name.startsWith('dossier/'):
+            case name.startsWith('admin/'):
                 // These pages build their own Neumorphism layout inline
-                // rather than using the shadcn AppLayout shell.
+                // (AdminLayout, or nothing at all for the standalone
+                // print page) rather than using the shadcn AppLayout
+                // shell — wrapping them in it double-chromes the page
+                // with an unrelated, independently-themed sidebar.
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;

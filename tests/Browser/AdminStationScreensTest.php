@@ -27,6 +27,14 @@ it('renders the station index', function () {
     $page->assertNoJavaScriptErrors();
     $page->resize(1280, 900);
     $page->screenshot(filename: 'phase-08-station-index');
+
+    // Regression: resources/js/app.tsx's Inertia layout resolver once had
+    // no `admin/` carve-out, so every admin page fell through to the
+    // starter kit's default `AppLayout` (its own sidebar, "Dashboard" nav
+    // item, independent theme handling) wrapped *around* AdminLayout's
+    // own header/tab strip — two stacked, independently-themed shells.
+    $page->assertDontSee('Repository');
+    $page->assertDontSee('Documentation');
 });
 
 it('renders the station edit form with all tabs reachable', function () {
