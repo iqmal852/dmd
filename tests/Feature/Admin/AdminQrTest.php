@@ -80,6 +80,28 @@ class AdminQrTest extends TestCase
         $this->assertSame($expected, $reader->text());
     }
 
+    /**
+     * Regression: GenerateStationQr caches its result on the `database`
+     * cache store, and Endroid's PngWriter result wraps a live GdImage —
+     * PHP refuses to serialize that ("Serialization of 'GdImage' is not
+     * allowed"), which broke every second view of a station's QR page.
+     * The fix wraps the result in App\Actions\Qr\QrImage (plain strings
+     * only) before it ever reaches Cache::remember; this proves the
+     * second, cache-hit call actually round-trips rather than only ever
+     * exercising the cache-miss path a single call would.
+     */
+    public function test_a_second_call_reads_the_cached_result_without_error(): void
+    {
+        $station = Station::factory()->create();
+        $generate = app(GenerateStationQr::class);
+
+        $first = $generate($station, 'png');
+        $second = $generate($station, 'png');
+
+        $this->assertSame($first->getString(), $second->getString());
+        $this->assertSame($first->getMimeType(), $second->getMimeType());
+    }
+
     public function test_the_qr_preview_page_renders_for_an_authenticated_admin(): void
     {
         $user = User::factory()->create();

@@ -9,7 +9,6 @@ use App\Services\QrUrlBuilder;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\Writer\PngWriter;
-use Endroid\QrCode\Writer\Result\ResultInterface;
 use Endroid\QrCode\Writer\SvgWriter;
 use Illuminate\Support\Facades\Cache;
 
@@ -25,14 +24,14 @@ final readonly class GenerateStationQr
         private QrUrlBuilder $urlBuilder,
     ) {}
 
-    public function __invoke(Station $station, string $format = 'png'): ResultInterface
+    public function __invoke(Station $station, string $format = 'png'): QrImage
     {
         $key = 'qr:'.$station->public_id.':'.$format.':'.$this->configFingerprint();
 
         return Cache::remember($key, now()->addDay(), fn () => $this->build($station, $format));
     }
 
-    private function build(Station $station, string $format): ResultInterface
+    private function build(Station $station, string $format): QrImage
     {
         $size = (int) config('dossier.qr.size');
         $logoPath = config('dossier.qr.logo_path');
@@ -47,7 +46,9 @@ final readonly class GenerateStationQr
             logoResizeToWidth: $logoPath ? (int) ($size * 0.18) : null,
         );
 
-        return $builder->build();
+        $result = $builder->build();
+
+        return new QrImage($result->getString(), $result->getMimeType(), $result->getDataUri());
     }
 
     /**
