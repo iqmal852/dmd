@@ -81,17 +81,29 @@ class AdminQrTest extends TestCase
     }
 
     /**
-     * Regression: GenerateStationQr caches its result on the `database`
-     * cache store, and Endroid's PngWriter result wraps a live GdImage —
-     * PHP refuses to serialize that ("Serialization of 'GdImage' is not
-     * allowed"), which broke every second view of a station's QR page.
-     * The fix wraps the result in App\Actions\Qr\QrImage (plain strings
-     * only) before it ever reaches Cache::remember; this proves the
-     * second, cache-hit call actually round-trips rather than only ever
-     * exercising the cache-miss path a single call would.
+     * Regression, two layers deep:
+     *
+     * 1. GenerateStationQr caches its result, and Endroid's PngWriter
+     *    result wraps a live GdImage — PHP refuses to serialize that
+     *    ("Serialization of 'GdImage' is not allowed"), breaking the
+     *    very first cache write.
+     * 2. Reducing the cached value to plain strings wasn't enough on its
+     *    own: config('cache.serializable_classes') defaults to `false`,
+     *    which makes the `database` store's unserialize() refuse *any*
+     *    object class (not just GdImage-bearing ones) — so caching even
+     *    a plain DTO object still silently came back as
+     *    __PHP_Incomplete_Class on the next, cache-hit read. The actual
+     *    fix caches a plain array; GenerateStationQr rebuilds the QrImage
+     *    wrapper from it on every call instead of ever serializing it.
+     *
+     * phpunit.xml sets CACHE_STORE=array for the whole suite, which never
+     * serializes anything and would hide both bugs — so this test forces
+     * the real `database` store to actually exercise a serialize/
+     * unserialize round trip, matching production and local dev.
      */
     public function test_a_second_call_reads_the_cached_result_without_error(): void
     {
+        config(['cache.default' => 'database']);
         $station = Station::factory()->create();
         $generate = app(GenerateStationQr::class);
 

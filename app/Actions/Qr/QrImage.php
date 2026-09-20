@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace App\Actions\Qr;
 
 /**
- * A plain, fully-serializable stand-in for Endroid's `ResultInterface`.
+ * A duck-typed stand-in for Endroid's `ResultInterface`, exposing only
+ * the three methods any caller actually uses (getString/getMimeType/
+ * getDataUri — checked, nothing here uses getMatrix() or saveToFile()).
  *
- * `GenerateStationQr` caches its output (Cache::remember, database
- * driver), and PngWriter's result wraps a live `GdImage` — PHP explicitly
- * refuses to serialize that ("Serialization of 'GdImage' is not
- * allowed"), which blew up on every cache write. This holds only the
- * three primitives every caller actually needs (getString/getMimeType/
- * getDataUri — checked, nothing here uses getMatrix() or saveToFile()),
- * computed once from the real result before it ever reaches the cache.
+ * Deliberately never itself the thing that gets cached — see
+ * GenerateStationQr, which caches a plain array and constructs this
+ * fresh from it on every call. PngWriter's real result wraps a live
+ * GdImage (unserializable at all), and even once reduced to plain
+ * strings, config('cache.serializable_classes') defaults to `false` on
+ * the `database` cache store, which makes PHP's unserialize() refuse
+ * *any* object class, not just GdImage-bearing ones — so this class
+ * exists for callers' convenience only, not as cache payload.
  */
 final readonly class QrImage
 {

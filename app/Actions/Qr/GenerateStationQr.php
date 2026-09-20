@@ -28,10 +28,23 @@ final readonly class GenerateStationQr
     {
         $key = 'qr:'.$station->public_id.':'.$format.':'.$this->configFingerprint();
 
-        return Cache::remember($key, now()->addDay(), fn () => $this->build($station, $format));
+        // Cache a plain array, never a QrImage instance. The `database`
+        // cache store's default config('cache.serializable_classes') is
+        // `false`, which tells PHP's unserialize() to disallow every
+        // class — not just GdImage — so *any* cached object silently
+        // comes back as __PHP_Incomplete_Class on the next (cache-hit)
+        // read. Arrays of scalars are unaffected by that restriction,
+        // so the object is rebuilt fresh from the array on every call
+        // instead of ever being what gets serialized.
+        $data = Cache::remember($key, now()->addDay(), fn () => $this->build($station, $format));
+
+        return new QrImage($data['content'], $data['mimeType'], $data['dataUri']);
     }
 
-    private function build(Station $station, string $format): QrImage
+    /**
+     * @return array{content: string, mimeType: string, dataUri: string}
+     */
+    private function build(Station $station, string $format): array
     {
         $size = (int) config('dossier.qr.size');
         $logoPath = config('dossier.qr.logo_path');
@@ -48,7 +61,11 @@ final readonly class GenerateStationQr
 
         $result = $builder->build();
 
-        return new QrImage($result->getString(), $result->getMimeType(), $result->getDataUri());
+        return [
+            'content' => $result->getString(),
+            'mimeType' => $result->getMimeType(),
+            'dataUri' => $result->getDataUri(),
+        ];
     }
 
     /**
