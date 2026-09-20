@@ -34,10 +34,23 @@ final readonly class StationCache
     private const int DATA_TTL_SECONDS = 300;
 
     /**
-     * @template TCacheValue
+     * The callback may return a Data object (or an array containing one,
+     * or several nested) — StationSummaryData, CoordinateSetData, and
+     * friends. Cache::remember would serialize that as-is, but the
+     * `database` cache store's config('cache.serializable_classes')
+     * defaults to `false`, which makes its unserialize() refuse *any*
+     * object class, anywhere in the structure — so a plain DTO,
+     * uncached, works fine, then 500s on every subsequent (cache-hit)
+     * request. json_decode(json_encode(...)) reduces the result to
+     * plain arrays/scalars before it ever reaches the cache — the exact
+     * same shape Inertia would send to the browser as JSON regardless,
+     * since every Data class here holds only display-ready primitives
+     * (see each class's own docblock) and every caller either passes the
+     * result straight through to Inertia::render() or destructures it
+     * with array access, never `instanceof` or `->property` on the
+     * cached value itself.
      *
-     * @param  Closure(): TCacheValue  $callback
-     * @return TCacheValue
+     * @param  Closure(): mixed  $callback
      */
     public static function remember(Station $station, string $key, Closure $callback): mixed
     {
@@ -48,7 +61,11 @@ final readonly class StationCache
             $key,
         );
 
-        return Cache::remember($cacheKey, self::DATA_TTL_SECONDS, $callback);
+        return Cache::remember(
+            $cacheKey,
+            self::DATA_TTL_SECONDS,
+            fn () => json_decode(json_encode($callback()) ?: 'null', true),
+        );
     }
 
     /**
