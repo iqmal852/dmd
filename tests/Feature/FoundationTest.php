@@ -89,8 +89,9 @@ class FoundationTest extends TestCase
         $this->assertSame([], $hits, 'env() must only be called from config/ files: '.implode(', ', $hits));
     }
 
-    public function test_home_page_renders(): void
+    public function test_home_page_redirects_to_the_admin_console(): void
     {
-        $this->get('/')->assertOk();
+        // Internal-use tool: no public landing page. See routes/web.php.
+        $this->get('/')->assertRedirect('/admin/stations');
     }
 }

@@ -2,7 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::inertia('/', 'welcome')->name('home');
+// This is an internal-use tool: there is no public landing page. `/` just
+// sends everyone to the admin console — auth middleware there takes an
+// unauthenticated visitor to /login same as it always did.
+Route::redirect('/', '/admin/stations')->name('home');
 
 /*
  | A physical `public/robots.txt` also exists so a real web server (Nginx,

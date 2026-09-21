@@ -34,7 +34,6 @@ function seededReferenceStation(): Station
 }
 
 $publicRoutes = [
-    'landing page' => fn () => route('home'),
     'dossier overview' => fn (Station $station) => route('dossier.show', $station),
     'dossier coordinates' => fn (Station $station) => route('dossier.coordinates', $station),
     'dossier map' => fn (Station $station) => route('dossier.map', $station),
