@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Listeners\CheckApplicationHealth;
 use App\Models\Station;
 use Carbon\CarbonImmutable;
+use Illuminate\Auth\Middleware\RedirectIfAuthenticated;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Events\DiagnosingHealth;
@@ -35,6 +36,16 @@ class AppServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         Event::listen(DiagnosingHealth::class, CheckApplicationHealth::class);
+
+        // Laravel's RedirectIfAuthenticated (the `guest` middleware on
+        // /login) ignores config('fortify.home') entirely — its default
+        // just redirects to whichever of a route literally named
+        // 'dashboard' or 'home' exists (see the framework source), which
+        // here is the starter kit's unused /dashboard, not this app's
+        // real landing page for an admin. This makes an already-
+        // authenticated visit to /login go to the same place a fresh
+        // login already does.
+        RedirectIfAuthenticated::redirectUsing(fn () => config('fortify.home'));
     }
 
     /**

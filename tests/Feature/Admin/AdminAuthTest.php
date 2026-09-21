@@ -55,6 +55,37 @@ class AdminAuthTest extends TestCase
         }
     }
 
+    public function test_a_successful_login_redirects_to_the_admin_station_index(): void
+    {
+        $user = User::factory()->create(['password' => 'correct-password']);
+
+        $response = $this->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'correct-password',
+        ]);
+
+        $response->assertRedirect(route('admin.stations.index', absolute: false));
+    }
+
+    /**
+     * Regression: Laravel's RedirectIfAuthenticated (the `guest`
+     * middleware on /login) ignores config('fortify.home') by default —
+     * it redirects to whichever of a route literally named 'dashboard'
+     * or 'home' exists first, which was the starter kit's unused
+     * /dashboard here, not this app's actual admin console. An already
+     * logged-in admin hitting /login (a stale tab, a bookmark, browser
+     * back) landed on that leftover page instead of where a fresh login
+     * already correctly goes.
+     */
+    public function test_visiting_login_while_already_authenticated_redirects_to_the_admin_station_index(): void
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get(route('login'));
+
+        $response->assertRedirect(route('admin.stations.index', absolute: false));
+    }
+
     public function test_six_failed_logins_in_a_minute_are_throttled(): void
     {
         $user = User::factory()->create();
