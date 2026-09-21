@@ -1,5 +1,5 @@
 import { Head, usePage } from '@inertiajs/react';
-import { Layers, Locate, Minus, Navigation, Plus } from 'lucide-react';
+import { Layers, Locate, Minus, Plus } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import type { Map as LeafletMap, Marker, TileLayer } from 'leaflet';
@@ -11,29 +11,6 @@ import { useClipboard } from '@/hooks/use-clipboard';
 import DossierLayout from '@/layouts/dossier/dossier-layout';
 import { buildDossierNavItems } from '@/lib/dossier-nav';
 import type { StationMap } from '@/types/dossier';
-
-function isIos(): boolean {
-    if (typeof navigator === 'undefined') {
-        return false;
-    }
-
-    return /iPad|iPhone|iPod/.test(navigator.userAgent);
-}
-
-/**
- * Opens the device's native map app — the single most useful button for a
- * crew trying to find a concrete block on a highway shoulder. `[OPTIONAL]`
- * per plan/phases/phase-05-location-map.md M5.5.
- */
-function navigateHereUrl(
-    latitude: number,
-    longitude: number,
-    code: string,
-): string {
-    return isIos()
-        ? `https://maps.apple.com/?ll=${latitude},${longitude}&q=${encodeURIComponent(code)}`
-        : `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
-}
 
 type PageProps = {
     stationPublicId: string;
@@ -256,23 +233,6 @@ export default function DossierMap() {
                         </NeuCard>
 
                         <div className="space-y-2">
-                            <a
-                                href={navigateHereUrl(
-                                    station.latitude,
-                                    station.longitude,
-                                    station.code,
-                                )}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                <NeuButton
-                                    variant="primary"
-                                    className="w-full gap-2"
-                                >
-                                    <Navigation className="size-4" />
-                                    Navigate to station
-                                </NeuButton>
-                            </a>
                             <NeuButton
                                 variant="ghost"
                                 className="w-full"
