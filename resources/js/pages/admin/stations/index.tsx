@@ -8,7 +8,7 @@ import {
     QrCode,
     RotateCw,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { NeuButton } from '@/components/neu/neu-button';
 import { NeuCard } from '@/components/neu/neu-card';
@@ -16,6 +16,7 @@ import { NeuInput } from '@/components/neu/neu-input';
 import { NeuPill } from '@/components/neu/neu-pill';
 import { NeuSelect } from '@/components/neu/neu-select';
 import { NeuToggle } from '@/components/neu/neu-toggle';
+import { Spinner } from '@/components/ui/spinner';
 import AdminLayout from '@/layouts/admin/admin-layout';
 import { create, edit, index, publish, qr } from '@/routes/admin/stations';
 import { show } from '@/routes/dossier';
@@ -65,14 +66,43 @@ export default function AdminStationIndex() {
     const { stations, filters, highways, statusOptions } =
         usePage<PageProps>().props;
     const [search, setSearch] = useState(filters.search);
+    const [isSearching, setIsSearching] = useState(false);
+    const searchTimeout = useRef<ReturnType<typeof setTimeout>>(null);
 
-    function applyFilters(next: Partial<typeof filters>) {
+    function applyFilters(
+        next: Partial<typeof filters>,
+        options?: { trackLoading?: boolean },
+    ) {
         router.get(
             index().url,
             { ...filters, ...next },
-            { preserveState: true, preserveScroll: true, replace: true },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                replace: true,
+                onStart: () => options?.trackLoading && setIsSearching(true),
+                onFinish: () => options?.trackLoading && setIsSearching(false),
+            },
         );
     }
+
+    // Search-as-you-type: waits for a pause in typing rather than firing on
+    // every keystroke, so the query string (and the resulting request)
+    // isn't rewritten on each character. The ref (rather than leaving this
+    // to the effect's own cleanup) lets Enter cancel a pending debounce and
+    // search immediately instead of firing the same query twice.
+    useEffect(() => {
+        if (search === filters.search) {
+            return;
+        }
+
+        searchTimeout.current = setTimeout(() => {
+            applyFilters({ search }, { trackLoading: true });
+        }, 400);
+
+        return () => clearTimeout(searchTimeout.current ?? undefined);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [search]);
 
     function togglePublished(station: AdminStationListItem, checked: boolean) {
         router.patch(
@@ -116,17 +146,28 @@ export default function AdminStationIndex() {
             </div>
 
             <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                <NeuInput
-                    placeholder="Search by code…"
-                    value={search}
-                    onChange={(event) => setSearch(event.target.value)}
-                    onKeyDown={(event) => {
-                        if (event.key === 'Enter') {
-                            applyFilters({ search });
-                        }
-                    }}
-                    onBlur={() => applyFilters({ search })}
-                />
+                <div className="relative">
+                    <NeuInput
+                        placeholder="Search by code…"
+                        value={search}
+                        className="pr-9"
+                        onChange={(event) => setSearch(event.target.value)}
+                        onKeyDown={(event) => {
+                            if (event.key === 'Enter') {
+                                clearTimeout(
+                                    searchTimeout.current ?? undefined,
+                                );
+                                applyFilters(
+                                    { search },
+                                    { trackLoading: true },
+                                );
+                            }
+                        }}
+                    />
+                    {isSearching && (
+                        <Spinner className="text-neu-ink-muted absolute top-1/2 right-3 -translate-y-1/2" />
+                    )}
+                </div>
                 <NeuSelect
                     value={filters.highway}
                     onChange={(event) =>
