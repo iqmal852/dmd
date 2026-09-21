@@ -30,10 +30,13 @@ export type Paginated<T> = {
 export type AdminStationForm = {
     publicId: string | null;
     code: string;
+    gcpReference: string | null;
     highway: string;
     section: string | null;
+    location: string | null;
     km: string;
     direction: string;
+    facilityType: string | null;
     monumentType: string;
     installedAt: string | null;
     status: string;

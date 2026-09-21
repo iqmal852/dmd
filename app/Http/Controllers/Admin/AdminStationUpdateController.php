@@ -22,10 +22,13 @@ class AdminStationUpdateController extends Controller
     {
         $station->fill([
             'code' => $request->validated('code'),
+            'gcp_reference' => $request->validated('gcp_reference'),
             'highway' => $request->validated('highway'),
             'section' => $request->validated('section'),
+            'location' => $request->validated('location'),
             'km' => $request->validated('km'),
             'direction' => $request->validated('direction'),
+            'facility_type' => $request->validated('facility_type'),
             'monument_type' => $request->validated('monument_type'),
             'installed_at' => $request->validated('installed_at'),
             'status' => $request->validated('status'),

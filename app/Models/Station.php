@@ -26,10 +26,13 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int $id
  * @property string $public_id
  * @property string $code
+ * @property string|null $gcp_reference
  * @property string $highway
  * @property string|null $section
+ * @property string|null $location
  * @property string $km
  * @property Direction $direction
+ * @property string|null $facility_type
  * @property string $monument_type
  * @property Carbon|null $installed_at
  * @property StationStatus $status
@@ -46,8 +49,9 @@ final class Station extends Model implements HasMedia
     use HasFactory, InteractsWithMedia, SoftDeletes;
 
     protected $fillable = [
-        'code', 'highway', 'section', 'km', 'direction', 'monument_type',
-        'installed_at', 'status', 'description', 'access_password', 'is_published',
+        'code', 'gcp_reference', 'highway', 'section', 'location', 'km', 'direction',
+        'facility_type', 'monument_type', 'installed_at', 'status', 'description',
+        'access_password', 'is_published',
     ];
 
     /**

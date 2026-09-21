@@ -1,9 +1,12 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import {
+    Building2,
     Camera,
     Compass,
     FileText,
+    Hash,
     MapPin,
+    MapPinned,
     RotateCw,
     Signpost,
 } from 'lucide-react';
@@ -29,6 +32,16 @@ type PageProps = {
  */
 export default function DossierOverview() {
     const { station, branding } = usePage<PageProps>().props;
+
+    // Only show the Facility chip when it says something the Direction
+    // chip doesn't already — the source data sets facility_type to a bare
+    // "NB"/"SB"/"EB"/"WB" for plain directional points, which would just
+    // repeat Direction verbatim.
+    const facilityLabel =
+        station.facilityType &&
+        !['NB', 'SB', 'EB', 'WB'].includes(station.facilityType)
+            ? station.facilityType
+            : null;
 
     return (
         <DossierLayout
@@ -71,6 +84,34 @@ export default function DossierOverview() {
                             value={station.direction}
                         />
                     </div>
+
+                    {(station.gcpReference ||
+                        station.location ||
+                        facilityLabel) && (
+                        <div className="-mx-1 flex snap-x scrollbar-none gap-2 overflow-x-auto px-1 pb-1 sm:grid sm:grid-cols-3 sm:overflow-visible">
+                            {station.gcpReference && (
+                                <MetaChip
+                                    icon={<Hash className="size-4" />}
+                                    label="GCP Reference"
+                                    value={station.gcpReference}
+                                />
+                            )}
+                            {station.location && (
+                                <MetaChip
+                                    icon={<MapPinned className="size-4" />}
+                                    label="Location"
+                                    value={station.location}
+                                />
+                            )}
+                            {facilityLabel && (
+                                <MetaChip
+                                    icon={<Building2 className="size-4" />}
+                                    label="Facility"
+                                    value={facilityLabel}
+                                />
+                            )}
+                        </div>
+                    )}
 
                     {station.mapPreview && (
                         <Link

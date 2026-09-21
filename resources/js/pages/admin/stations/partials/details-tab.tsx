@@ -73,6 +73,20 @@ export function DetailsTab({
                             </NeuFormField>
 
                             <NeuFormField
+                                label="GCP Reference"
+                                htmlFor="gcp_reference"
+                                error={errors.gcp_reference}
+                                hint="The physical survey point ID used in the field (e.g. GP91, TBM03)."
+                            >
+                                <NeuInput
+                                    id="gcp_reference"
+                                    name="gcp_reference"
+                                    defaultValue={station.gcpReference ?? ''}
+                                    invalid={!!errors.gcp_reference}
+                                />
+                            </NeuFormField>
+
+                            <NeuFormField
                                 label="Highway"
                                 htmlFor="highway"
                                 error={errors.highway}
@@ -97,6 +111,20 @@ export function DetailsTab({
                                     name="section"
                                     defaultValue={station.section ?? ''}
                                     invalid={!!errors.section}
+                                />
+                            </NeuFormField>
+
+                            <NeuFormField
+                                label="Location"
+                                htmlFor="location"
+                                error={errors.location}
+                                hint="State or named link road (e.g. KEDAH, or DL1- Dengkil NB)."
+                            >
+                                <NeuInput
+                                    id="location"
+                                    name="location"
+                                    defaultValue={station.location ?? ''}
+                                    invalid={!!errors.location}
                                 />
                             </NeuFormField>
 
@@ -143,6 +171,20 @@ export function DetailsTab({
                                         </option>
                                     ))}
                                 </NeuSelect>
+                            </NeuFormField>
+
+                            <NeuFormField
+                                label="Facility Type"
+                                htmlFor="facility_type"
+                                error={errors.facility_type}
+                                hint="What's physically here, if not just a direction (e.g. Toll Plaza, Interchange, RSA NB)."
+                            >
+                                <NeuInput
+                                    id="facility_type"
+                                    name="facility_type"
+                                    defaultValue={station.facilityType ?? ''}
+                                    invalid={!!errors.facility_type}
+                                />
                             </NeuFormField>
 
                             <NeuFormField

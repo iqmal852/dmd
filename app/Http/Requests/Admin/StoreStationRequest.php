@@ -28,10 +28,13 @@ class StoreStationRequest extends FormRequest
     {
         return [
             'code' => ['required', 'string', 'max:50', new UniqueStationCode],
+            'gcp_reference' => ['nullable', 'string', 'max:255'],
             'highway' => ['required', 'string', 'max:50'],
             'section' => ['nullable', 'string', 'max:20'],
+            'location' => ['nullable', 'string', 'max:255'],
             'km' => ['required', 'numeric', 'between:0,2000'],
             'direction' => ['required', new Enum(Direction::class)],
+            'facility_type' => ['nullable', 'string', 'max:255'],
             'monument_type' => ['required', 'string', 'max:50'],
             'installed_at' => ['nullable', 'date', 'before_or_equal:today'],
             'status' => ['required', new Enum(StationStatus::class)],
