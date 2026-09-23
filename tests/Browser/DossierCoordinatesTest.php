@@ -66,12 +66,14 @@ it('renders the bottom nav with coordinates active and files/photos disabled', f
         ->assertNoJavaScriptErrors();
 });
 
-it('renders empty states for a station missing coordinates and specs', function () {
+it('renders an empty state for missing coordinates and N/A for a missing specification', function () {
     $station = Station::factory()->create(['is_published' => true]);
 
     visit(route('dossier.coordinates', $station))
         ->assertSee('Coordinates not yet recorded for this station.')
-        ->assertSee('Specifications not yet recorded for this station.')
+        ->assertSee('GNSS Observation')
+        ->assertSee('Accuracy (RMS)')
+        ->assertSee('N/A')
         ->assertNoJavaScriptErrors();
 });
 

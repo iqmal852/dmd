@@ -18,6 +18,11 @@ type PageProps = {
     specification: Specification | null;
 };
 
+// Every specification field is shown even when the survey record hasn't
+// been filled in yet (or doesn't exist at all) — explicit user request:
+// missing values read as "N/A" rather than the field disappearing.
+const NA = 'N/A';
+
 /**
  * Picture1.png panels 2a (Coordinates) and 2b (Specs & QC), one scrolling
  * page — see plan/phases/phase-04-coordinates-specs.md M4.2/M4.3.
@@ -116,95 +121,72 @@ export default function DossierCoordinates() {
                     <NeuEmptyState message="Coordinates not yet recorded for this station." />
                 )}
 
-                {specification ? (
-                    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                        <NeuGroup
-                            title="GNSS Observation"
-                            icon={<Satellite className="size-3.5" />}
-                        >
-                            {specification.observationMethod && (
-                                <NeuStat
-                                    label="Method"
-                                    value={specification.observationMethod}
-                                />
-                            )}
-                            {specification.observationMinutes && (
-                                <NeuStat
-                                    label="Observation Time"
-                                    value={specification.observationMinutes}
-                                />
-                            )}
-                            {specification.satelliteCount !== null && (
-                                <NeuStat
-                                    label="No. of Satellites"
-                                    value={specification.satelliteCount}
-                                />
-                            )}
-                            {specification.pdopMax && (
-                                <NeuStat
-                                    label="PDOP (Max)"
-                                    value={specification.pdopMax}
-                                />
-                            )}
-                            {specification.elevationCutoff && (
-                                <NeuStat
-                                    label="Elevation Cut-off"
-                                    value={specification.elevationCutoff}
-                                />
-                            )}
-                            {specification.antennaType && (
-                                <NeuStat
-                                    label="Antenna Type"
-                                    value={specification.antennaType}
-                                />
-                            )}
-                            {specification.antennaHeight && (
-                                <NeuStat
-                                    label="Antenna Height"
-                                    value={specification.antennaHeight}
-                                />
-                            )}
-                            {specification.antennaReferencePoint && (
-                                <NeuStat
-                                    label="Antenna Point"
-                                    value={specification.antennaReferencePoint}
-                                />
-                            )}
-                        </NeuGroup>
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                    <NeuGroup
+                        title="GNSS Observation"
+                        icon={<Satellite className="size-3.5" />}
+                    >
+                        <NeuStat
+                            label="Method"
+                            value={specification?.observationMethod ?? NA}
+                        />
+                        <NeuStat
+                            label="Observation Time"
+                            value={specification?.observationMinutes ?? NA}
+                        />
+                        <NeuStat
+                            label="No. of Satellites"
+                            value={specification?.satelliteCount ?? NA}
+                        />
+                        <NeuStat
+                            label="PDOP (Max)"
+                            value={specification?.pdopMax ?? NA}
+                        />
+                        <NeuStat
+                            label="Elevation Cut-off"
+                            value={specification?.elevationCutoff ?? NA}
+                        />
+                        <NeuStat
+                            label="Antenna Type"
+                            value={specification?.antennaType ?? NA}
+                        />
+                        <NeuStat
+                            label="Antenna Height"
+                            value={specification?.antennaHeight ?? NA}
+                        />
+                        <NeuStat
+                            label="Antenna Point"
+                            value={specification?.antennaReferencePoint ?? NA}
+                        />
+                    </NeuGroup>
 
-                        <NeuGroup
-                            title="Accuracy (RMS)"
-                            icon={<Gauge className="size-3.5" />}
-                        >
-                            {specification.horizontalRms && (
-                                <NeuStat
-                                    label="Horizontal (XY)"
-                                    value={specification.horizontalRms}
-                                />
-                            )}
-                            {specification.verticalRms && (
-                                <NeuStat
-                                    label="Vertical (Z)"
-                                    value={specification.verticalRms}
-                                />
-                            )}
-                            <div className="flex items-center justify-between py-2.5">
-                                <span className="text-neu-ink-muted text-sm">
-                                    Status
-                                </span>
-                                <NeuPill
-                                    tone={
-                                        specification.qcStatusColor as NeuPillTone
-                                    }
-                                >
-                                    {specification.qcStatus}
-                                </NeuPill>
-                            </div>
-                        </NeuGroup>
-                    </div>
-                ) : (
-                    <NeuEmptyState message="Specifications not yet recorded for this station." />
-                )}
+                    <NeuGroup
+                        title="Accuracy (RMS)"
+                        icon={<Gauge className="size-3.5" />}
+                    >
+                        <NeuStat
+                            label="Horizontal (XY)"
+                            value={specification?.horizontalRms ?? NA}
+                        />
+                        <NeuStat
+                            label="Vertical (Z)"
+                            value={specification?.verticalRms ?? NA}
+                        />
+                        <div className="flex items-center justify-between py-2.5">
+                            <span className="text-neu-ink-muted text-sm">
+                                Status
+                            </span>
+                            <NeuPill
+                                tone={
+                                    (specification?.qcStatusColor as NeuPillTone) ??
+                                    'ink-muted'
+                                }
+                            >
+                                {specification?.qcStatus ?? NA}
+                            </NeuPill>
+                        </div>
+                    </NeuGroup>
+                </div>
             </div>
         </DossierLayout>
     );
