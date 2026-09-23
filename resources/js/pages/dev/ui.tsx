@@ -171,7 +171,7 @@ export default function DevUi() {
                             NeuGroup / NeuStat — LPT2-GCP-015 reference values
                         </h2>
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                            <NeuGroup title="WGS 84 (GPS)">
+                            <NeuGroup title="WGS 84">
                                 <NeuStat
                                     label="Latitude"
                                     value="4.27412582"
@@ -188,7 +188,7 @@ export default function DevUi() {
                                     unit="m"
                                 />
                             </NeuGroup>
-                            <NeuGroup title="GDM 2000 (TM)">
+                            <NeuGroup title="GDM 2000">
                                 <NeuStat
                                     label="Easting (E)"
                                     value="428,765.212"

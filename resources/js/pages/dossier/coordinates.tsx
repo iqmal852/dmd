@@ -49,7 +49,7 @@ export default function DossierCoordinates() {
                 {coordinateSet ? (
                     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                         <NeuGroup
-                            title="WGS 84 (GPS)"
+                            title="WGS 84"
                             icon={<Satellite className="size-3.5" />}
                         >
                             <button
@@ -89,7 +89,7 @@ export default function DossierCoordinates() {
                         </NeuGroup>
 
                         <NeuGroup
-                            title="GDM 2000 (TM)"
+                            title="GDM 2000"
                             icon={<Compass className="size-3.5" />}
                         >
                             <NeuStat
