@@ -97,7 +97,7 @@ class StationCacheTest extends TestCase
         CoordinateSet::factory()->for($station)->create();
         Specification::factory()->for($station)->create();
         $this->actingAs($admin)->post(route('admin.stations.photos.store', $station), [
-            'file' => UploadedFile::fake()->image('a.jpg', 800, 600),
+            'files' => [UploadedFile::fake()->image('a.jpg', 800, 600)],
         ]);
         $station->addMediaFromString('%PDF-1.4')
             ->usingFileName('a.pdf')
@@ -135,7 +135,7 @@ class StationCacheTest extends TestCase
             ->assertInertia(fn ($page) => $page->where('station.modules.photoCount', 0));
 
         $this->actingAs($admin)->post(route('admin.stations.photos.store', $station), [
-            'file' => UploadedFile::fake()->image('a.jpg', 800, 600),
+            'files' => [UploadedFile::fake()->image('a.jpg', 800, 600)],
         ]);
 
         $this->get(route('dossier.show', $station))

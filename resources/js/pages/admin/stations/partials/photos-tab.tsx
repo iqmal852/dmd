@@ -1,5 +1,6 @@
 import { Form, router } from '@inertiajs/react';
 import { Trash2, Upload } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { NeuButton } from '@/components/neu/neu-button';
 import { NeuCard } from '@/components/neu/neu-card';
@@ -15,21 +16,63 @@ type Props = {
     photos: AdminPhoto[];
 };
 
+type SelectedFile = {
+    file: File;
+    label: string;
+    previewUrl: string;
+};
+
 /**
- * plan/phases/phase-08-admin-qr.md M8.7. One file per submission — the
- * admin repeats the action for a multi-file selection — via Inertia's
- * `<Form>` component, the same pattern used throughout this admin console
- * (and the public unlock form). Deviation: no client-side downscale of
- * oversized images before upload. That needs replacing the file input's
- * FileList via the DataTransfer API before a native form submission,
- * which is real added complexity for a nice-to-have the Test Gate doesn't
- * require; the server-side 20 MB cap (StorePhotoRequest) is the actual
- * safeguard against an enormous upload today.
+ * plan/phases/phase-08-admin-qr.md M8.7. A single `<input type="file"
+ * multiple>` carries every selected file to the server natively in one
+ * request — no DataTransfer/synthetic-FormData trickery (that category
+ * of approach broke uploads under Pest's browser-testing plugin before,
+ * see AdminEndToEndTest's own docblock). Reading `e.target.files` here
+ * is only ever to drive the live thumbnail/label preview below; the
+ * input's own FileList is never replaced or reconstructed, so the
+ * actual submission is exactly what the browser already does natively
+ * for a multi-file field.
  *
- * No fixed photo type/category (a free-text label only) and no cap on how
- * many photos a station may carry — explicit user request.
+ * No fixed photo type/category (a free-text label only) and no cap on
+ * how many photos a station may carry — explicit user request.
+ * Reselecting the file input replaces the whole preview — there's no
+ * per-file "remove before upload," since doing that without touching
+ * the native FileList needs the same DataTransfer trickery this
+ * deliberately avoids.
  */
 export function PhotosTab({ stationPublicId, photos }: Props) {
+    const [selected, setSelected] = useState<SelectedFile[]>([]);
+
+    function revokePreviews(items: SelectedFile[]) {
+        items.forEach((item) => URL.revokeObjectURL(item.previewUrl));
+    }
+
+    function handleFilesChosen(fileList: FileList | null) {
+        revokePreviews(selected);
+
+        const files = fileList ? Array.from(fileList) : [];
+        setSelected(
+            files.map((file) => ({
+                file,
+                label: '',
+                previewUrl: URL.createObjectURL(file),
+            })),
+        );
+    }
+
+    function clearSelection() {
+        revokePreviews(selected);
+        setSelected([]);
+    }
+
+    function setLabelAt(index: number, label: string) {
+        setSelected((current) =>
+            current.map((item, i) =>
+                i === index ? { ...item, label } : item,
+            ),
+        );
+    }
+
     function updatePhoto(photo: AdminPhoto, changes: Partial<AdminPhoto>) {
         router.patch(
             update({ station: stationPublicId, media: photo.id }).url,
@@ -54,62 +97,93 @@ export function PhotosTab({ stationPublicId, photos }: Props) {
     return (
         <div className="space-y-4">
             <NeuCard className="p-5">
-                <h2 className="mb-4 font-bold">Add Photo</h2>
+                <h2 className="mb-1 font-bold">Add Photos</h2>
+                <p className="text-neu-ink-muted mb-4 text-sm">
+                    Select one or more photos, label each one, then upload
+                    them all at once.
+                </p>
                 <Form
                     {...AdminPhotoStoreController.form({
                         station: stationPublicId,
                     })}
                     resetOnSuccess
-                    onSuccess={() => toast('Photo uploaded')}
+                    onSuccess={() => {
+                        toast(
+                            selected.length > 1
+                                ? `${selected.length} photos uploaded`
+                                : 'Photo uploaded',
+                        );
+                        clearSelection();
+                    }}
                 >
                     {({ processing, errors }) => (
-                        <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+                        <div className="space-y-4">
                             <NeuFormField
-                                label="File"
-                                htmlFor="photo-file"
-                                error={errors.file}
-                                className="sm:col-span-4"
+                                label="Photos"
+                                htmlFor="photo-files"
+                                error={errors.files}
+                                hint="JPEG, PNG, or WebP — select multiple at once"
                             >
                                 <input
-                                    id="photo-file"
-                                    name="file"
+                                    id="photo-files"
+                                    name="files[]"
                                     type="file"
                                     accept="image/jpeg,image/png,image/webp"
+                                    multiple
                                     required
                                     className="text-sm"
+                                    onChange={(e) =>
+                                        handleFilesChosen(e.target.files)
+                                    }
                                 />
                             </NeuFormField>
-                            <NeuFormField
-                                label="Label"
-                                htmlFor="label"
-                                hint="Optional"
-                                error={errors.label}
-                                className="sm:col-span-2"
-                            >
-                                <NeuInput id="label" name="label" />
-                            </NeuFormField>
-                            <NeuFormField
-                                label="Bearing (0-359)"
-                                htmlFor="bearing"
-                                hint="Optional"
-                                error={errors.bearing}
-                            >
-                                <NeuInput
-                                    id="bearing"
-                                    name="bearing"
-                                    type="number"
-                                    min={0}
-                                    max={359}
-                                />
-                            </NeuFormField>
+
+                            {selected.length > 0 && (
+                                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                                    {selected.map((item, index) => (
+                                        <div
+                                            key={index}
+                                            className="neu shadow-neu-sm flex items-center gap-3 rounded-[var(--radius-neu-md)] p-2"
+                                        >
+                                            <img
+                                                src={item.previewUrl}
+                                                alt=""
+                                                className="size-14 shrink-0 rounded-[var(--radius-neu-sm)] object-cover"
+                                            />
+                                            <div className="min-w-0 flex-1">
+                                                <p className="text-neu-ink-subtle truncate text-xs">
+                                                    {item.file.name}
+                                                </p>
+                                                <NeuInput
+                                                    placeholder="Label (optional)"
+                                                    name="labels[]"
+                                                    value={item.label}
+                                                    onChange={(e) =>
+                                                        setLabelAt(
+                                                            index,
+                                                            e.target.value,
+                                                        )
+                                                    }
+                                                    className="mt-1 py-1 text-sm"
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
                             <NeuButton
                                 type="submit"
                                 variant="primary"
-                                className="gap-2 sm:col-span-4 sm:w-fit"
-                                disabled={processing}
+                                className="gap-2"
+                                disabled={processing || selected.length === 0}
                             >
                                 <Upload className="size-4" />
-                                {processing ? 'Uploading…' : 'Upload'}
+                                {processing
+                                    ? 'Uploading…'
+                                    : selected.length > 1
+                                      ? `Upload ${selected.length} Photos`
+                                      : 'Upload'}
                             </NeuButton>
                         </div>
                     )}
