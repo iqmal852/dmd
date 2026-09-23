@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 use App\Enums\AccessMode;
 use App\Models\Station;
-use Database\Seeders\DemoDocumentSeeder;
-use Database\Seeders\DemoPhotoSeeder;
 use Database\Seeders\DemoStationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -13,8 +11,12 @@ uses(RefreshDatabase::class);
 
 /**
  * plan/phases/phase-03-dossier-shell.md Test Gate #13 — every poster value
- * for LPT2-GCP-015 must be visible on screen at 390x844, the four tiles
- * present and >=44px, no horizontal overflow.
+ * for LPT2-GCP-015 must be visible on screen at 390x844, no horizontal
+ * overflow. The module-tile grid (Coordinates/As-Built/Site Photos/360°
+ * View) was removed from this page per explicit user request — that
+ * navigation now lives solely in the persistent bottom nav bar (see
+ * resources/js/lib/dossier-nav.tsx) and, for 360°, the Photos page's own
+ * link.
  */
 it('shows every poster value for LPT2-GCP-015 at 390x844 with no horizontal overflow', function () {
     $this->seed(DemoStationSeeder::class);
@@ -29,11 +31,7 @@ it('shows every poster value for LPT2-GCP-015 at 390x844 with no horizontal over
         ->assertSee('4.27412582')
         ->assertSee('128.346 m')
         ->assertSee('428,765.212 m')
-        ->assertSee('112.436 m')
-        ->assertSee('Coordinates')
-        ->assertSee('As-Built')
-        ->assertSee('Site Photos')
-        ->assertSee('360° View');
+        ->assertSee('112.436 m');
 
     $page->assertScript('document.body.scrollWidth <= window.innerWidth + 1');
 
@@ -61,51 +59,6 @@ it('renders the overview with no javascript errors', function () {
     $station = Station::query()->where('code', 'LPT2-GCP-015')->firstOrFail();
 
     visit(route('dossier.show', $station))->assertNoJavaScriptErrors();
-});
-
-it('navigates via the Site Photos and 360° View tiles when both are available', function () {
-    $this->seed(DemoStationSeeder::class);
-    $this->seed(DemoPhotoSeeder::class);
-    $station = Station::query()->where('code', 'LPT2-GCP-015')->firstOrFail();
-
-    $page = visit(route('dossier.show', $station));
-
-    $page->assertScript(<<<'JS'
-        (() => {
-            const tile = [...document.querySelectorAll('a')].find((a) => a.textContent.includes('Site Photos'));
-            return tile !== undefined && tile.getAttribute('href')?.endsWith('/photos');
-        })()
-        JS);
-
-    $page->click('Site Photos');
-    $page->assertPathContains('/photos');
-
-    $page = visit(route('dossier.show', $station));
-
-    $page->assertScript(<<<'JS'
-        (() => {
-            const tile = [...document.querySelectorAll('a')].find((a) => a.textContent.includes('360° View'));
-            return tile !== undefined && tile.getAttribute('href')?.endsWith('/360');
-        })()
-        JS);
-});
-
-it('navigates via the As-Built tile once a document exists', function () {
-    $this->seed(DemoStationSeeder::class);
-    $this->seed(DemoDocumentSeeder::class);
-    $station = Station::query()->where('code', 'LPT2-GCP-015')->firstOrFail();
-
-    $page = visit(route('dossier.show', $station));
-
-    $page->assertScript(<<<'JS'
-        (() => {
-            const tile = [...document.querySelectorAll('a')].find((a) => a.textContent.includes('As-Built'));
-            return tile !== undefined && tile.getAttribute('href')?.endsWith('/files');
-        })()
-        JS);
-
-    $page->click('As-Built');
-    $page->assertPathContains('/files');
 });
 
 it('renders the unlock screen with no javascript errors and no station data', function () {
