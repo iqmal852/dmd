@@ -27,7 +27,6 @@ type PageProps = {
     documents: AdminDocument[];
     directionOptions: Option[];
     statusOptions: Option[];
-    photoTypeOptions: Option[];
     documentTypeOptions: Option[];
 };
 
@@ -110,7 +109,6 @@ export default function AdminStationForm() {
                 <PhotosTab
                     stationPublicId={station.publicId}
                     photos={props.photos}
-                    photoTypeOptions={props.photoTypeOptions}
                 />
             )}
             {tab === 'panorama' && station.publicId && (

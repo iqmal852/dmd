@@ -17,9 +17,8 @@ class AdminPhotoUpdateController extends Controller
     {
         abort_unless($media->collection_name === 'photos', 404);
 
-        $media->setCustomProperty('photo_type', $request->validated('photo_type'));
         $media->setCustomProperty('bearing', $request->validated('bearing'));
-        $media->setCustomProperty('caption', $request->validated('caption'));
+        $media->setCustomProperty('label', $request->validated('label'));
         $media->save();
 
         StationCache::bump($station);

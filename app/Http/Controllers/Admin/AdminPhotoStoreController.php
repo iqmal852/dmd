@@ -19,9 +19,8 @@ class AdminPhotoStoreController extends Controller
 
         $station->addMediaFromRequest('file')
             ->withCustomProperties([
-                'photo_type' => $request->validated('photo_type'),
+                'label' => $request->validated('label'),
                 'bearing' => $request->validated('bearing'),
-                'caption' => $request->validated('caption'),
                 'captured_at' => now()->toDateString(),
                 'width' => $dimensions[0] ?? null,
                 'height' => $dimensions[1] ?? null,

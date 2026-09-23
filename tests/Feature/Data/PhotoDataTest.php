@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Tests\Feature\Data;
 
 use App\Data\PhotoData;
-use App\Enums\PhotoType;
 use App\Models\Station;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
+/**
+ * Photos carry a free-text label only — no fixed type/category — per
+ * explicit user request. See App\Data\PhotoData's own docblock.
+ */
 class PhotoDataTest extends TestCase
 {
     use RefreshDatabase;
@@ -30,10 +33,9 @@ class PhotoDataTest extends TestCase
         $station = Station::factory()->create();
 
         $media = $station->addMediaFromString($this->fakeJpegBytes())
-            ->usingFileName('eye_level.jpg')
+            ->usingFileName('photo.jpg')
             ->withCustomProperties([
-                'photo_type' => PhotoType::EyeLevel->value,
-                'caption' => 'Facing the highway',
+                'label' => 'Facing the highway',
                 'bearing' => 145,
                 'captured_at' => '2026-01-15',
                 'width' => 1200,
@@ -44,27 +46,24 @@ class PhotoDataTest extends TestCase
         $data = PhotoData::from($media->fresh());
 
         $this->assertSame((string) $media->uuid, $data->id);
-        $this->assertSame(PhotoType::EyeLevel->value, $data->type);
-        $this->assertSame(PhotoType::EyeLevel->label(), $data->typeLabel);
-        $this->assertSame('Facing the highway', $data->caption);
+        $this->assertSame('Facing the highway', $data->label);
         $this->assertSame(145, $data->bearing);
         $this->assertSame('2026-01-15', $data->capturedAt);
         $this->assertSame(1200, $data->width);
         $this->assertSame(900, $data->height);
     }
 
-    public function test_from_falls_back_to_the_type_label_when_no_caption_is_set(): void
+    public function test_from_falls_back_to_a_generic_label_when_none_is_set(): void
     {
         $station = Station::factory()->create();
 
         $media = $station->addMediaFromString($this->fakeJpegBytes())
-            ->usingFileName('close_up.jpg')
-            ->withCustomProperties(['photo_type' => PhotoType::CloseUp->value])
+            ->usingFileName('photo.jpg')
             ->toMediaCollection('photos');
 
         $data = PhotoData::from($media->fresh());
 
-        $this->assertSame(PhotoType::CloseUp->label(), $data->caption);
+        $this->assertSame('Site Photo', $data->label);
     }
 
     public function test_from_builds_a_two_candidate_srcset_from_the_thumb_and_preview_conversions(): void
@@ -72,8 +71,7 @@ class PhotoDataTest extends TestCase
         $station = Station::factory()->create();
 
         $media = $station->addMediaFromString($this->fakeJpegBytes())
-            ->usingFileName('top_down.jpg')
-            ->withCustomProperties(['photo_type' => PhotoType::TopDown->value])
+            ->usingFileName('photo.jpg')
             ->toMediaCollection('photos');
 
         $data = PhotoData::from($media->fresh());
@@ -89,8 +87,7 @@ class PhotoDataTest extends TestCase
         $station = Station::factory()->create();
 
         $media = $station->addMediaFromString($this->fakeJpegBytes())
-            ->usingFileName('eye_level.jpg')
-            ->withCustomProperties(['photo_type' => PhotoType::EyeLevel->value])
+            ->usingFileName('photo.jpg')
             ->toMediaCollection('photos');
 
         $data = PhotoData::from($media->fresh());
@@ -104,8 +101,7 @@ class PhotoDataTest extends TestCase
         $station = Station::factory()->create();
 
         $media = $station->addMediaFromString($this->fakeJpegBytes())
-            ->usingFileName('eye_level.jpg')
-            ->withCustomProperties(['photo_type' => PhotoType::EyeLevel->value])
+            ->usingFileName('photo.jpg')
             ->toMediaCollection('photos');
 
         $data = PhotoData::from($media->fresh());

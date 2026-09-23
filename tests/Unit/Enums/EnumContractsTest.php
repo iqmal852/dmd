@@ -8,7 +8,6 @@ use App\Contracts\HasColor;
 use App\Contracts\HasLabel;
 use App\Enums\Direction;
 use App\Enums\DocumentType;
-use App\Enums\PhotoType;
 use App\Enums\QcStatus;
 use App\Enums\StationStatus;
 use Tests\TestCase;
@@ -24,7 +23,6 @@ class EnumContractsTest extends TestCase
             StationStatus::class => [StationStatus::class],
             Direction::class => [Direction::class],
             QcStatus::class => [QcStatus::class],
-            PhotoType::class => [PhotoType::class],
             DocumentType::class => [DocumentType::class],
         ];
     }
@@ -86,12 +84,5 @@ class EnumContractsTest extends TestCase
     {
         $this->assertSame('accent', QcStatus::Verified->color());
         $this->assertSame('Verified', QcStatus::Verified->label());
-    }
-
-    public function test_photo_type_labels_match_the_poster_captions(): void
-    {
-        $this->assertSame('Eye-Level Approach', PhotoType::EyeLevel->label());
-        $this->assertSame('Top-Down (Sky Visibility)', PhotoType::TopDown->label());
-        $this->assertSame('Close-Up (Monument)', PhotoType::CloseUp->label());
     }
 }

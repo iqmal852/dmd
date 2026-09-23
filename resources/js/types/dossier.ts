@@ -61,9 +61,7 @@ export type Specification = {
 /** Mirrors App\Data\PhotoData exactly. */
 export type Photo = {
     id: string;
-    type: string;
-    typeLabel: string;
-    caption: string;
+    label: string;
     bearing: number | null;
     capturedAt: string | null;
     thumbUrl: string;

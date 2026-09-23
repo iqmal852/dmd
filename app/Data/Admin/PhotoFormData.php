@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Data\Admin;
 
-use App\Enums\PhotoType;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
@@ -15,9 +14,8 @@ final readonly class PhotoFormData
 {
     public function __construct(
         public string $id,
-        public string $type,
         public ?int $bearing,
-        public ?string $caption,
+        public ?string $label,
         public string $thumbUrl,
     ) {}
 
@@ -25,9 +23,8 @@ final readonly class PhotoFormData
     {
         return new self(
             id: (string) $media->uuid,
-            type: (string) ($media->getCustomProperty('photo_type') ?: PhotoType::EyeLevel->value),
             bearing: $media->getCustomProperty('bearing'),
-            caption: $media->getCustomProperty('caption'),
+            label: $media->getCustomProperty('label'),
             thumbUrl: $media->getFullUrl('thumb'),
         );
     }

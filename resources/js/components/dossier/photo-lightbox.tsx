@@ -58,7 +58,7 @@ export function PhotoLightbox({
                     aria-describedby={undefined}
                 >
                     <Dialog.Title className="sr-only">
-                        {photo.caption}
+                        {photo.label}
                     </Dialog.Title>
 
                     <Dialog.Close asChild>
@@ -92,12 +92,12 @@ export function PhotoLightbox({
 
                     <img
                         src={photo.previewUrl}
-                        alt={photo.caption}
+                        alt={photo.label}
                         className="max-h-[80dvh] max-w-full touch-pinch-zoom object-contain"
                     />
 
                     <p className="text-center text-sm font-medium text-white">
-                        {photo.typeLabel}
+                        {photo.label}
                     </p>
                 </Dialog.Content>
             </Dialog.Portal>

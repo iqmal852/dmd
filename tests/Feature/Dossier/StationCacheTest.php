@@ -98,7 +98,6 @@ class StationCacheTest extends TestCase
         Specification::factory()->for($station)->create();
         $this->actingAs($admin)->post(route('admin.stations.photos.store', $station), [
             'file' => UploadedFile::fake()->image('a.jpg', 800, 600),
-            'photo_type' => 'eye_level',
         ]);
         $station->addMediaFromString('%PDF-1.4')
             ->usingFileName('a.pdf')
@@ -137,7 +136,6 @@ class StationCacheTest extends TestCase
 
         $this->actingAs($admin)->post(route('admin.stations.photos.store', $station), [
             'file' => UploadedFile::fake()->image('a.jpg', 800, 600),
-            'photo_type' => 'eye_level',
         ]);
 
         $this->get(route('dossier.show', $station))

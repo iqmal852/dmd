@@ -6,15 +6,13 @@ import { NeuCard } from '@/components/neu/neu-card';
 import { NeuFormField } from '@/components/neu/neu-form-field';
 import { NeuIconButton } from '@/components/neu/neu-icon-button';
 import { NeuInput } from '@/components/neu/neu-input';
-import { NeuSelect } from '@/components/neu/neu-select';
 import AdminPhotoStoreController from '@/actions/App/Http/Controllers/Admin/AdminPhotoStoreController';
 import { destroy, update } from '@/routes/admin/stations/photos';
-import type { AdminPhoto, Option } from '@/types/admin';
+import type { AdminPhoto } from '@/types/admin';
 
 type Props = {
     stationPublicId: string;
     photos: AdminPhoto[];
-    photoTypeOptions: Option[];
 };
 
 /**
@@ -27,19 +25,17 @@ type Props = {
  * which is real added complexity for a nice-to-have the Test Gate doesn't
  * require; the server-side 20 MB cap (StorePhotoRequest) is the actual
  * safeguard against an enormous upload today.
+ *
+ * No fixed photo type/category (a free-text label only) and no cap on how
+ * many photos a station may carry — explicit user request.
  */
-export function PhotosTab({
-    stationPublicId,
-    photos,
-    photoTypeOptions,
-}: Props) {
+export function PhotosTab({ stationPublicId, photos }: Props) {
     function updatePhoto(photo: AdminPhoto, changes: Partial<AdminPhoto>) {
         router.patch(
             update({ station: stationPublicId, media: photo.id }).url,
             {
-                photo_type: changes.type ?? photo.type,
                 bearing: changes.bearing ?? photo.bearing,
-                caption: changes.caption ?? photo.caption,
+                label: changes.label ?? photo.label,
             },
             { preserveScroll: true, onSuccess: () => toast('Photo updated') },
         );
@@ -84,24 +80,13 @@ export function PhotosTab({
                                 />
                             </NeuFormField>
                             <NeuFormField
-                                label="Type"
-                                htmlFor="photo_type"
-                                error={errors.photo_type}
+                                label="Label"
+                                htmlFor="label"
+                                hint="Optional"
+                                error={errors.label}
+                                className="sm:col-span-2"
                             >
-                                <NeuSelect
-                                    id="photo_type"
-                                    name="photo_type"
-                                    defaultValue={photoTypeOptions[0]?.value}
-                                >
-                                    {photoTypeOptions.map((option) => (
-                                        <option
-                                            key={option.value}
-                                            value={option.value}
-                                        >
-                                            {option.label}
-                                        </option>
-                                    ))}
-                                </NeuSelect>
+                                <NeuInput id="label" name="label" />
                             </NeuFormField>
                             <NeuFormField
                                 label="Bearing (0-359)"
@@ -116,15 +101,6 @@ export function PhotosTab({
                                     min={0}
                                     max={359}
                                 />
-                            </NeuFormField>
-                            <NeuFormField
-                                label="Caption"
-                                htmlFor="caption"
-                                hint="Optional"
-                                error={errors.caption}
-                                className="sm:col-span-2"
-                            >
-                                <NeuInput id="caption" name="caption" />
                             </NeuFormField>
                             <NeuButton
                                 type="submit"
@@ -149,22 +125,16 @@ export function PhotosTab({
                             className="size-20 shrink-0 rounded-[var(--radius-neu-sm)] object-cover"
                         />
                         <div className="flex-1 space-y-2">
-                            <NeuSelect
-                                value={photo.type}
-                                onChange={(e) =>
-                                    updatePhoto(photo, { type: e.target.value })
+                            <NeuInput
+                                placeholder="Label"
+                                defaultValue={photo.label ?? ''}
+                                onBlur={(e) =>
+                                    updatePhoto(photo, {
+                                        label: e.target.value || null,
+                                    })
                                 }
                                 className="py-1.5 text-sm"
-                            >
-                                {photoTypeOptions.map((option) => (
-                                    <option
-                                        key={option.value}
-                                        value={option.value}
-                                    >
-                                        {option.label}
-                                    </option>
-                                ))}
-                            </NeuSelect>
+                            />
                             <div className="flex items-center gap-2">
                                 <NeuInput
                                     type="number"

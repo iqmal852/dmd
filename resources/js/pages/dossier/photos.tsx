@@ -67,7 +67,7 @@ export default function DossierPhotos() {
                         onClick={() => setLightboxIndex(heroIndex)}
                     >
                         <span className="bg-neu-surface/90 text-neu-ink absolute top-3 left-3 z-10 rounded-[var(--radius-neu-pill)] px-3 py-1 text-xs font-bold tracking-wide uppercase">
-                            {hero.typeLabel}
+                            {hero.label}
                         </span>
 
                         {hero.bearing !== null && (
@@ -82,7 +82,7 @@ export default function DossierPhotos() {
                         <img
                             src={hero.previewUrl}
                             srcSet={hero.srcset}
-                            alt={hero.caption}
+                            alt={hero.label}
                             width={hero.width}
                             height={hero.height}
                             style={{
@@ -117,13 +117,13 @@ export default function DossierPhotos() {
                             >
                                 <img
                                     src={photo.thumbUrl}
-                                    alt={photo.caption}
+                                    alt={photo.label}
                                     loading="lazy"
                                     decoding="async"
                                     className="size-20 object-cover"
                                 />
-                                <span className="bg-neu-surface/90 text-neu-ink absolute inset-x-0 bottom-0 px-1 py-0.5 text-center text-[0.6rem] font-bold">
-                                    {photo.type.replace('_', ' ')}
+                                <span className="bg-neu-surface/90 text-neu-ink absolute inset-x-0 bottom-0 truncate px-1 py-0.5 text-center text-[0.6rem] font-bold">
+                                    {photo.label}
                                 </span>
                             </button>
                         ))}

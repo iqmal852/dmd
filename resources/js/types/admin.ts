@@ -80,9 +80,8 @@ export type AdminSpecification = {
 /** Mirrors App\Data\Admin\PhotoFormData exactly. */
 export type AdminPhoto = {
     id: string;
-    type: string;
     bearing: number | null;
-    caption: string | null;
+    label: string | null;
     thumbUrl: string;
 };
 

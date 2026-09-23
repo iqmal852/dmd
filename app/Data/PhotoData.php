@@ -4,23 +4,22 @@ declare(strict_types=1);
 
 namespace App\Data;
 
-use App\Enums\PhotoType;
 use Illuminate\Support\Facades\Storage;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
  * One Site Photos carousel item — Picture1.png panel 4. `id` is the
  * media row's UUID, not its numeric primary key, so the prop never
- * reveals storage layout or row counts. See
+ * reveals storage layout or row counts. Photos carry a free-text label
+ * only — no fixed type/category and no cap on how many a station may
+ * have, per explicit user request. See
  * plan/phases/phase-06-photos-360.md M6.2.
  */
 final readonly class PhotoData
 {
     public function __construct(
         public string $id,
-        public string $type,
-        public string $typeLabel,
-        public string $caption,
+        public string $label,
         public ?int $bearing,
         public ?string $capturedAt,
         public string $thumbUrl,
@@ -33,15 +32,12 @@ final readonly class PhotoData
 
     public static function from(Media $media): self
     {
-        $type = PhotoType::from((string) $media->getCustomProperty('photo_type'));
         $thumbUrl = $media->getFullUrl('thumb');
         $previewUrl = $media->getFullUrl('preview');
 
         return new self(
             id: (string) $media->uuid,
-            type: $type->value,
-            typeLabel: $type->label(),
-            caption: (string) ($media->getCustomProperty('caption') ?: $type->label()),
+            label: (string) ($media->getCustomProperty('label') ?: 'Site Photo'),
             bearing: $media->getCustomProperty('bearing'),
             capturedAt: $media->getCustomProperty('captured_at'),
             thumbUrl: $thumbUrl,

@@ -33,12 +33,12 @@ class PhotosTest extends TestCase
         return (string) $bytes;
     }
 
-    private function attachPhoto(Station $station, string $type, ?int $bearing = null): Media
+    private function attachPhoto(Station $station, string $label, ?int $bearing = null): Media
     {
         return $station->addMediaFromString($this->fakeJpegBytes())
-            ->usingFileName("{$type}.jpg")
+            ->usingFileName(str($label)->slug().'.jpg')
             ->withCustomProperties([
-                'photo_type' => $type,
+                'label' => $label,
                 'bearing' => $bearing,
                 'width' => 1200,
                 'height' => 900,
@@ -59,14 +59,14 @@ class PhotosTest extends TestCase
     public function test_props_contain_exactly_the_photo_data_fields(): void
     {
         $station = Station::factory()->create(['is_published' => true]);
-        $this->attachPhoto($station, 'eye_level', 145);
+        $this->attachPhoto($station, 'Facing the highway', 145);
 
         $response = $this->get(route('dossier.photos', $station));
 
         $response->assertInertia(fn (AssertableInertia $page) => $page
             ->has('photos.0', fn (AssertableInertia $p) => $p
                 ->hasAll([
-                    'id', 'type', 'typeLabel', 'caption', 'bearing', 'capturedAt',
+                    'id', 'label', 'bearing', 'capturedAt',
                     'thumbUrl', 'previewUrl', 'srcset', 'placeholder', 'width', 'height',
                 ])
                 ->missing('file_name')
@@ -79,7 +79,7 @@ class PhotosTest extends TestCase
     public function test_props_never_reveal_the_internal_media_primary_key(): void
     {
         $station = Station::factory()->create(['is_published' => true]);
-        $media = $this->attachPhoto($station, 'eye_level');
+        $media = $this->attachPhoto($station, 'Facing the highway');
 
         $response = $this->get(route('dossier.photos', $station));
 
@@ -89,24 +89,30 @@ class PhotosTest extends TestCase
         $this->assertStringContainsString((string) $media->uuid, (string) $content);
     }
 
-    public function test_photos_are_ordered_eye_level_first(): void
+    /**
+     * Photos have no type/category to sort by any more — they render in
+     * the order they were uploaded (Spatie's own `order_column`).
+     */
+    public function test_photos_are_returned_in_upload_order(): void
     {
         $station = Station::factory()->create(['is_published' => true]);
-        $this->attachPhoto($station, 'close_up');
-        $this->attachPhoto($station, 'top_down');
-        $this->attachPhoto($station, 'eye_level');
+        $this->attachPhoto($station, 'Second uploaded');
+        $this->attachPhoto($station, 'First uploaded');
+        $this->attachPhoto($station, 'Third uploaded');
 
         $response = $this->get(route('dossier.photos', $station));
 
         $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->where('photos.0.type', 'eye_level')
+            ->where('photos.0.label', 'Second uploaded')
+            ->where('photos.1.label', 'First uploaded')
+            ->where('photos.2.label', 'Third uploaded')
         );
     }
 
     public function test_every_photo_carries_a_non_empty_srcset_and_dimensions(): void
     {
         $station = Station::factory()->create(['is_published' => true]);
-        $this->attachPhoto($station, 'eye_level');
+        $this->attachPhoto($station, 'Facing the highway');
 
         $response = $this->get(route('dossier.photos', $station));
 

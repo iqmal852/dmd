@@ -12,7 +12,6 @@ use App\Data\Admin\SpecificationFormData;
 use App\Data\Admin\StationFormData;
 use App\Enums\Direction;
 use App\Enums\DocumentType;
-use App\Enums\PhotoType;
 use App\Enums\StationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Station;
@@ -52,8 +51,6 @@ class AdminStationEditController extends Controller
                 ->map(fn (Direction $direction) => ['value' => $direction->value, 'label' => $direction->label()]),
             'statusOptions' => collect(StationStatus::cases())
                 ->map(fn (StationStatus $status) => ['value' => $status->value, 'label' => $status->label()]),
-            'photoTypeOptions' => collect(PhotoType::cases())
-                ->map(fn (PhotoType $type) => ['value' => $type->value, 'label' => $type->label()]),
             'documentTypeOptions' => collect(DocumentType::cases())
                 ->map(fn (DocumentType $type) => ['value' => $type->value, 'label' => $type->label()]),
         ]);
