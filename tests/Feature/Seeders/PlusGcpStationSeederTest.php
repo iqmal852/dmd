@@ -46,8 +46,8 @@ class PlusGcpStationSeederTest extends TestCase
 
         $station = Station::query()->where('gcp_reference', 'GP91')->with('coordinateSet')->firstOrFail();
 
-        $this->assertSame('PLUS-GCP-001', $station->code);
-        $this->assertSame('PLUS', $station->highway);
+        $this->assertSame('LPT2-GCP-001', $station->code);
+        $this->assertSame('LPT2', $station->highway);
         $this->assertSame('N1', $station->section);
         $this->assertSame('KEDAH/PERLIS', $station->location);
         $this->assertSame('27.000', $station->km);

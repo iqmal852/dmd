@@ -11,13 +11,17 @@ use Illuminate\Database\Seeder;
 use RuntimeException;
 
 /**
- * The real PLUS North-South Expressway GCP dataset — 136 ground control
- * points spanning Perlis to Johor (sections N1-N7, C1-C6, S1-S6, SPDH),
- * supplied as plan/GCP_GDM2000.xls and pre-converted to
+ * The real GCP dataset — 136 ground control points spanning Perlis to
+ * Johor (sections N1-N7, C1-C6, S1-S6, SPDH), supplied as
+ * plan/GCP_GDM2000.xls and pre-converted to
  * database/seeders/data/plus_gcp_stations.csv (see that file's own header
- * for the exact source columns). Replaces the earlier all-fake
- * DemoStationSeeder as this app's actual production/dev data — see the
- * plan/STATUS.md deviation log.
+ * for the exact source columns). Sourced from PLUS's own GIS export
+ * (hence the file/class naming), but every one of these monuments
+ * belongs to the LPT2 highway specifically — `highway` and `code` are
+ * set to LPT2 accordingly, distinct from `BRAND_CLIENT=PLUS`
+ * (config/dossier.php), which is the operator/client, not the highway.
+ * Replaces the earlier all-fake DemoStationSeeder as this app's actual
+ * production/dev data — see the plan/STATUS.md deviation log.
  *
  * The source's Latitude/Longitude columns in the original .csv export
  * were truncated to bare integers and useless; the .xls export has full
@@ -36,9 +40,9 @@ class PlusGcpStationSeeder extends Seeder
 
         foreach ($rows as $sequence => $row) {
             $station = Station::create([
-                'code' => sprintf('PLUS-GCP-%03d', $sequence + 1),
+                'code' => sprintf('LPT2-GCP-%03d', $sequence + 1),
                 'gcp_reference' => $row['GCP'],
-                'highway' => 'PLUS',
+                'highway' => 'LPT2',
                 'section' => $row['Section'] !== '' ? $row['Section'] : null,
                 'location' => $row['Location'] !== '' ? $row['Location'] : null,
                 'km' => $row['KM_Marker'],
