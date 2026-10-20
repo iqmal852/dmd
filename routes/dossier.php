@@ -27,9 +27,16 @@ use Illuminate\Support\Facades\Route;
  | routes the way a global Route::bind() would. See
  | plan/phases/phase-03-dossier-shell.md M3.1 and
  | plan/phases/phase-08-admin-qr.md (which found the leak).
+ |
+ | Every route here also requires a logged-in user. A guest who scans a QR
+ | plate is sent to /login and, once authenticated, returned to the dossier
+ | page they scanned (the `auth` middleware stores the intended URL and
+ | Fortify's login response redirects to it before falling back to home).
+ | `auth` runs ahead of station binding, so a guest cannot probe which
+ | station IDs exist or are published.
  */
 Route::prefix(config('dossier.route_prefix'))
-    ->middleware([AddNoindexHeader::class, EnsureStationIsPublished::class])
+    ->middleware(['auth', AddNoindexHeader::class, EnsureStationIsPublished::class])
     ->name('dossier.')
     ->group(function (): void {
         Route::get('{station}/unlock', UnlockFormController::class)->name('unlock');

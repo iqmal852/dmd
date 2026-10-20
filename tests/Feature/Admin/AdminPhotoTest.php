@@ -122,10 +122,10 @@ class AdminPhotoTest extends TestCase
         $user = User::factory()->create();
         $station = Station::factory()->create(['is_published' => true]);
 
-        $this->get(route('dossier.show', $station))
+        $this->actingAs($user)->get(route('dossier.show', $station))
             ->assertInertia(fn ($page) => $page->where('station.modules.photoCount', 0));
 
-        $this->actingAs($user)->post(route('admin.stations.photos.store', $station), [
+        $this->post(route('admin.stations.photos.store', $station), [
             'files' => [
                 UploadedFile::fake()->image('a.jpg', 800, 600),
                 UploadedFile::fake()->image('b.jpg', 800, 600),

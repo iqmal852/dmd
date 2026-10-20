@@ -6,6 +6,7 @@ namespace Tests\Feature\Dossier;
 
 use App\Enums\AccessMode;
 use App\Models\Station;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -17,6 +18,13 @@ use Tests\TestCase;
 class PhotosTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->actingAs(User::factory()->create());
+    }
 
     /**
      * A real (if tiny) JPEG — medialibrary validates MIME type against the
@@ -78,6 +86,11 @@ class PhotosTest extends TestCase
 
     public function test_props_never_reveal_the_internal_media_primary_key(): void
     {
+        // The shared Inertia `auth.user` prop carries `"id":<user id>`; give the
+        // viewer an id no media row can share so the assertion below only
+        // ever matches a leaked media primary key.
+        $this->actingAs(User::factory()->create(['id' => 900001]));
+
         $station = Station::factory()->create(['is_published' => true]);
         $media = $this->attachPhoto($station, 'Facing the highway');
 

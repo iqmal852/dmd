@@ -7,6 +7,7 @@ namespace Tests\Feature\Dossier;
 use App\Enums\AccessMode;
 use App\Models\CoordinateSet;
 use App\Models\Station;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Testing\TestResponse;
@@ -20,6 +21,13 @@ use Tests\TestCase;
 class AccessControlTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->actingAs(User::factory()->create());
+    }
 
     private function publishedStation(array $attributes = []): Station
     {

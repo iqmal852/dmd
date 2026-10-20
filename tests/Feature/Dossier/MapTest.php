@@ -7,6 +7,7 @@ namespace Tests\Feature\Dossier;
 use App\Enums\AccessMode;
 use App\Models\CoordinateSet;
 use App\Models\Station;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Inertia\Testing\AssertableInertia;
 use Tests\TestCase;
@@ -17,6 +18,13 @@ use Tests\TestCase;
 class MapTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->actingAs(User::factory()->create());
+    }
 
     public function test_it_returns_200_with_the_map_component(): void
     {

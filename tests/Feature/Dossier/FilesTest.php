@@ -8,6 +8,7 @@ use App\Enums\AccessMode;
 use App\Enums\DocumentType;
 use App\Models\DownloadLog;
 use App\Models\Station;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
 use Inertia\Testing\AssertableInertia;
@@ -20,6 +21,13 @@ use Tests\TestCase;
 class FilesTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->actingAs(User::factory()->create());
+    }
 
     private function attachDocument(
         Station $station,
@@ -84,6 +92,11 @@ class FilesTest extends TestCase
 
     public function test_props_never_reveal_the_internal_media_primary_key(): void
     {
+        // The shared Inertia `auth.user` prop carries `"id":<user id>`; give the
+        // viewer an id no media row can share so the assertion below only
+        // ever matches a leaked media primary key.
+        $this->actingAs(User::factory()->create(['id' => 900001]));
+
         $station = Station::factory()->create(['is_published' => true]);
         $media = $this->attachDocument($station);
 

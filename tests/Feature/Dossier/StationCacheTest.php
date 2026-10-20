@@ -21,6 +21,13 @@ class StationCacheTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->actingAs(User::factory()->create());
+    }
+
     public function test_a_second_request_for_the_same_station_issues_fewer_queries(): void
     {
         $station = Station::factory()->create(['is_published' => true]);

@@ -7,6 +7,7 @@ namespace Tests\Feature\Dossier;
 use App\Models\CoordinateSet;
 use App\Models\Specification;
 use App\Models\Station;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\Assert;
@@ -21,6 +22,13 @@ use Tests\TestCase;
 class OverviewTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->actingAs(User::factory()->create());
+    }
 
     public function test_overview_prop_shape_is_exactly_the_dto(): void
     {

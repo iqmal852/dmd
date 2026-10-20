@@ -54,7 +54,8 @@ class AdminQrTest extends TestCase
         $encoded = app(QrUrlBuilder::class)->forStation($station);
         $this->assertStringContainsString('/'.$configuredPrefix.'/'.$station->public_id, $encoded);
 
-        $response = $this->get('/'.$configuredPrefix.'/'.$station->public_id);
+        $response = $this->actingAs(User::factory()->create())
+            ->get('/'.$configuredPrefix.'/'.$station->public_id);
         $response->assertOk();
     }
 
