@@ -10,7 +10,7 @@ return [
      |     php artisan batu:admin-password
      */
     'admin' => [
-        'name' => env('ADMIN_NAME', 'MySpatial Admin'),
+        'name' => env('ADMIN_NAME', 'PLUS Admin'),
         'email' => env('ADMIN_EMAIL', 'admin@myspatial.com.my'),
         'password' => env('ADMIN_PASSWORD'),
     ],

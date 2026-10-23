@@ -23,7 +23,7 @@ class TeamUserSeederTest extends TestCase
             User::query()->pluck('name')->all(),
         );
 
-        $user = User::query()->where('email', 'user.lpt@myspatial.com.my')->firstOrFail();
+        $user = User::query()->where('email', 'user.lpt@plus.com')->firstOrFail();
         $this->assertTrue(Hash::check('secret123', $user->password));
         $this->assertNotNull($user->email_verified_at);
     }
@@ -41,7 +41,7 @@ class TeamUserSeederTest extends TestCase
         $this->seed(TeamUserSeeder::class);
 
         $this->post(route('login.store'), [
-            'email' => 'admin.plus@myspatial.com.my',
+            'email' => 'admin.plus@plus.com',
             'password' => 'secret123',
         ]);
 
@@ -58,5 +58,15 @@ class TeamUserSeederTest extends TestCase
         ]);
 
         $this->assertAuthenticated();
+    }
+
+    public function test_reseeding_moves_an_existing_account_to_the_new_email(): void
+    {
+        User::factory()->create(['username' => 'admin-plus', 'email' => 'admin.plus@myspatial.com.my']);
+
+        $this->seed(TeamUserSeeder::class);
+
+        $this->assertSame(5, User::query()->count());
+        $this->assertSame('admin.plus@plus.com', User::query()->where('username', 'admin-plus')->value('email'));
     }
 }

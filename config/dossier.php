@@ -40,7 +40,7 @@ return [
         'margin' => (int) env('QR_MARGIN', 16),
         'error_correction' => env('QR_ERROR_CORRECTION', 'high'), // high: survives a scratched roadside plate
         'format' => env('QR_FORMAT', 'png'), // png | svg
-        'logo_path' => env('QR_LOGO_PATH'), // optional MySpatial mark in the centre
+        'logo_path' => env('QR_LOGO_PATH'), // optional PLUS mark in the centre
     ],
 
     'map' => [
@@ -53,7 +53,7 @@ return [
     ],
 
     'branding' => [
-        'operator' => env('BRAND_OPERATOR', 'MySpatial'),
+        'operator' => env('BRAND_OPERATOR', 'PLUS'),
         'client' => env('BRAND_CLIENT', 'PLUS'),
         'title' => env('BRAND_TITLE', 'Digital Monument Dossier'),
     ],
