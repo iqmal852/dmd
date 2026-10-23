@@ -10,6 +10,7 @@ use App\Models\Station;
 use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 
 /**
  * See plan/phases/phase-08-admin-qr.md M8.7.
@@ -48,7 +49,9 @@ class AdminDocumentStoreController extends Controller
 
         StationCache::bump($station);
 
-        return back()->with('status', 'Document uploaded.');
+        Inertia::flash('toast', ['type' => 'success', 'message' => "Document uploaded successfully. It is now available in this station's as-built files."]);
+
+        return back();
     }
 
     private function clearExistingPrimary(Station $station): void

@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreStationRequest;
 use App\Models\Station;
 use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
 
 /**
  * See plan/phases/phase-08-admin-qr.md M8.3. `public_id` is never set from
@@ -35,7 +36,8 @@ class AdminStationStoreController extends Controller
             'is_published' => $request->validated('is_published', false),
         ]);
 
-        return to_route('admin.stations.edit', $station)
-            ->with('status', 'Station created.');
+        Inertia::flash('toast', ['type' => 'success', 'message' => "Station {$station->code} was created successfully. You can now add its coordinates, specification, photos and documents."]);
+
+        return to_route('admin.stations.edit', $station);
     }
 }

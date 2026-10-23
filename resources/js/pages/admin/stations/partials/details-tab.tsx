@@ -1,8 +1,10 @@
 import { Form } from '@inertiajs/react';
+import { AlertTriangle } from 'lucide-react';
 import { NeuButton } from '@/components/neu/neu-button';
 import { NeuCard } from '@/components/neu/neu-card';
 import { NeuFormField } from '@/components/neu/neu-form-field';
 import { NeuInput } from '@/components/neu/neu-input';
+import { NeuPill } from '@/components/neu/neu-pill';
 import { NeuSelect } from '@/components/neu/neu-select';
 import { NeuTextarea } from '@/components/neu/neu-textarea';
 import { NeuToggle } from '@/components/neu/neu-toggle';
@@ -41,19 +43,57 @@ export function DetailsTab({
                 {({ processing, errors }) => (
                     <>
                         {isEditing && (
-                            <div className="space-y-1.5">
-                                <span className="text-neu-ink-muted text-sm font-medium">
-                                    Public ID
-                                </span>
-                                <p className="text-neu-ink-subtle font-mono text-sm">
-                                    {station.publicId}
-                                </p>
-                                <p className="text-neu-danger text-xs">
-                                    Changing this would invalidate every QR
-                                    plate already installed in the field — it
-                                    cannot be edited here.
-                                </p>
-                            </div>
+                            <>
+                                {/*
+                                  * The warning below is about the Public ID
+                                  * only, not the editable form beneath it, so
+                                  * it lives in its own read-only panel with a
+                                  * divider after it.
+                                  */}
+                                <section
+                                    aria-labelledby="public-id-heading"
+                                    className="bg-neu-surface-sunken space-y-3 rounded-[var(--radius-neu-md)] p-4"
+                                >
+                                    <div className="flex items-center justify-between gap-2">
+                                        <h3
+                                            id="public-id-heading"
+                                            className="text-neu-ink-muted text-sm font-medium"
+                                        >
+                                            Public ID
+                                        </h3>
+                                        <NeuPill tone="ink-muted">
+                                            Read-only
+                                        </NeuPill>
+                                    </div>
+                                    <p className="bg-neu-primary text-neu-on-primary rounded-[var(--radius-neu-md)] px-3 py-2 font-mono text-base font-semibold tracking-wide break-all select-all">
+                                        {station.publicId}
+                                    </p>
+                                    <div
+                                        role="alert"
+                                        className="bg-neu-warning text-neu-on-warning flex items-start gap-2 rounded-[var(--radius-neu-md)] p-3 text-sm"
+                                    >
+                                        <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+                                        <span>
+                                            <strong className="font-semibold">
+                                                Warning:
+                                            </strong>{' '}
+                                            Changing this Public ID would
+                                            invalidate every QR plate already
+                                            installed in the field — it cannot
+                                            be edited here.
+                                        </span>
+                                    </div>
+                                </section>
+
+                                <div
+                                    role="separator"
+                                    className="bg-neu-surface-sunken h-0.5 rounded-full"
+                                />
+
+                                <h3 className="text-neu-ink text-sm font-semibold">
+                                    Station details
+                                </h3>
+                            </>
                         )}
 
                         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

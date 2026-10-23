@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\UpdateStationRequest;
 use App\Models\Station;
 use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
 
 /**
  * See plan/phases/phase-08-admin-qr.md M8.3. Every field is set explicitly
@@ -46,7 +47,8 @@ class AdminStationUpdateController extends Controller
 
         StationCache::bump($station);
 
-        return to_route('admin.stations.edit', $station)
-            ->with('status', 'Station updated.');
+        Inertia::flash('toast', ['type' => 'success', 'message' => "Station {$station->code} was updated successfully. Your changes have been saved."]);
+
+        return to_route('admin.stations.edit', $station);
     }
 }

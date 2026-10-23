@@ -53,7 +53,7 @@ class AdminSpecificationTest extends TestCase
         );
 
         $response->assertRedirect();
-        $response->assertSessionHas('status', 'Specification updated.');
+        $response->assertSessionHas('inertia.flash_data.toast', ['type' => 'success', 'message' => 'Specification was updated successfully. Your changes have been saved.']);
 
         $specification = $station->refresh()->specification;
         $this->assertNotNull($specification);

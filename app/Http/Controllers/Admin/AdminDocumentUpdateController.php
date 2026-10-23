@@ -10,6 +10,7 @@ use App\Models\Station;
 use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Inertia\Inertia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class AdminDocumentUpdateController extends Controller
@@ -40,6 +41,8 @@ class AdminDocumentUpdateController extends Controller
 
         StationCache::bump($station);
 
-        return back()->with('status', 'Document updated.');
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Document details were updated successfully. Your changes have been saved.']);
+
+        return back();
     }
 }

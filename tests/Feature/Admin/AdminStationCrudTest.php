@@ -58,6 +58,7 @@ class AdminStationCrudTest extends TestCase
 
         $this->assertMatchesRegularExpression('/^[0-9A-Z]{26}$/', $station->public_id);
         $response->assertRedirect(route('admin.stations.edit', $station));
+        $response->assertSessionHas('inertia.flash_data.toast', ['type' => 'success', 'message' => "Station {$station->code} was created successfully. You can now add its coordinates, specification, photos and documents."]);
     }
 
     public function test_public_id_cannot_be_changed_by_submitting_it_in_the_update_payload(): void
@@ -95,6 +96,7 @@ class AdminStationCrudTest extends TestCase
         ]));
 
         $response->assertSessionDoesntHaveErrors('code');
+        $response->assertSessionHas('inertia.flash_data.toast', ['type' => 'success', 'message' => "Station {$station->code} was updated successfully. Your changes have been saved."]);
     }
 
     public function test_a_blank_access_password_on_update_leaves_the_existing_one_unchanged(): void
@@ -140,7 +142,9 @@ class AdminStationCrudTest extends TestCase
         $user = User::factory()->create();
         $station = Station::factory()->create(['is_published' => false, 'code' => 'LPT2-GCP-777']);
 
-        $this->actingAs($user)->patch(route('admin.stations.publish', $station), ['is_published' => true]);
+        $response = $this->actingAs($user)->patch(route('admin.stations.publish', $station), ['is_published' => true]);
+
+        $response->assertSessionHas('inertia.flash_data.toast', ['type' => 'success', 'message' => 'Station LPT2-GCP-777 is now published. Logged-in users can open its dossier from the QR code.']);
 
         $station->refresh();
         $this->assertTrue($station->is_published);
@@ -152,8 +156,10 @@ class AdminStationCrudTest extends TestCase
         $user = User::factory()->create();
         $station = Station::factory()->create();
 
-        $this->actingAs($user)->delete(route('admin.stations.destroy', $station));
+        $response = $this->actingAs($user)->delete(route('admin.stations.destroy', $station));
 
+        $response->assertRedirect(route('admin.stations.index'));
+        $response->assertSessionHas('inertia.flash_data.toast', ['type' => 'success', 'message' => "Station {$station->code} was deleted successfully. It is no longer listed and its QR code no longer opens a dossier."]);
         $this->assertSoftDeleted($station);
     }
 }

@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Station;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
+use Inertia\Inertia;
 
 /**
  * Soft delete only (Station uses SoftDeletes) — a station is never hard
@@ -22,7 +23,8 @@ class AdminStationDestroyController extends Controller
 
         $station->delete();
 
-        return to_route('admin.stations.index')
-            ->with('status', "Station {$station->code} deleted.");
+        Inertia::flash('toast', ['type' => 'success', 'message' => "Station {$station->code} was deleted successfully. It is no longer listed and its QR code no longer opens a dossier."]);
+
+        return to_route('admin.stations.index');
     }
 }

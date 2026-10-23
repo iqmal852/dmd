@@ -9,6 +9,7 @@ use App\Models\Station;
 use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
+use Inertia\Inertia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class AdminPanoramaDestroyController extends Controller
@@ -23,6 +24,8 @@ class AdminPanoramaDestroyController extends Controller
 
         StationCache::bump($station);
 
-        return back()->with('status', 'Panorama deleted.');
+        Inertia::flash('toast', ['type' => 'success', 'message' => '360° panorama deleted. It has been removed from this station.']);
+
+        return back();
     }
 }

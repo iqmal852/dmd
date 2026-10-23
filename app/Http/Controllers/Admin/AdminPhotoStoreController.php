@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\StorePhotoRequest;
 use App\Models\Station;
 use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
 
 /**
  * Accepts every file from one multi-select in a single request — see
@@ -39,6 +40,8 @@ class AdminPhotoStoreController extends Controller
 
         StationCache::bump($station);
 
-        return back()->with('status', $count === 1 ? 'Photo uploaded.' : "{$count} photos uploaded.");
+        Inertia::flash('toast', ['type' => 'success', 'message' => $count === 1 ? "Photo uploaded successfully. It now appears in this station's photo gallery." : "{$count} photos uploaded successfully. They now appear in this station's photo gallery."]);
+
+        return back();
     }
 }

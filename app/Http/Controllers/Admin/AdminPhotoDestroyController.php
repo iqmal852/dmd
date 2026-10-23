@@ -9,6 +9,7 @@ use App\Models\Station;
 use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
+use Inertia\Inertia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class AdminPhotoDestroyController extends Controller
@@ -23,6 +24,8 @@ class AdminPhotoDestroyController extends Controller
 
         StationCache::bump($station);
 
-        return back()->with('status', 'Photo deleted.');
+        Inertia::flash('toast', ['type' => 'success', 'message' => "Photo deleted. It has been removed from this station's photo gallery."]);
+
+        return back();
     }
 }

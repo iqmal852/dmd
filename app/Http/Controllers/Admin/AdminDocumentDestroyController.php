@@ -9,6 +9,7 @@ use App\Models\Station;
 use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
+use Inertia\Inertia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
@@ -35,6 +36,8 @@ class AdminDocumentDestroyController extends Controller
 
         StationCache::bump($station);
 
-        return back()->with('status', 'Document deleted.');
+        Inertia::flash('toast', ['type' => 'success', 'message' => "Document deleted. It has been removed from this station's as-built files."]);
+
+        return back();
     }
 }

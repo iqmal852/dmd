@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\UpdateSpecificationRequest;
 use App\Models\Station;
 use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
 
 /**
  * See plan/phases/phase-08-admin-qr.md M8.6.
@@ -24,6 +25,8 @@ class AdminSpecificationUpdateController extends Controller
 
         StationCache::bump($station);
 
-        return back()->with('status', 'Specification updated.');
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Specification was updated successfully. Your changes have been saved.']);
+
+        return back();
     }
 }

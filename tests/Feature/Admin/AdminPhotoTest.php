@@ -33,7 +33,7 @@ class AdminPhotoTest extends TestCase
         ]);
 
         $response->assertRedirect();
-        $response->assertSessionHas('status', 'Photo uploaded.');
+        $response->assertSessionHas('inertia.flash_data.toast', ['type' => 'success', 'message' => "Photo uploaded successfully. It now appears in this station's photo gallery."]);
 
         $photos = $station->fresh()->getMedia('photos');
         $this->assertCount(1, $photos);
@@ -55,7 +55,7 @@ class AdminPhotoTest extends TestCase
         ]);
 
         $response->assertRedirect();
-        $response->assertSessionHas('status', '3 photos uploaded.');
+        $response->assertSessionHas('inertia.flash_data.toast', ['type' => 'success', 'message' => "3 photos uploaded successfully. They now appear in this station's photo gallery."]);
 
         $labels = $station->fresh()->getMedia('photos')
             ->map(fn ($media) => $media->getCustomProperty('label'))

@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\StorePanoramaRequest;
 use App\Models\Station;
 use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
 
 /**
  * `panoramas` is a `singleFile()` collection — uploading a new one
@@ -29,6 +30,8 @@ class AdminPanoramaStoreController extends Controller
 
         StationCache::bump($station);
 
-        return back()->with('status', 'Panorama uploaded.');
+        Inertia::flash('toast', ['type' => 'success', 'message' => "360° panorama uploaded successfully. It is now available in this station's photo gallery."]);
+
+        return back();
     }
 }

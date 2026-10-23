@@ -9,6 +9,7 @@ use App\Http\Requests\Admin\UpdatePhotoRequest;
 use App\Models\Station;
 use App\Services\StationCache;
 use Illuminate\Http\RedirectResponse;
+use Inertia\Inertia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class AdminPhotoUpdateController extends Controller
@@ -23,6 +24,8 @@ class AdminPhotoUpdateController extends Controller
 
         StationCache::bump($station);
 
-        return back()->with('status', 'Photo updated.');
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Photo details were updated successfully. Your changes have been saved.']);
+
+        return back();
     }
 }
