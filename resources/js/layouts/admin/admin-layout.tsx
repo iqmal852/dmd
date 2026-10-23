@@ -1,6 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
 import { LogOut, QrCode, Rows3 } from 'lucide-react';
 import * as React from 'react';
+import { BrandLogo } from '@/components/brand-logo';
 import { logout } from '@/routes';
 import { index } from '@/routes/admin/stations';
 import { sheet } from '@/routes/admin/qr';
@@ -27,9 +28,9 @@ export default function AdminLayout({ active, children }: AdminLayoutProps) {
     return (
         <div className="bg-neu-surface text-neu-ink min-h-screen">
             <header className="bg-neu-primary text-neu-on-primary shadow-neu-sm sticky top-0 z-10 flex items-center justify-between px-4 py-3">
-                <span className="text-sm font-bold tracking-wide">
-                    MySpatial{' '}
-                    <span className="font-normal opacity-80">| Admin</span>
+                <span className="flex items-center gap-3 text-sm font-bold tracking-wide">
+                    <BrandLogo className="h-8" />
+                    GNSS LPT2
                 </span>
 
                 <div className="flex items-center gap-3 text-sm">

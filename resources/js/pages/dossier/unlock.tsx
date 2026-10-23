@@ -1,5 +1,6 @@
 import { Form, Head, usePage } from '@inertiajs/react';
-import { Lock, ShieldCheck } from 'lucide-react';
+import { Lock } from 'lucide-react';
+import { BrandLogo } from '@/components/brand-logo';
 import { NeuButton } from '@/components/neu/neu-button';
 import { NeuCard } from '@/components/neu/neu-card';
 import UnlockSubmitController from '@/actions/App/Http/Controllers/Dossier/UnlockSubmitController';
@@ -28,10 +29,7 @@ export default function DossierUnlock() {
 
             <NeuCard className="w-full max-w-sm space-y-6 p-6">
                 <div className="flex flex-col items-center gap-2 text-center">
-                    <ShieldCheck
-                        className="text-neu-primary-bright size-8"
-                        aria-hidden="true"
-                    />
+                    <BrandLogo className="h-14" />
                     <p className="text-sm font-bold tracking-wide uppercase">
                         {branding.operator}
                     </p>

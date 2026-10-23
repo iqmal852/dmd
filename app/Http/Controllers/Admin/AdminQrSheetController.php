@@ -30,7 +30,6 @@ class AdminQrSheetController extends Controller
             'plates' => $stations
                 ->map(fn (Station $station) => PlateData::from($station, $generate($station, 'svg')->getDataUri()))
                 ->values(),
-            'brandOperator' => config('dossier.branding.operator'),
         ]);
     }
 }

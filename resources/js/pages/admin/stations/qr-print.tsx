@@ -5,7 +5,6 @@ import type { AdminPlate } from '@/types/admin';
 
 type PageProps = {
     plates: AdminPlate[];
-    brandOperator: string;
 };
 
 /**
@@ -21,7 +20,7 @@ type PageProps = {
  * black on pure white rather than browsers lightening it to save ink.
  */
 export default function AdminQrPrint() {
-    const { plates, brandOperator } = usePage<PageProps>().props;
+    const { plates } = usePage<PageProps>().props;
 
     return (
         <div className="bg-neu-surface min-h-screen p-6 print:bg-white print:p-0">
@@ -74,12 +73,14 @@ export default function AdminQrPrint() {
                     return (
                         <div
                             key={plate.publicId}
-                            className="plate flex flex-col items-center justify-between border border-black bg-white p-[2mm] text-black"
+                            className="plate flex flex-col items-center justify-center gap-[3mm] border border-black bg-white p-[2mm] text-black"
                         >
-                            <div className="text-center leading-tight">
-                                <p className="text-[3mm] font-bold">
-                                    {plate.highway}
-                                </p>
+                            <div className="flex flex-col items-center gap-[0.8mm] text-center leading-tight">
+                                <img
+                                    src="/plus-logo.svg.webp"
+                                    alt="PLUS"
+                                    className="h-[6mm] w-auto"
+                                />
                                 <p className="text-[2.4mm] font-bold">
                                     {shortCode}
                                 </p>
@@ -89,12 +90,6 @@ export default function AdminQrPrint() {
                                 alt={`QR code for ${plate.code}`}
                                 className="h-[30mm] w-[30mm]"
                             />
-                            <div className="text-center leading-tight">
-                                <p className="text-[2mm] font-bold">
-                                    SCAN QR CODE
-                                </p>
-                                <p className="text-[1.8mm]">{brandOperator}</p>
-                            </div>
                         </div>
                     );
                 })}

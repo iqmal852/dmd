@@ -22,7 +22,6 @@ class AdminQrPrintController extends Controller
 
         return Inertia::render('admin/stations/qr-print', [
             'plates' => [PlateData::from($station, $svg->getDataUri())],
-            'brandOperator' => config('dossier.branding.operator'),
         ]);
     }
 }

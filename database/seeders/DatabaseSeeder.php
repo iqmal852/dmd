@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(AdminUserSeeder::class);
+        $this->call(TeamUserSeeder::class);
 
         // Real PLUS North-South Expressway GCP data (plan/GCP_GDM2000.xls),
         // not fake demo stations — see PlusGcpStationSeeder's own docblock

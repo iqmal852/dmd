@@ -1,5 +1,6 @@
 import { ShieldCheck } from 'lucide-react';
 import * as React from 'react';
+import { BrandLogo } from '@/components/brand-logo';
 import {
     NeuBottomNav,
     type NeuBottomNavItem,
@@ -29,9 +30,12 @@ export default function DossierLayout({
     return (
         <div className="bg-neu-surface text-neu-ink min-h-screen">
             <header className="bg-neu-primary text-neu-on-primary shadow-neu-sm sticky top-0 z-10 flex items-center justify-between px-4 py-3">
-                <span className="text-sm font-bold tracking-wide">
-                    {operator}{' '}
-                    <span className="font-normal opacity-80">| {title}</span>
+                <span className="flex items-center gap-3 text-sm font-bold tracking-wide">
+                    <BrandLogo className="h-8" />
+                    <span>
+                        {operator}{' '}
+                        <span className="font-normal opacity-80">| {title}</span>
+                    </span>
                 </span>
                 <ShieldCheck className="size-5 opacity-90" aria-hidden="true" />
             </header>
