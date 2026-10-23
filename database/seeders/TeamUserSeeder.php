@@ -20,22 +20,24 @@ class TeamUserSeeder extends Seeder
     private const string PASSWORD = 'secret123';
 
     /**
-     * @var array<string, string> email => name
+     * @var array<string, array{name: string, username: string}> keyed by email
      */
     private const array USERS = [
-        'admin.plus@myspatial.com.my' => 'admin plus',
-        'admin.mssb@myspatial.com.my' => 'admin mssb',
-        'user.plus@myspatial.com.my' => 'user plus',
-        'user.lpt@myspatial.com.my' => 'user lpt',
+        'admin.plus@myspatial.com.my' => ['name' => 'admin plus', 'username' => 'admin-plus'],
+        'admin.mssb@myspatial.com.my' => ['name' => 'admin mssb', 'username' => 'admin-mssb'],
+        'user.plus@myspatial.com.my' => ['name' => 'user plus', 'username' => 'user-plus'],
+        'user.mssb@myspatial.com.my' => ['name' => 'user mssb', 'username' => 'user-mssb'],
+        'user.lpt@myspatial.com.my' => ['name' => 'user lpt', 'username' => 'user-lpt'],
     ];
 
     public function run(): void
     {
-        foreach (self::USERS as $email => $name) {
+        foreach (self::USERS as $email => $account) {
             User::query()->updateOrCreate(
                 ['email' => $email],
                 [
-                    'name' => $name,
+                    'name' => $account['name'],
+                    'username' => $account['username'],
                     'password' => self::PASSWORD, // hashed by User's 'hashed' cast
                     'email_verified_at' => now(),
                 ],

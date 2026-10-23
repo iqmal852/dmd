@@ -14,12 +14,12 @@ class TeamUserSeederTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_it_seeds_the_four_team_accounts_with_the_shared_password(): void
+    public function test_it_seeds_the_team_accounts_with_the_shared_password(): void
     {
         $this->seed(TeamUserSeeder::class);
 
         $this->assertEqualsCanonicalizing(
-            ['admin plus', 'admin mssb', 'user plus', 'user lpt'],
+            ['admin plus', 'admin mssb', 'user plus', 'user mssb', 'user lpt'],
             User::query()->pluck('name')->all(),
         );
 
@@ -33,7 +33,7 @@ class TeamUserSeederTest extends TestCase
         $this->seed(TeamUserSeeder::class);
         $this->seed(TeamUserSeeder::class);
 
-        $this->assertSame(4, User::query()->count());
+        $this->assertSame(5, User::query()->count());
     }
 
     public function test_a_seeded_account_can_log_in(): void
@@ -42,6 +42,18 @@ class TeamUserSeederTest extends TestCase
 
         $this->post(route('login.store'), [
             'email' => 'admin.plus@myspatial.com.my',
+            'password' => 'secret123',
+        ]);
+
+        $this->assertAuthenticated();
+    }
+
+    public function test_a_seeded_account_can_log_in_with_its_username(): void
+    {
+        $this->seed(TeamUserSeeder::class);
+
+        $this->post(route('login.store'), [
+            'email' => 'user-mssb',
             'password' => 'secret123',
         ]);
 

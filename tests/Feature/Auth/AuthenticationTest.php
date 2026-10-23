@@ -34,6 +34,30 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect('/admin/stations');
     }
 
+    public function test_users_can_authenticate_using_their_username()
+    {
+        $user = User::factory()->create(['username' => 'jane-doe']);
+
+        $this->post(route('login.store'), [
+            'email' => 'Jane-Doe',
+            'password' => 'password',
+        ])->assertRedirect('/admin/stations');
+
+        $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_username_login_with_wrong_password_fails()
+    {
+        User::factory()->create(['username' => 'jane-doe']);
+
+        $this->post(route('login.store'), [
+            'email' => 'jane-doe',
+            'password' => 'wrong-password',
+        ]);
+
+        $this->assertGuest();
+    }
+
     public function test_users_with_two_factor_enabled_are_redirected_to_two_factor_challenge()
     {
         $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());

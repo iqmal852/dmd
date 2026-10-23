@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
@@ -39,6 +41,21 @@ class FortifyServiceProvider extends ServiceProvider
         // exactly one admin, seeded by AdminUserSeeder and rotated via
         // `php artisan batu:admin-password`. There is no self-registration or
         // self-service password reset flow.
+
+        // The login field is still posted as `email` but accepts either the
+        // email or the username. Fortify lowercases it before we get here.
+        Fortify::authenticateUsing(function (Request $request): ?User {
+            $login = (string) $request->input(Fortify::username());
+
+            $user = User::query()
+                ->where('email', $login)
+                ->orWhere('username', $login)
+                ->first();
+
+            return $user !== null && Hash::check((string) $request->input('password'), $user->password)
+                ? $user
+                : null;
+        });
     }
 
     /**
