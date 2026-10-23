@@ -3,11 +3,15 @@
 declare(strict_types=1);
 
 use App\Models\Station;
+use App\Models\User;
 use Database\Seeders\DemoPhotoSeeder;
 use Database\Seeders\DemoStationSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
+
+// Dossier pages are login-gated; every test here views them as a signed-in user.
+beforeEach(fn () => $this->actingAs(User::factory()->create()));
 
 function seededPanoramaStation(): Station
 {

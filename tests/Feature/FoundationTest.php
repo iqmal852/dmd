@@ -17,13 +17,13 @@ class FoundationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_the_database_connection_is_postgresql(): void
+    public function test_the_database_connection_is_sql_server(): void
     {
-        $this->assertSame('pgsql', config('database.default'));
+        $this->assertSame('sqlsrv', config('database.default'));
 
-        $version = DB::selectOne('select version()')->version;
+        $version = DB::selectOne('select @@VERSION as version')->version;
 
-        $this->assertStringContainsString('PostgreSQL', $version);
+        $this->assertStringContainsString('Microsoft SQL Server', $version);
     }
 
     public function test_registration_and_password_reset_routes_do_not_exist(): void

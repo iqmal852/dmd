@@ -26,7 +26,7 @@ final readonly class GenerateStationQr
 
     public function __invoke(Station $station, string $format = 'png'): QrImage
     {
-        $key = 'qr:'.$station->public_id.':'.$format.':'.$this->configFingerprint();
+        $key = 'qr:v2:'.$station->public_id.':'.$format.':'.$this->configFingerprint();
 
         // Cache a plain array, never a QrImage instance. The `database`
         // cache store's default config('cache.serializable_classes') is
@@ -38,7 +38,7 @@ final readonly class GenerateStationQr
         // instead of ever being what gets serialized.
         $data = Cache::remember($key, now()->addDay(), fn () => $this->build($station, $format));
 
-        return new QrImage($data['content'], $data['mimeType'], $data['dataUri']);
+        return new QrImage(base64_decode($data['content']), $data['mimeType'], $data['dataUri']);
     }
 
     /**
@@ -62,7 +62,7 @@ final readonly class GenerateStationQr
         $result = $builder->build();
 
         return [
-            'content' => $result->getString(),
+            'content' => base64_encode($result->getString()),
             'mimeType' => $result->getMimeType(),
             'dataUri' => $result->getDataUri(),
         ];

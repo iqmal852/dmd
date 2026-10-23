@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Data;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
@@ -36,7 +37,7 @@ final readonly class PhotoData
         $previewUrl = $media->getFullUrl('preview');
 
         return new self(
-            id: (string) $media->uuid,
+            id: Str::lower((string) $media->uuid),
             label: (string) ($media->getCustomProperty('label') ?: 'Site Photo'),
             bearing: $media->getCustomProperty('bearing'),
             capturedAt: $media->getCustomProperty('captured_at'),

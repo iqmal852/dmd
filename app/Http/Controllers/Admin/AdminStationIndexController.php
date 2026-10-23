@@ -9,6 +9,7 @@ use App\Enums\StationStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Station;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -27,7 +28,7 @@ class AdminStationIndexController extends Controller
 
         $stations = Station::query()
             ->with(['coordinateSet', 'media'])
-            ->when($request->filled('search'), fn ($query) => $query->where('code', 'ilike', '%'.$request->query('search').'%'))
+            ->when($request->filled('search'), fn ($query) => $query->whereRaw('lower(code) like ?', ['%'.Str::lower((string) $request->query('search')).'%']))
             ->when($request->filled('highway'), fn ($query) => $query->where('highway', $request->query('highway')))
             ->when($request->filled('status'), fn ($query) => $query->where('status', $request->query('status')))
             ->orderBy($sort)

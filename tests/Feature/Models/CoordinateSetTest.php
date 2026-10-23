@@ -36,7 +36,7 @@ class CoordinateSetTest extends TestCase
 
     /**
      * Guards against a migration silently using `double precision` instead of
-     * `numeric` — that would pass the round-trip test above on small values
+     * `decimal` — that would pass the round-trip test above on small values
      * and only fail with real survey-grade precision in the field.
      */
     public function test_coordinate_columns_are_numeric_with_the_documented_precision(): void
@@ -62,7 +62,8 @@ class CoordinateSetTest extends TestCase
         foreach ($expected as $column => [$precision, $scale]) {
             $row = $columns[$column];
 
-            $this->assertSame('numeric', $row->data_type, "{$column} is not a numeric column");
+            // Postgres reports `numeric`; SQL Server reports the synonym `decimal`.
+            $this->assertContains($row->data_type, ['numeric', 'decimal'], "{$column} is not a numeric column");
             $this->assertSame($precision, (int) $row->numeric_precision, "{$column} precision mismatch");
             $this->assertSame($scale, (int) $row->numeric_scale, "{$column} scale mismatch");
         }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature;
 
 use App\Models\Station;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -54,6 +55,7 @@ class SecurityHeadersTest extends TestCase
 
     public function test_the_download_route_is_rate_limited(): void
     {
+        $this->actingAs(User::factory()->create());
         $station = Station::factory()->create(['is_published' => true]);
         $media = $station->addMediaFromString('%PDF-1.4')
             ->usingFileName('a.pdf')

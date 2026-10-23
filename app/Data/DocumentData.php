@@ -6,6 +6,7 @@ namespace App\Data;
 
 use App\Enums\DocumentType;
 use App\Models\Station;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 /**
@@ -46,7 +47,7 @@ final readonly class DocumentData
         $previewMedia = self::resolvePreviewMedia($media, $station);
 
         return new self(
-            id: (string) $media->uuid,
+            id: Str::lower((string) $media->uuid),
             type: $type->value,
             typeLabel: $type->label(),
             title: (string) ($media->getCustomProperty('title') ?: $type->label()),
@@ -55,10 +56,10 @@ final readonly class DocumentData
             size: (string) $media->human_readable_size,
             isPrimary: (bool) $media->getCustomProperty('is_primary', false),
             previewUrl: $previewMedia !== null
-                ? route('dossier.files.preview', ['station' => $station, 'media' => $previewMedia->uuid])
+                ? route('dossier.files.preview', ['station' => $station, 'media' => Str::lower((string) $previewMedia->uuid)])
                 : null,
             previewKind: self::previewKindFor($previewMedia),
-            downloadUrl: route('dossier.files.download', ['station' => $station, 'media' => $media->uuid]),
+            downloadUrl: route('dossier.files.download', ['station' => $station, 'media' => Str::lower((string) $media->uuid)]),
         );
     }
 

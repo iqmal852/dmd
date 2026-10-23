@@ -18,5 +18,37 @@ services:
       timeout: 5s
       retries: 5
 
+  # SQL Server 2022 shares its engine and T-SQL with Azure SQL Database, so
+  # it is the local stand-in for the client's Azure SQL target. Image is
+  # amd64-only: Docker Desktop runs it under emulation on Apple Silicon.
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "Batu_Pass123!"
+    ports: ["1433:1433"]
+    volumes:
+      - sqldata:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # One-shot: creates the app and test databases (SQL Server has no
+  # init-script hook like Postgres's docker-entrypoint-initdb.d).
+  sqlserver-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    restart: "no"
+    entrypoint: >
+      /opt/mssql-tools18/bin/sqlcmd -C -S sqlserver -U sa -P "Batu_Pass123!"
+      -Q "IF DB_ID('batu') IS NULL CREATE DATABASE batu; IF DB_ID('batu_test') IS NULL CREATE DATABASE batu_test;"
+
 volumes:
   pgdata:
+  sqldata:

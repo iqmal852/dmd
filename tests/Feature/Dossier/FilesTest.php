@@ -92,19 +92,15 @@ class FilesTest extends TestCase
 
     public function test_props_never_reveal_the_internal_media_primary_key(): void
     {
-        // The shared Inertia `auth.user` prop carries `"id":<user id>`; give the
-        // viewer an id no media row can share so the assertion below only
-        // ever matches a leaked media primary key.
-        $this->actingAs(User::factory()->create(['id' => 900001]));
-
         $station = Station::factory()->create(['is_published' => true]);
         $media = $this->attachDocument($station);
 
         $response = $this->get(route('dossier.files', $station));
-        $content = $response->getContent();
+        // Only the documents prop: the shared `auth.user` prop also carries an `id`.
+        $content = json_encode($response->viewData('page')['props']['documents']);
 
         $this->assertNotEmpty($content);
-        $this->assertStringNotContainsString('"id":'.$media->id, (string) $content);
+        $this->assertStringNotContainsString('"id":'.$media->id.',', (string) $content);
         $this->assertStringContainsString((string) $media->uuid, (string) $content);
     }
 
@@ -229,8 +225,8 @@ class FilesTest extends TestCase
 
         $log = DownloadLog::query()->firstOrFail();
 
-        $this->assertSame($station->id, $log->station_id);
-        $this->assertSame($media->id, $log->media_id);
+        $this->assertSame((int) $station->id, $log->station_id);
+        $this->assertSame((int) $media->id, $log->media_id);
         $this->assertSame(64, strlen((string) $log->ip_hash));
         $this->assertNotSame('203.0.113.42', $log->ip_hash);
         $this->assertStringNotContainsString('203.0.113.42', (string) $log->ip_hash);

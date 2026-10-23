@@ -39,6 +39,8 @@ final class DownloadLog extends Model
     protected function casts(): array
     {
         return [
+            'station_id' => 'integer',
+            'media_id' => 'integer',
             'downloaded_at' => 'datetime',
         ];
     }

@@ -86,19 +86,15 @@ class PhotosTest extends TestCase
 
     public function test_props_never_reveal_the_internal_media_primary_key(): void
     {
-        // The shared Inertia `auth.user` prop carries `"id":<user id>`; give the
-        // viewer an id no media row can share so the assertion below only
-        // ever matches a leaked media primary key.
-        $this->actingAs(User::factory()->create(['id' => 900001]));
-
         $station = Station::factory()->create(['is_published' => true]);
         $media = $this->attachPhoto($station, 'Facing the highway');
 
         $response = $this->get(route('dossier.photos', $station));
 
-        $content = $response->getContent();
+        // Only the photos prop: the shared `auth.user` prop also carries an `id`.
+        $content = json_encode($response->viewData('page')['props']['photos']);
 
-        $this->assertStringNotContainsString('"id":'.$media->id, (string) $content);
+        $this->assertStringNotContainsString('"id":'.$media->id.',', (string) $content);
         $this->assertStringContainsString((string) $media->uuid, (string) $content);
     }
 

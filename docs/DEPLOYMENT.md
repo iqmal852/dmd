@@ -11,12 +11,11 @@ and roll it back.
 
 | | |
 |---|---|
-| PHP | 8.3+ (developed and tested on 8.5) — extensions: `pdo_pgsql`, `gd` or `imagick`, `bcmath`, `intl`, `zip` |
+| PHP | 8.3+ (developed and tested on 8.5) — extensions: `pdo_sqlsrv` (+ Microsoft ODBC Driver 18), `gd` or `imagick`, `bcmath`, `intl`, `zip` |
 | Database | PostgreSQL 17 (required — see `plan/01-architecture.md` ADR-003; the case-insensitive unique index on `stations.code` and the JSON columns used by the media library are Postgres-specific) |
 | Web server | Nginx (or any server that can proxy PHP-FPM and serve `public/` as the document root) |
 | Node | 22, for `npm run build` only — not needed at runtime, only at deploy/build time |
 | Redis | **Not required.** Cache, session, and queue all deliberately use the `database` driver (`App\Services\StationCache` exists specifically because the database cache store doesn't support tags) — don't provision Redis unless a future feature needs it |
-| Binaries on `PATH` | `pg_dump`, `psql`, `gzip`, `gunzip` — used by `batu:backup` / `batu:restore` (M9.4), not by the app itself at request time |
 
 ---
 
@@ -156,58 +155,11 @@ gate for that one station regardless of the deployment-wide setting.
 
 ## 8. Backup and restore
 
-### Backup
-
-```bash
-php artisan batu:backup
-```
-
-`pg_dump`s the configured database connection, gzips it, and stores it on
-`config('backup.disk')` (`BACKUP_DISK` in `.env`) under `config('backup.path')`,
-pruning anything older than `BACKUP_KEEP_DAYS`. Scheduled daily already
-(`routes/console.php`) — this only fires if the server's cron actually
-calls `php artisan schedule:run` every minute:
-
-```cron
-* * * * * cd /var/www/batu/current && php artisan schedule:run >> /dev/null 2>&1
-```
-
-**`BACKUP_DISK=local` is a placeholder, not a production configuration.**
-A backup on the same disk as the database it protects against survives
-nothing that actually takes the server down. Before going live, wire up an
-off-site disk (S3 or equivalent) in `config/filesystems.php` — this needs
-`league/flysystem-aws-s3-v3`, a new Composer dependency, approved before
-install per this repo's CLAUDE.md.
-
-### Restore — the tested procedure
-
-An untested backup is not a backup. This is the drill, and it's exactly
-what `tests/Feature/DatabaseBackupRestoreTest.php` automates against a
-scratch database on every test run:
-
-```bash
-# 1. List available backups
-php artisan tinker --execute='dd(Illuminate\Support\Facades\Storage::disk(config("backup.disk"))->files(config("backup.path")));'
-
-# 2. Restore into a SCRATCH connection first, never straight into production.
-#    Add a temporary connection to config/database.php (or set these as env
-#    overrides), e.g. `restore_scratch` pointing at a throwaway database,
-#    then:
-php artisan batu:restore backup-2026-09-08-030000.sql.gz --connection=restore_scratch
-
-# 3. Verify the scratch database looks right — row counts, spot-check a
-#    known station — before trusting the backup at all.
-
-# 4. Only once verified, restore into the real connection. This requires
-#    --force precisely because it is destructive and irreversible:
-php artisan batu:restore backup-2026-09-08-030000.sql.gz --force
-```
-
-Restoring into the app's default connection replaces its entire contents
-with the backup's — there is no merge. Take the application into
-maintenance mode first (`php artisan down`) so nothing writes to the
-database mid-restore, and bring it back up (`php artisan up`) once
-`batu:restore` reports success.
+The production database is Azure SQL, which takes automated full, differential
+and log backups and supports point-in-time restore from the Azure portal or
+CLI (retention is set per server/database). There is no application-level
+backup command. Restore into a new database first, verify row counts and a
+known station, then repoint `DB_*` or swap the database names.
 
 ---
 

@@ -47,7 +47,14 @@ return new class extends Migration
 
         // Case-insensitive uniqueness on code: "LPT2-GCP-001" and "lpt2-gcp-001"
         // must not both exist. Not expressible via the fluent Blueprint API.
-        DB::statement('create unique index stations_code_lower_unique on stations (lower(code))');
+        // SQL Server has no expression indexes, but its default collation
+        // (…_CI_AS, also Azure SQL's) is already case-insensitive, so a plain
+        // unique index does the same job there.
+        if (DB::getDriverName() === 'sqlsrv') {
+            DB::statement('create unique index stations_code_lower_unique on stations (code)');
+        } else {
+            DB::statement('create unique index stations_code_lower_unique on stations (lower(code))');
+        }
 
         // Partial index: the public read path only ever queries published, non-deleted
         // stations, so index exactly that subset rather than the whole table.

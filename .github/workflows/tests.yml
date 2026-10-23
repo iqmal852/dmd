@@ -14,27 +14,28 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      postgres:
-        image: postgres:17-alpine
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2022-latest
         env:
-          POSTGRES_DB: batu_test
-          POSTGRES_USER: batu
-          POSTGRES_PASSWORD: secret
+          ACCEPT_EULA: Y
+          MSSQL_SA_PASSWORD: Batu_Pass123!
         ports:
-          - 5432:5432
+          - 1433:1433
         options: >-
-          --health-cmd pg_isready
-          --health-interval 5s
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'Batu_Pass123!' -Q 'SELECT 1'"
+          --health-interval 10s
           --health-timeout 5s
           --health-retries 10
 
     env:
-      DB_CONNECTION: pgsql
+      DB_CONNECTION: sqlsrv
       DB_HOST: 127.0.0.1
-      DB_PORT: 5432
+      DB_PORT: 1433
       DB_DATABASE: batu_test
-      DB_USERNAME: batu
-      DB_PASSWORD: secret
+      DB_USERNAME: sa
+      DB_PASSWORD: Batu_Pass123!
+      DB_ENCRYPT: 'yes'
+      DB_TRUST_SERVER_CERTIFICATE: 'true'
 
     steps:
       - name: Checkout code
@@ -42,11 +43,16 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Create test database
+        run: |
+          sudo ACCEPT_EULA=Y apt-get install -y msodbcsql18 mssql-tools18 unixodbc-dev || true
+          /opt/mssql-tools18/bin/sqlcmd -C -S 127.0.0.1 -U sa -P 'Batu_Pass123!' -Q "IF DB_ID('batu_test') IS NULL CREATE DATABASE batu_test;"
+
       - name: Setup PHP
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
           php-version: '8.5'
-          extensions: pgsql, pdo_pgsql
+          extensions: sqlsrv, pdo_sqlsrv
           tools: composer:v2
           coverage: none
 
