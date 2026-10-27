@@ -20,7 +20,6 @@ final readonly class StationListItemData
         public string $km,
         public string $status,
         public string $statusColor,
-        public bool $isPublished,
         public bool $hasCoordinates,
         public int $photoCount,
         public int $documentCount,
@@ -36,7 +35,6 @@ final readonly class StationListItemData
             km: (string) $station->km,
             status: $station->status->label(),
             statusColor: $station->status->color(),
-            isPublished: $station->is_published,
             hasCoordinates: $station->coordinateSet !== null,
             photoCount: $station->getMedia('photos')->count(),
             documentCount: $station->getMedia('documents')

@@ -31,7 +31,6 @@ class CoordinatesTest extends TestCase
     private function referenceStation(): Station
     {
         $station = Station::factory()->create([
-            'is_published' => true,
             'code' => 'LPT2-GCP-015',
         ]);
 
@@ -61,7 +60,7 @@ class CoordinatesTest extends TestCase
 
     public function test_it_returns_200_with_the_coordinates_component(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
 
         $response = $this->get(route('dossier.coordinates', $station));
 
@@ -137,7 +136,7 @@ class CoordinatesTest extends TestCase
 
     public function test_a_station_without_a_coordinate_set_renders_without_error(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
 
         $response = $this->get(route('dossier.coordinates', $station));
 

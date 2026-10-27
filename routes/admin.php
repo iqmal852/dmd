@@ -18,7 +18,6 @@ use App\Http\Controllers\Admin\AdminStationCreateController;
 use App\Http\Controllers\Admin\AdminStationDestroyController;
 use App\Http\Controllers\Admin\AdminStationEditController;
 use App\Http\Controllers\Admin\AdminStationIndexController;
-use App\Http\Controllers\Admin\AdminStationPublishController;
 use App\Http\Controllers\Admin\AdminStationStoreController;
 use App\Http\Controllers\Admin\AdminStationUpdateController;
 use App\Http\Middleware\EnsureIsAdmin;
@@ -40,7 +39,6 @@ Route::prefix('admin')
         Route::get('stations/{station}/edit', AdminStationEditController::class)->name('stations.edit');
         Route::put('stations/{station}', AdminStationUpdateController::class)->name('stations.update');
         Route::delete('stations/{station}', AdminStationDestroyController::class)->name('stations.destroy');
-        Route::patch('stations/{station}/publish', AdminStationPublishController::class)->name('stations.publish');
 
         Route::put('stations/{station}/coordinates', AdminStationCoordinatesUpdateController::class)->name('stations.coordinates.update');
         Route::put('stations/{station}/specification', AdminSpecificationUpdateController::class)->name('stations.specification.update');

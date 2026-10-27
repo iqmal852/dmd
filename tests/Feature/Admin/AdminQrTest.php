@@ -43,7 +43,7 @@ class AdminQrTest extends TestCase
         // hardcoding 'd' — so they can never drift apart when
         // DOSSIER_ROUTE_PREFIX changes for a real deployment.
         $configuredPrefix = trim((string) config('dossier.route_prefix'), '/');
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
 
         $showRoute = collect(Route::getRoutes())
             ->first(fn ($route) => $route->getName() === 'dossier.show');

@@ -84,7 +84,7 @@ it('renders the overview map preview without loading leaflet', function () {
 });
 
 it('shows an empty state for a station with no coordinates instead of a broken map', function () {
-    $station = Station::factory()->create(['is_published' => true]);
+    $station = Station::factory()->create();
 
     visit(route('dossier.map', $station))
         ->assertSee('the map cannot be')

@@ -60,7 +60,7 @@ class FilesTest extends TestCase
 
     public function test_it_returns_200_with_the_files_component(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         $this->attachDocument($station);
 
         $response = $this->get(route('dossier.files', $station));
@@ -71,7 +71,7 @@ class FilesTest extends TestCase
 
     public function test_props_contain_exactly_the_document_data_fields(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         $this->attachDocument($station);
 
         $response = $this->get(route('dossier.files', $station));
@@ -92,7 +92,7 @@ class FilesTest extends TestCase
 
     public function test_props_never_reveal_the_internal_media_primary_key(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         $media = $this->attachDocument($station);
 
         $response = $this->get(route('dossier.files', $station));
@@ -106,7 +106,7 @@ class FilesTest extends TestCase
 
     public function test_a_preview_only_companion_media_row_is_not_listed_as_its_own_document(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         $preview = $station->addMediaFromString($this->fakeFileBytes('application/pdf'))
             ->usingFileName('preview.pdf')
             ->withCustomProperties(['is_preview_only' => true])
@@ -132,7 +132,7 @@ class FilesTest extends TestCase
 
     public function test_a_station_with_no_documents_renders_the_empty_state_without_error(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
 
         $response = $this->get(route('dossier.files', $station));
 
@@ -146,14 +146,14 @@ class FilesTest extends TestCase
             'dossier.access_mode' => AccessMode::Password,
             'dossier.access_password' => 'secret',
         ]);
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
 
         $this->get(route('dossier.files', $station))->assertRedirect();
     }
 
     public function test_download_returns_200_with_an_attachment_disposition_and_a_sanitised_filename(): void
     {
-        $station = Station::factory()->create(['is_published' => true, 'code' => 'LPT2-GCP-015']);
+        $station = Station::factory()->create(['code' => 'LPT2-GCP-015']);
         $media = $this->attachDocument($station, revision: 'A');
 
         $response = $this->get(route('dossier.files.download', ['station' => $station, 'media' => $media->uuid]));
@@ -167,8 +167,8 @@ class FilesTest extends TestCase
 
     public function test_downloading_a_media_row_belonging_to_another_station_404s(): void
     {
-        $stationA = Station::factory()->create(['is_published' => true]);
-        $stationB = Station::factory()->create(['is_published' => true]);
+        $stationA = Station::factory()->create();
+        $stationB = Station::factory()->create();
         $mediaOfB = $this->attachDocument($stationB);
 
         $this->get(route('dossier.files.download', ['station' => $stationA, 'media' => $mediaOfB->uuid]))
@@ -181,7 +181,7 @@ class FilesTest extends TestCase
             'dossier.access_mode' => AccessMode::Password,
             'dossier.access_password' => 'secret',
         ]);
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         $media = $this->attachDocument($station);
 
         $this->get(route('dossier.files.preview', ['station' => $station, 'media' => $media->uuid]))
@@ -190,7 +190,7 @@ class FilesTest extends TestCase
 
     public function test_previewing_a_non_renderable_document_404s(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         $media = $this->attachDocument($station, fileName: 'as-built.dwg', mime: 'application/acad', revision: null);
 
         $this->get(route('dossier.files.preview', ['station' => $station, 'media' => $media->uuid]))
@@ -203,7 +203,7 @@ class FilesTest extends TestCase
             'dossier.access_mode' => AccessMode::Password,
             'dossier.access_password' => 'secret',
         ]);
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         $media = $this->attachDocument($station);
 
         $this->get(route('dossier.files.download', ['station' => $station, 'media' => $media->uuid]))
@@ -214,7 +214,7 @@ class FilesTest extends TestCase
 
     public function test_a_download_writes_exactly_one_download_log_row_with_a_hashed_ip_and_no_raw_ip(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         $media = $this->attachDocument($station);
 
         $this->withServerVariables(['REMOTE_ADDR' => '203.0.113.42'])
@@ -235,7 +235,7 @@ class FilesTest extends TestCase
     public function test_download_log_enabled_false_writes_no_row_but_still_serves_the_file(): void
     {
         config(['dossier.downloads.log_enabled' => false]);
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         $media = $this->attachDocument($station);
 
         $this->get(route('dossier.files.download', ['station' => $station, 'media' => $media->uuid]))
@@ -260,7 +260,7 @@ class FilesTest extends TestCase
 
     public function test_a_documents_media_file_is_not_reachable_at_a_public_storage_url(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         $media = $this->attachDocument($station);
 
         $response = $this->get("/storage/{$media->id}/{$media->file_name}");

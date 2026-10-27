@@ -55,7 +55,6 @@ class DemoStationSeeder extends Seeder
             'monument_type' => 'Concrete Block',
             'installed_at' => '2025-03-15',
             'status' => StationStatus::Active->value,
-            'is_published' => true,
         ]);
 
         $station->coordinateSet()->create([

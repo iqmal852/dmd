@@ -58,24 +58,13 @@ class StationTest extends TestCase
         $this->assertNull($station->access_password);
     }
 
-    public function test_published_scope_excludes_unpublished_stations(): void
+    public function test_soft_deleting_hides_a_station_from_queries_but_keeps_the_row(): void
     {
-        Station::factory()->unpublished()->create();
-        $published = Station::factory()->create(['is_published' => true]);
-
-        $result = Station::query()->published()->get();
-
-        $this->assertCount(1, $result);
-        $this->assertTrue($result->first()->is($published));
-    }
-
-    public function test_soft_deleting_removes_a_station_from_published_scope_but_keeps_the_row(): void
-    {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
 
         $station->delete();
 
-        $this->assertCount(0, Station::query()->published()->get());
+        $this->assertCount(0, Station::query()->get());
         $this->assertDatabaseHas('stations', ['id' => $station->id]);
         $this->assertNotNull($station->fresh()->deleted_at);
     }

@@ -55,14 +55,12 @@ class UpdateStationRequest extends FormRequest
             // (the KM value, say) would silently un-gate it.
             'access_password' => ['nullable', 'string', 'min:8'],
             'clear_access_password' => ['sometimes', 'boolean'],
-            'is_published' => ['sometimes', 'boolean'],
         ];
     }
 
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'is_published' => $this->boolean('is_published'),
             'clear_access_password' => $this->boolean('clear_access_password'),
         ]);
     }

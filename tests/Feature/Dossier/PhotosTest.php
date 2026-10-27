@@ -56,7 +56,7 @@ class PhotosTest extends TestCase
 
     public function test_it_returns_200_with_the_photos_component(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
 
         $response = $this->get(route('dossier.photos', $station));
 
@@ -66,7 +66,7 @@ class PhotosTest extends TestCase
 
     public function test_props_contain_exactly_the_photo_data_fields(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         $this->attachPhoto($station, 'Facing the highway', 145);
 
         $response = $this->get(route('dossier.photos', $station));
@@ -86,7 +86,7 @@ class PhotosTest extends TestCase
 
     public function test_props_never_reveal_the_internal_media_primary_key(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         $media = $this->attachPhoto($station, 'Facing the highway');
 
         $response = $this->get(route('dossier.photos', $station));
@@ -104,7 +104,7 @@ class PhotosTest extends TestCase
      */
     public function test_photos_are_returned_in_upload_order(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         $this->attachPhoto($station, 'Second uploaded');
         $this->attachPhoto($station, 'First uploaded');
         $this->attachPhoto($station, 'Third uploaded');
@@ -120,7 +120,7 @@ class PhotosTest extends TestCase
 
     public function test_every_photo_carries_a_non_empty_srcset_and_dimensions(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         $this->attachPhoto($station, 'Facing the highway');
 
         $response = $this->get(route('dossier.photos', $station));
@@ -134,7 +134,7 @@ class PhotosTest extends TestCase
 
     public function test_a_station_with_no_photos_renders_the_empty_state_without_error(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
 
         $response = $this->get(route('dossier.photos', $station));
 
@@ -148,7 +148,7 @@ class PhotosTest extends TestCase
             'dossier.access_mode' => AccessMode::Password,
             'dossier.access_password' => 'secret',
         ]);
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
 
         $this->get(route('dossier.photos', $station))->assertRedirect();
     }

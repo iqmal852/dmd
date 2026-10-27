@@ -22,14 +22,13 @@ class PlusGcpStationSeederTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_it_seeds_exactly_136_published_stations_with_unique_codes(): void
+    public function test_it_seeds_exactly_136_stations_with_unique_codes(): void
     {
         $this->seed(PlusGcpStationSeeder::class);
 
         $this->assertSame(136, Station::query()->count());
         $this->assertSame(136, Station::query()->distinct('code')->count('code'));
         $this->assertSame(136, Station::query()->distinct('public_id')->count('public_id'));
-        $this->assertSame(136, Station::query()->where('is_published', true)->count());
     }
 
     public function test_every_station_has_a_coordinate_set_and_no_specification(): void

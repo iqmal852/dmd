@@ -56,7 +56,7 @@ class SecurityHeadersTest extends TestCase
     public function test_the_download_route_is_rate_limited(): void
     {
         $this->actingAs(User::factory()->create());
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         $media = $station->addMediaFromString('%PDF-1.4')
             ->usingFileName('a.pdf')
             ->withCustomProperties(['document_type' => 'as_built', 'title' => 'A', 'is_primary' => true])
@@ -93,7 +93,7 @@ class SecurityHeadersTest extends TestCase
      */
     public function test_uploaded_media_lives_outside_the_publicly_served_disk(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         $media = $station->addMediaFromString('%PDF-1.4')
             ->usingFileName('a.pdf')
             ->withCustomProperties(['document_type' => 'as_built', 'title' => 'A', 'is_primary' => true])

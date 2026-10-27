@@ -20,18 +20,15 @@ class GuestAccessTest extends TestCase
 
     public function test_a_guest_is_redirected_to_login_for_every_dossier_page(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
 
         foreach (['show', 'coordinates', 'map', 'photos', 'files', 'unlock'] as $name) {
             $this->get(route("dossier.{$name}", $station))->assertRedirect(route('login'));
         }
     }
 
-    public function test_a_guest_cannot_probe_for_unpublished_or_missing_stations(): void
+    public function test_a_guest_cannot_probe_for_missing_stations(): void
     {
-        $unpublished = Station::factory()->create(['is_published' => false]);
-
-        $this->get(route('dossier.show', $unpublished))->assertRedirect(route('login'));
         $this->get(route('dossier.show', ['station' => '01ARZ3NDEKTSV4RRFFQ69G5FAV']))
             ->assertRedirect(route('login'));
     }
@@ -39,7 +36,7 @@ class GuestAccessTest extends TestCase
     public function test_login_returns_the_user_to_the_dossier_page_they_scanned(): void
     {
         $user = User::factory()->create();
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         $dossierUrl = route('dossier.show', $station);
 
         $this->get($dossierUrl)->assertRedirect(route('login'));
@@ -54,7 +51,7 @@ class GuestAccessTest extends TestCase
 
     public function test_a_logged_in_user_can_open_the_dossier(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
 
         $this->actingAs(User::factory()->create())
             ->get(route('dossier.show', $station))

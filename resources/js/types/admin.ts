@@ -7,7 +7,6 @@ export type AdminStationListItem = {
     km: string;
     status: string;
     statusColor: string;
-    isPublished: boolean;
     hasCoordinates: boolean;
     photoCount: number;
     documentCount: number;
@@ -41,7 +40,6 @@ export type AdminStationForm = {
     status: string;
     description: string | null;
     hasAccessPassword: boolean;
-    isPublished: boolean;
 };
 
 /** Mirrors App\Data\Admin\CoordinateSetFormData exactly. */

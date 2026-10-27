@@ -120,7 +120,7 @@ class AdminPhotoTest extends TestCase
     public function test_the_station_cache_is_bumped_exactly_once_for_the_whole_batch(): void
     {
         $user = User::factory()->create();
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
 
         $this->actingAs($user)->get(route('dossier.show', $station))
             ->assertInertia(fn ($page) => $page->where('station.modules.photoCount', 0));

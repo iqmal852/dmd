@@ -40,14 +40,6 @@ class StoreStationRequest extends FormRequest
             'status' => ['required', new Enum(StationStatus::class)],
             'description' => ['nullable', 'string'],
             'access_password' => ['nullable', 'string', 'min:8'],
-            'is_published' => ['sometimes', 'boolean'],
         ];
-    }
-
-    protected function prepareForValidation(): void
-    {
-        $this->merge([
-            'is_published' => $this->boolean('is_published'),
-        ]);
     }
 }

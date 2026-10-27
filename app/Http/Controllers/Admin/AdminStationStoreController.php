@@ -33,7 +33,6 @@ class AdminStationStoreController extends Controller
             'status' => $request->validated('status'),
             'description' => $request->validated('description'),
             'access_password' => $request->validated('access_password'),
-            'is_published' => $request->validated('is_published', false),
         ]);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => "Station {$station->code} was created successfully. You can now add its coordinates, specification, photos and documents."]);

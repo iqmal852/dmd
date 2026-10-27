@@ -38,7 +38,6 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property StationStatus $status
  * @property string|null $description
  * @property string|null $access_password
- * @property bool $is_published
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
@@ -51,7 +50,7 @@ final class Station extends Model implements HasMedia
     protected $fillable = [
         'code', 'gcp_reference', 'highway', 'section', 'location', 'km', 'direction',
         'facility_type', 'monument_type', 'installed_at', 'status', 'description',
-        'access_password', 'is_published',
+        'access_password',
     ];
 
     /**
@@ -78,7 +77,6 @@ final class Station extends Model implements HasMedia
             'installed_at' => 'date',
             'status' => StationStatus::class,
             'direction' => Direction::class,
-            'is_published' => 'boolean',
             'access_password' => 'hashed',
         ];
     }
@@ -105,15 +103,6 @@ final class Station extends Model implements HasMedia
     public function downloadLogs(): HasMany
     {
         return $this->hasMany(DownloadLog::class);
-    }
-
-    /**
-     * @param  Builder<Station>  $query
-     * @return Builder<Station>
-     */
-    public function scopePublished(Builder $query): Builder
-    {
-        return $query->where('is_published', true);
     }
 
     /**

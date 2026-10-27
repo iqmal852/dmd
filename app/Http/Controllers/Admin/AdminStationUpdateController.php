@@ -34,7 +34,6 @@ class AdminStationUpdateController extends Controller
             'installed_at' => $request->validated('installed_at'),
             'status' => $request->validated('status'),
             'description' => $request->validated('description'),
-            'is_published' => $request->validated('is_published', false),
         ]);
 
         if ($request->clearAccessPassword()) {

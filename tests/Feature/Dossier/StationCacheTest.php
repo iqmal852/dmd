@@ -30,7 +30,7 @@ class StationCacheTest extends TestCase
 
     public function test_a_second_request_for_the_same_station_issues_fewer_queries(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         CoordinateSet::factory()->for($station)->create();
 
         $this->get(route('dossier.show', $station))->assertOk();
@@ -52,7 +52,7 @@ class StationCacheTest extends TestCase
     public function test_an_admin_write_makes_the_next_public_read_reflect_the_change(): void
     {
         $admin = User::factory()->create();
-        $station = Station::factory()->create(['is_published' => true, 'monument_type' => 'Original Type']);
+        $station = Station::factory()->create(['monument_type' => 'Original Type']);
 
         // Warm the cache with the original value.
         $this->get(route('dossier.show', $station))
@@ -65,7 +65,6 @@ class StationCacheTest extends TestCase
             'direction' => $station->direction->value,
             'monument_type' => 'Updated Type',
             'status' => $station->status->value,
-            'is_published' => '1',
         ]);
 
         $this->get(route('dossier.show', $station))
@@ -100,7 +99,7 @@ class StationCacheTest extends TestCase
         config(['cache.default' => 'database']);
 
         $admin = User::factory()->create();
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         CoordinateSet::factory()->for($station)->create();
         Specification::factory()->for($station)->create();
         $this->actingAs($admin)->post(route('admin.stations.photos.store', $station), [
@@ -136,7 +135,7 @@ class StationCacheTest extends TestCase
     public function test_a_photo_upload_makes_the_next_public_read_reflect_the_new_count(): void
     {
         $admin = User::factory()->create();
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
 
         $this->get(route('dossier.show', $station))
             ->assertInertia(fn ($page) => $page->where('station.modules.photoCount', 0));

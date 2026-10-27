@@ -30,7 +30,6 @@ final readonly class StationFormData
         public string $status,
         public ?string $description,
         public bool $hasAccessPassword,
-        public bool $isPublished,
     ) {}
 
     public static function from(Station $station): self
@@ -50,7 +49,6 @@ final readonly class StationFormData
             status: $station->status->value,
             description: $station->description,
             hasAccessPassword: $station->access_password !== null,
-            isPublished: $station->is_published,
         );
     }
 
@@ -71,7 +69,6 @@ final readonly class StationFormData
             status: '',
             description: null,
             hasAccessPassword: false,
-            isPublished: false,
         );
     }
 }

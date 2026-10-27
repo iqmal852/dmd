@@ -13,29 +13,23 @@ use App\Http\Controllers\Dossier\UnlockFormController;
 use App\Http\Controllers\Dossier\UnlockSubmitController;
 use App\Http\Middleware\AddNoindexHeader;
 use App\Http\Middleware\EnsureDossierUnlocked;
-use App\Http\Middleware\EnsureStationIsPublished;
 use Illuminate\Support\Facades\Route;
 
 /*
  | {station} resolves on the ULID public_id via Station::getRouteKeyName()
- | (default implicit binding — the same as every admin route). This group
- | additionally requires is_published via EnsureStationIsPublished: an
- | unpublished or soft-deleted station 404s here — never "this exists but
- | you can't see it" (a QR plate should not confirm the existence of an
- | unpublished record) — without that restriction leaking onto unrelated
- | routes the way a global Route::bind() would. See
- | plan/phases/phase-03-dossier-shell.md M3.1 and
- | plan/phases/phase-08-admin-qr.md (which found the leak).
+ | (default implicit binding — the same as every admin route). A soft-deleted
+ | station fails binding and 404s here — never "this exists but you can't see
+ | it".
  |
  | Every route here also requires a logged-in user. A guest who scans a QR
  | plate is sent to /login and, once authenticated, returned to the dossier
  | page they scanned (the `auth` middleware stores the intended URL and
  | Fortify's login response redirects to it before falling back to home).
  | `auth` runs ahead of station binding, so a guest cannot probe which
- | station IDs exist or are published.
+ | station IDs exist.
  */
 Route::prefix(config('dossier.route_prefix'))
-    ->middleware(['auth', AddNoindexHeader::class, EnsureStationIsPublished::class])
+    ->middleware(['auth', AddNoindexHeader::class])
     ->name('dossier.')
     ->group(function (): void {
         Route::get('{station}/unlock', UnlockFormController::class)->name('unlock');

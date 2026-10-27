@@ -32,7 +32,7 @@ class OverviewTest extends TestCase
 
     public function test_overview_prop_shape_is_exactly_the_dto(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         CoordinateSet::factory()->for($station)->create();
         Specification::factory()->for($station)->create();
 
@@ -57,7 +57,6 @@ class OverviewTest extends TestCase
     public function test_overview_never_exposes_the_internal_primary_key_or_password(): void
     {
         $station = Station::factory()->create([
-            'is_published' => true,
             'access_password' => 'super-secret',
         ]);
 
@@ -83,7 +82,7 @@ class OverviewTest extends TestCase
      */
     public function test_overview_issues_at_most_four_queries(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
         CoordinateSet::factory()->for($station)->create();
         Specification::factory()->for($station)->create();
 
@@ -99,7 +98,7 @@ class OverviewTest extends TestCase
 
     public function test_overview_renders_empty_states_for_a_station_with_no_coordinates(): void
     {
-        $station = Station::factory()->create(['is_published' => true]);
+        $station = Station::factory()->create();
 
         $response = $this->get(route('dossier.show', $station));
 

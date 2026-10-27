@@ -9,16 +9,14 @@ import {
     RotateCw,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import { toast } from 'sonner';
 import { NeuButton } from '@/components/neu/neu-button';
 import { NeuCard } from '@/components/neu/neu-card';
 import { NeuInput } from '@/components/neu/neu-input';
 import { NeuPill } from '@/components/neu/neu-pill';
 import { NeuSelect } from '@/components/neu/neu-select';
-import { NeuToggle } from '@/components/neu/neu-toggle';
 import { Spinner } from '@/components/ui/spinner';
 import AdminLayout from '@/layouts/admin/admin-layout';
-import { create, edit, index, publish, qr } from '@/routes/admin/stations';
+import { create, edit, index, qr } from '@/routes/admin/stations';
 import { show } from '@/routes/dossier';
 import type { AdminStationListItem, Option, Paginated } from '@/types/admin';
 import type { NeuPillTone } from '@/components/neu/neu-pill';
@@ -97,20 +95,6 @@ export default function AdminStationIndex() {
         return () => clearTimeout(searchTimeout.current ?? undefined);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [search]);
-
-    function togglePublished(station: AdminStationListItem, checked: boolean) {
-        router.patch(
-            publish({ station: station.publicId }).url,
-            { is_published: checked },
-            {
-                preserveScroll: true,
-                onSuccess: () =>
-                    toast(
-                        checked ? 'Station published' : 'Station unpublished',
-                    ),
-            },
-        );
-    }
 
     function sortLink(column: string) {
         return (
@@ -200,7 +184,6 @@ export default function AdminStationIndex() {
                             <th className="px-4 py-3">{sortLink('km')}</th>
                             <th className="px-4 py-3">Status</th>
                             <th className="px-4 py-3">Media</th>
-                            <th className="px-4 py-3">Published</th>
                             <th className="px-4 py-3">Actions</th>
                         </tr>
                     </thead>
@@ -226,15 +209,6 @@ export default function AdminStationIndex() {
                                 </td>
                                 <td className="px-4 py-3">
                                     <MediaBadges station={station} />
-                                </td>
-                                <td className="px-4 py-3">
-                                    <NeuToggle
-                                        checked={station.isPublished}
-                                        onChange={(checked) =>
-                                            togglePublished(station, checked)
-                                        }
-                                        aria-label={`Publish ${station.code}`}
-                                    />
                                 </td>
                                 <td className="px-4 py-3">
                                     <div className="flex items-center gap-3 text-xs font-bold">
@@ -293,14 +267,7 @@ export default function AdminStationIndex() {
                             </NeuPill>
                         </div>
                         <MediaBadges station={station} />
-                        <div className="flex items-center justify-between">
-                            <NeuToggle
-                                checked={station.isPublished}
-                                onChange={(checked) =>
-                                    togglePublished(station, checked)
-                                }
-                                aria-label={`Publish ${station.code}`}
-                            />
+                        <div className="flex items-center justify-end">
                             <div className="flex items-center gap-4 text-sm font-bold">
                                 <Link
                                     href={

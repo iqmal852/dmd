@@ -10,7 +10,7 @@ uses(RefreshDatabase::class);
 
 /**
  * plan/phases/phase-08-admin-qr.md Test Gate #14 — log in, create a
- * station, add coordinates, generate a QR, publish it, and open the
+ * station, add coordinates, generate a QR, and open the
  * public dossier for it.
  *
  * Deliberately does not exercise a real file upload here: Pest's
@@ -64,10 +64,6 @@ it('takes a station from nothing to a live public dossier without touching the d
     $qrPage = visit(route('admin.stations.qr', $station));
     $qrPage->assertScript("document.querySelector('img[alt*=\"QR code\"]') !== null");
     $qrPage->assertSee($station->public_id);
-
-    // Publish it — the public dossier 404s for an unpublished station.
-    $indexPage = visit(route('admin.stations.index'));
-    $indexPage->click('table [aria-label="Publish E2E-GCP-001"]');
 
     $publicPage = visit(route('dossier.show', $station->fresh()));
     $publicPage->assertSee('E2E-GCP-001');

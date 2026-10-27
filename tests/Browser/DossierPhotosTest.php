@@ -116,7 +116,7 @@ it('renders correctly at 1280px desktop', function () {
 });
 
 it('shows an empty state for a station with no photos instead of a broken layout', function () {
-    $station = Station::factory()->create(['is_published' => true]);
+    $station = Station::factory()->create();
 
     visit(route('dossier.photos', $station))
         ->assertSee('No site photos')

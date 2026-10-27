@@ -7,7 +7,6 @@ import { NeuInput } from '@/components/neu/neu-input';
 import { NeuPill } from '@/components/neu/neu-pill';
 import { NeuSelect } from '@/components/neu/neu-select';
 import { NeuTextarea } from '@/components/neu/neu-textarea';
-import { NeuToggle } from '@/components/neu/neu-toggle';
 import AdminStationStoreController from '@/actions/App/Http/Controllers/Admin/AdminStationStoreController';
 import AdminStationUpdateController from '@/actions/App/Http/Controllers/Admin/AdminStationUpdateController';
 import type { AdminStationForm, Option } from '@/types/admin';
@@ -29,7 +28,6 @@ export function DetailsTab({
 }: Props) {
     const isEditing = station.publicId !== null;
     const [clearPassword, setClearPassword] = useState(false);
-    const [isPublished, setIsPublished] = useState(station.isPublished);
 
     const formProps = isEditing
         ? AdminStationUpdateController.form({
@@ -332,20 +330,6 @@ export function DetailsTab({
                                 Clear the per-station password
                             </label>
                         )}
-
-                        <label className="flex items-center gap-3 text-sm font-medium">
-                            <NeuToggle
-                                checked={isPublished}
-                                onChange={setIsPublished}
-                                aria-label="Published"
-                            />
-                            <input
-                                type="hidden"
-                                name="is_published"
-                                value={isPublished ? '1' : '0'}
-                            />
-                            Published
-                        </label>
 
                         <NeuButton
                             type="submit"

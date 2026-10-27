@@ -34,7 +34,6 @@ class StationFactory extends Factory
             'status' => StationStatus::Active->value,
             'description' => null,
             'access_password' => null,
-            'is_published' => true,
         ];
     }
 
@@ -46,10 +45,5 @@ class StationFactory extends Factory
     public function damaged(): static
     {
         return $this->state(['status' => StationStatus::Damaged->value]);
-    }
-
-    public function unpublished(): static
-    {
-        return $this->state(['is_published' => false]);
     }
 }

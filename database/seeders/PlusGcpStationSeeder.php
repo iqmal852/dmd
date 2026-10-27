@@ -56,7 +56,6 @@ class PlusGcpStationSeeder extends Seeder
                 'monument_type' => 'Ground Control Point',
                 'status' => StationStatus::Active->value,
                 'description' => $row['Remark'] !== '' ? $row['Remark'] : null,
-                'is_published' => true,
             ]);
 
             // The source gives one "Elevation" figure, not separate

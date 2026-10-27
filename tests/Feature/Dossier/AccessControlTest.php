@@ -29,9 +29,9 @@ class AccessControlTest extends TestCase
         $this->actingAs(User::factory()->create());
     }
 
-    private function publishedStation(array $attributes = []): Station
+    private function makeStation(array $attributes = []): Station
     {
-        return Station::factory()->create(['is_published' => true, ...$attributes]);
+        return Station::factory()->create($attributes);
     }
 
     // ── Public mode ──────────────────────────────────────────────────
@@ -39,7 +39,7 @@ class AccessControlTest extends TestCase
     public function test_public_mode_with_no_station_password_opens_immediately(): void
     {
         config(['dossier.access_mode' => AccessMode::Public]);
-        $station = $this->publishedStation();
+        $station = $this->makeStation();
 
         $response = $this->get(route('dossier.show', $station));
 
@@ -50,7 +50,7 @@ class AccessControlTest extends TestCase
     public function test_public_mode_with_a_station_password_still_requires_unlock(): void
     {
         config(['dossier.access_mode' => AccessMode::Public]);
-        $station = $this->publishedStation(['access_password' => 'station-secret']);
+        $station = $this->makeStation(['access_password' => 'station-secret']);
 
         $response = $this->get(route('dossier.show', $station));
 
@@ -66,7 +66,7 @@ class AccessControlTest extends TestCase
             'dossier.access_mode' => AccessMode::Password,
             'dossier.access_password' => 'global-secret',
         ]);
-        $station = $this->publishedStation();
+        $station = $this->makeStation();
         $station->coordinateSet()->create(CoordinateSet::factory()->raw());
 
         $response = $this->get(route('dossier.show', $station));
@@ -84,7 +84,7 @@ class AccessControlTest extends TestCase
             'dossier.access_mode' => AccessMode::Password,
             'dossier.access_password' => 'global-secret',
         ]);
-        $station = $this->publishedStation();
+        $station = $this->makeStation();
 
         $unlock = $this->post(route('dossier.unlock.submit', $station), [
             'password' => 'global-secret',
@@ -101,7 +101,7 @@ class AccessControlTest extends TestCase
             'dossier.access_mode' => AccessMode::Password,
             'dossier.access_password' => 'global-secret',
         ]);
-        $station = $this->publishedStation();
+        $station = $this->makeStation();
 
         $response = $this->from(route('dossier.unlock', $station))
             ->post(route('dossier.unlock.submit', $station), ['password' => 'wrong']);
@@ -117,7 +117,7 @@ class AccessControlTest extends TestCase
             'dossier.access_password' => 'global-secret',
             'dossier.unlock_throttle' => 5,
         ]);
-        $station = $this->publishedStation();
+        $station = $this->makeStation();
 
         for ($i = 0; $i < 5; $i++) {
             $this->post(route('dossier.unlock.submit', $station), ['password' => 'wrong'])
@@ -133,7 +133,7 @@ class AccessControlTest extends TestCase
     public function test_matrix_public_mode_no_station_password_opens(): void
     {
         config(['dossier.access_mode' => AccessMode::Public]);
-        $station = $this->publishedStation();
+        $station = $this->makeStation();
 
         $this->get(route('dossier.show', $station))->assertOk();
     }
@@ -141,7 +141,7 @@ class AccessControlTest extends TestCase
     public function test_matrix_public_mode_with_station_password_gates(): void
     {
         config(['dossier.access_mode' => AccessMode::Public]);
-        $station = $this->publishedStation(['access_password' => 'secret']);
+        $station = $this->makeStation(['access_password' => 'secret']);
 
         $this->assertRedirectsToUnlock($this->get(route('dossier.show', $station)), $station);
     }
@@ -152,7 +152,7 @@ class AccessControlTest extends TestCase
             'dossier.access_mode' => AccessMode::Password,
             'dossier.access_password' => 'global-secret',
         ]);
-        $station = $this->publishedStation();
+        $station = $this->makeStation();
 
         $this->post(route('dossier.unlock.submit', $station), ['password' => 'global-secret'])
             ->assertRedirect(route('dossier.show', $station));
@@ -164,7 +164,7 @@ class AccessControlTest extends TestCase
             'dossier.access_mode' => AccessMode::Password,
             'dossier.access_password' => 'global-secret',
         ]);
-        $station = $this->publishedStation(['access_password' => 'station-secret']);
+        $station = $this->makeStation(['access_password' => 'station-secret']);
 
         // Global password no longer works once the station has its own.
         $this->post(route('dossier.unlock.submit', $station), ['password' => 'global-secret'])
@@ -183,7 +183,7 @@ class AccessControlTest extends TestCase
             'dossier.access_password' => 'global-secret',
             'dossier.unlock_ttl' => 10,
         ]);
-        $station = $this->publishedStation();
+        $station = $this->makeStation();
 
         $this->post(route('dossier.unlock.submit', $station), ['password' => 'global-secret']);
         $this->get(route('dossier.show', $station))->assertOk();
@@ -199,8 +199,8 @@ class AccessControlTest extends TestCase
             'dossier.access_mode' => AccessMode::Password,
             'dossier.access_password' => 'global-secret',
         ]);
-        $stationA = $this->publishedStation();
-        $stationB = $this->publishedStation();
+        $stationA = $this->makeStation();
+        $stationB = $this->makeStation();
 
         $this->post(route('dossier.unlock.submit', $stationA), ['password' => 'global-secret']);
 
@@ -216,7 +216,7 @@ class AccessControlTest extends TestCase
             'dossier.access_mode' => AccessMode::Password,
             'dossier.access_password' => null,
         ]);
-        $station = $this->publishedStation();
+        $station = $this->makeStation();
 
         $response = $this->get(route('dossier.show', $station));
 
@@ -230,24 +230,17 @@ class AccessControlTest extends TestCase
             'dossier.access_mode' => AccessMode::Password,
             'dossier.access_password' => null,
         ]);
-        $station = $this->publishedStation(['access_password' => 'station-secret']);
+        $station = $this->makeStation(['access_password' => 'station-secret']);
 
         // Not misconfigured: this station has its own password.
         $this->assertRedirectsToUnlock($this->get(route('dossier.show', $station)), $station);
     }
 
-    // ── Publication / soft-delete ────────────────────────────────────
-
-    public function test_unpublished_station_404s(): void
-    {
-        $station = Station::factory()->unpublished()->create();
-
-        $this->get(route('dossier.show', $station))->assertNotFound();
-    }
+    // ── Soft-delete ────────────────────────────────────
 
     public function test_soft_deleted_station_404s(): void
     {
-        $station = $this->publishedStation();
+        $station = $this->makeStation();
         $station->delete();
 
         $this->get(route('dossier.show', $station))->assertNotFound();
@@ -257,7 +250,7 @@ class AccessControlTest extends TestCase
 
     public function test_dossier_routes_carry_the_noindex_header(): void
     {
-        $station = $this->publishedStation();
+        $station = $this->makeStation();
 
         $response = $this->get(route('dossier.show', $station));
 
@@ -273,7 +266,7 @@ class AccessControlTest extends TestCase
 
     public function test_password_hashing_uses_the_correct_comparison_strategy(): void
     {
-        $station = $this->publishedStation(['access_password' => 'station-secret']);
+        $station = $this->makeStation(['access_password' => 'station-secret']);
 
         $this->assertTrue(Hash::isHashed($station->access_password));
     }

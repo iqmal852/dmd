@@ -71,7 +71,7 @@ it('renders the bottom nav with coordinates active and files/photos disabled', f
 });
 
 it('renders an empty state for missing coordinates and N/A for a missing specification', function () {
-    $station = Station::factory()->create(['is_published' => true]);
+    $station = Station::factory()->create();
 
     visit(route('dossier.coordinates', $station))
         ->assertSee('Coordinates not yet recorded for this station.')

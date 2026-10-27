@@ -137,20 +137,6 @@ class AdminStationCrudTest extends TestCase
         $this->assertTrue(Hash::check('a-brand-new-secret', $station->fresh()->access_password));
     }
 
-    public function test_the_publish_toggle_updates_only_is_published(): void
-    {
-        $user = User::factory()->create();
-        $station = Station::factory()->create(['is_published' => false, 'code' => 'LPT2-GCP-777']);
-
-        $response = $this->actingAs($user)->patch(route('admin.stations.publish', $station), ['is_published' => true]);
-
-        $response->assertSessionHas('inertia.flash_data.toast', ['type' => 'success', 'message' => 'Station LPT2-GCP-777 is now published. Logged-in users can open its dossier from the QR code.']);
-
-        $station->refresh();
-        $this->assertTrue($station->is_published);
-        $this->assertSame('LPT2-GCP-777', $station->code);
-    }
-
     public function test_deleting_a_station_soft_deletes_it(): void
     {
         $user = User::factory()->create();
