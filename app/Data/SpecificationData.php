@@ -21,9 +21,6 @@ final readonly class SpecificationData
         public ?int $satelliteCount,
         public ?string $pdopMax,
         public ?string $elevationCutoff,
-        public ?string $antennaType,
-        public ?string $antennaHeight,
-        public ?string $antennaReferencePoint,
         public ?string $horizontalRms,
         public ?string $verticalRms,
         public string $qcStatus,
@@ -44,11 +41,6 @@ final readonly class SpecificationData
             elevationCutoff: $specification->elevation_cutoff_deg !== null
                 ? $formatter->degrees($specification->elevation_cutoff_deg)
                 : null,
-            antennaType: $specification->antenna_type,
-            antennaHeight: $specification->antenna_height !== null
-                ? $formatter->metres($specification->antenna_height)
-                : null,
-            antennaReferencePoint: $specification->antenna_reference_point,
             horizontalRms: $specification->horizontal_rms_mm !== null
                 ? $formatter->tolerance($specification->horizontal_rms_mm)
                 : null,

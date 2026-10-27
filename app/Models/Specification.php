@@ -23,9 +23,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int|null $satellite_count
  * @property string|null $pdop_max
  * @property int|null $elevation_cutoff_deg
- * @property string|null $antenna_type
- * @property string|null $antenna_height
- * @property string|null $antenna_reference_point
  * @property string|null $horizontal_rms_mm
  * @property string|null $vertical_rms_mm
  * @property QcStatus $qc_status
@@ -40,8 +37,8 @@ final class Specification extends Model
 
     protected $fillable = [
         'station_id', 'observation_method', 'observation_minutes', 'satellite_count',
-        'pdop_max', 'elevation_cutoff_deg', 'antenna_type', 'antenna_height',
-        'antenna_reference_point', 'horizontal_rms_mm', 'vertical_rms_mm',
+        'pdop_max', 'elevation_cutoff_deg',
+        'horizontal_rms_mm', 'vertical_rms_mm',
         'qc_status', 'verified_at', 'verified_by', 'remarks',
     ];
 
@@ -49,7 +46,6 @@ final class Specification extends Model
     {
         return [
             'pdop_max' => 'decimal:2',
-            'antenna_height' => 'decimal:3',
             'horizontal_rms_mm' => 'decimal:2',
             'vertical_rms_mm' => 'decimal:2',
             'qc_status' => QcStatus::class,

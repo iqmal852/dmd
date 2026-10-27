@@ -5,13 +5,11 @@ import { DetailsTab } from '@/pages/admin/stations/partials/details-tab';
 import { CoordinatesTab } from '@/pages/admin/stations/partials/coordinates-tab';
 import { SpecificationTab } from '@/pages/admin/stations/partials/specification-tab';
 import { PhotosTab } from '@/pages/admin/stations/partials/photos-tab';
-import { PanoramaTab } from '@/pages/admin/stations/partials/panorama-tab';
 import { DocumentsTab } from '@/pages/admin/stations/partials/documents-tab';
 import { cn } from '@/lib/utils';
 import type {
     AdminCoordinateSet,
     AdminDocument,
-    AdminPanorama,
     AdminPhoto,
     AdminSpecification,
     AdminStationForm,
@@ -23,7 +21,6 @@ type PageProps = {
     coordinateSet: AdminCoordinateSet | null;
     specification: AdminSpecification | null;
     photos: AdminPhoto[];
-    panorama: AdminPanorama | null;
     documents: AdminDocument[];
     directionOptions: Option[];
     statusOptions: Option[];
@@ -35,7 +32,6 @@ type Tab =
     | 'coordinates'
     | 'specification'
     | 'photos'
-    | 'panorama'
     | 'documents';
 
 /**
@@ -55,7 +51,6 @@ export default function AdminStationForm() {
         { key: 'coordinates', label: 'Coordinates' },
         { key: 'specification', label: 'Specification' },
         { key: 'photos', label: 'Photos' },
-        { key: 'panorama', label: '360° Panorama' },
         { key: 'documents', label: 'Documents' },
     ];
 
@@ -109,12 +104,6 @@ export default function AdminStationForm() {
                 <PhotosTab
                     stationPublicId={station.publicId}
                     photos={props.photos}
-                />
-            )}
-            {tab === 'panorama' && station.publicId && (
-                <PanoramaTab
-                    stationPublicId={station.publicId}
-                    panorama={props.panorama}
                 />
             )}
             {tab === 'documents' && station.publicId && (

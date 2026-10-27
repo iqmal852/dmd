@@ -68,33 +68,6 @@ class AdminMediaTest extends TestCase
         $this->assertTrue((bool) $second->fresh()->getCustomProperty('is_primary'));
     }
 
-    public function test_uploading_a_3_to_1_panorama_is_rejected(): void
-    {
-        $user = User::factory()->create();
-        $station = Station::factory()->create();
-
-        $response = $this->actingAs($user)->post(route('admin.stations.panorama.store', $station), [
-            'file' => UploadedFile::fake()->image('pano.jpg', 3000, 1000),
-        ]);
-
-        $response->assertSessionHasErrors('file');
-        $this->assertNull($station->fresh()->getFirstMedia('panoramas'));
-    }
-
-    public function test_uploading_a_2_to_1_panorama_is_accepted(): void
-    {
-        $user = User::factory()->create();
-        $station = Station::factory()->create();
-
-        $response = $this->actingAs($user)->post(route('admin.stations.panorama.store', $station), [
-            'file' => UploadedFile::fake()->image('pano.jpg', 4000, 2000),
-            'initial_yaw' => 10,
-        ]);
-
-        $response->assertSessionDoesntHaveErrors();
-        $this->assertNotNull($station->fresh()->getFirstMedia('panoramas'));
-    }
-
     public function test_uploading_a_dwg_without_a_preview_is_rejected(): void
     {
         $user = User::factory()->create();

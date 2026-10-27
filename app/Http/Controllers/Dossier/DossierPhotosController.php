@@ -27,10 +27,7 @@ class DossierPhotosController extends Controller
                 ->values()
                 ->all();
 
-            return [
-                'photos' => $photos,
-                'hasPanorama' => $station->getFirstMedia('panoramas') !== null,
-            ];
+            return ['photos' => $photos];
         });
 
         return Inertia::render('dossier/photos', [

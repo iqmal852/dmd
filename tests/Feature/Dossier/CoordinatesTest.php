@@ -51,9 +51,6 @@ class CoordinatesTest extends TestCase
             'satellite_count' => 18,
             'pdop_max' => '1.60',
             'elevation_cutoff_deg' => 15,
-            'antenna_type' => 'Geodetic L1/L2',
-            'antenna_height' => '1.532',
-            'antenna_reference_point' => 'Bottom of ARP',
             'horizontal_rms_mm' => '10.00',
             'vertical_rms_mm' => '15.00',
             'qc_status' => 'verified',
@@ -82,7 +79,7 @@ class CoordinatesTest extends TestCase
             ->has('coordinateSet', fn (AssertableInertia $c) => $c
                 ->hasAll([
                     'latitude', 'longitude', 'ellipsoidalHeight', 'easting', 'northing',
-                    'zone', 'orthometricHeight', 'geoidModel', 'epoch',
+                    'orthometricHeight', 'geoidModel',
                     'latitudeRaw', 'longitudeRaw',
                 ])
                 ->missing('id')
@@ -92,7 +89,7 @@ class CoordinatesTest extends TestCase
             ->has('specification', fn (AssertableInertia $s) => $s
                 ->hasAll([
                     'observationMethod', 'observationMinutes', 'satelliteCount', 'pdopMax',
-                    'elevationCutoff', 'antennaType', 'antennaHeight', 'antennaReferencePoint',
+                    'elevationCutoff',
                     'horizontalRms', 'verticalRms', 'qcStatus', 'qcStatusColor',
                 ])
                 ->missing('id')
@@ -120,9 +117,6 @@ class CoordinatesTest extends TestCase
             ->where('specification.satelliteCount', 18)
             ->where('specification.pdopMax', '1.6')
             ->where('specification.elevationCutoff', '15 °')
-            ->where('specification.antennaType', 'Geodetic L1/L2')
-            ->where('specification.antennaHeight', '1.532 m')
-            ->where('specification.antennaReferencePoint', 'Bottom of ARP')
             ->where('specification.horizontalRms', '≤ 10 mm')
             ->where('specification.verticalRms', '≤ 15 mm')
             ->where('specification.qcStatus', 'Verified')

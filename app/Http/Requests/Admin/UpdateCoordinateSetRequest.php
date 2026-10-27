@@ -32,10 +32,8 @@ class UpdateCoordinateSetRequest extends FormRequest
             'ellipsoidal_height' => ['required', 'numeric', 'between:-100,3000'],
             'easting' => ['required', 'numeric', 'min:0', 'max:10000000'],
             'northing' => ['required', 'numeric', 'min:0', 'max:10000000'],
-            'zone' => ['nullable', 'string', 'max:20'],
             'orthometric_height' => ['required', 'numeric', 'between:-100,3000'],
             'geoid_model' => ['required', 'string', 'max:50'],
-            'epoch' => ['nullable', 'string', 'max:20'],
             'computed_at' => ['nullable', 'date', 'before_or_equal:today'],
         ];
     }

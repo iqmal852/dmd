@@ -84,7 +84,7 @@ class SecurityHeadersTest extends TestCase
 
     /**
      * Station::registerMediaCollections() uses the `local` disk
-     * (config/filesystems.php) for photos, panoramas, and documents. Its
+     * (config/filesystems.php) for photos and documents. Its
      * root is storage/app/private — a sibling of, not inside, the
      * storage/app/public directory the `storage:link` symlink exposes —
      * so nothing in it is reachable except through

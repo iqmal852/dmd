@@ -45,12 +45,6 @@ function MediaBadges({ station }: { station: AdminStationListItem }) {
                 <Camera className="size-4" />
                 {station.photoCount}
             </span>
-            <span
-                className={station.hasPanorama ? 'text-neu-violet' : undefined}
-                title="360° panorama"
-            >
-                <RotateCw className="size-4" />
-            </span>
             <span className="flex items-center gap-0.5">
                 <FileText className="size-4" />
                 {station.documentCount}

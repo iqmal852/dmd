@@ -23,7 +23,7 @@ class DossierOverviewController extends Controller
     {
         $data = StationCache::remember($station, 'overview', function () use ($station, $formatter) {
             // 'media' is loaded once here so ModuleAvailability's
-            // getMedia('photos') and getFirstMedia('panoramas') both read
+            // getMedia('photos') reads
             // the same cached Eloquent relation in-memory instead of
             // issuing a query each — see
             // plan/phases/phase-06-photos-360.md M6.1 and the query-count

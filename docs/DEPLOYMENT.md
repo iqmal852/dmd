@@ -200,7 +200,7 @@ theoretically-reversible migration.
 
 - `GET /up` — extended health check; verifies the database connection and
   a real write/read/delete round trip against the `local` storage disk
-  (where every station's photos/panoramas/documents live). Returns 500 if
+  (where every station's photos/documents live). Returns 500 if
   either fails — point an uptime monitor at this.
 - `LOG_CHANNEL=json` — one JSON object per log line, `request_id` present
   on every entry (via `Illuminate\Support\Facades\Context`, set by

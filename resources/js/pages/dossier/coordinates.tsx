@@ -146,18 +146,6 @@ export default function DossierCoordinates() {
                             label="Elevation Cut-off"
                             value={specification?.elevationCutoff ?? NA}
                         />
-                        <NeuStat
-                            label="Antenna Type"
-                            value={specification?.antennaType ?? NA}
-                        />
-                        <NeuStat
-                            label="Antenna Height"
-                            value={specification?.antennaHeight ?? NA}
-                        />
-                        <NeuStat
-                            label="Antenna Point"
-                            value={specification?.antennaReferencePoint ?? NA}
-                        />
                     </NeuGroup>
 
                     <NeuGroup

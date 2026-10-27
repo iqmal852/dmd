@@ -19,7 +19,7 @@ use Symfony\Component\HttpFoundation\Response;
  * loaded, and Laravel's FilesystemManager then caches the resolved disk
  * adapter for the life of the application instance — so both the stale
  * URL and the cached disk survive that later override, and every
- * medialibrary-generated URL (thumbnails, previews, the panorama image)
+ * medialibrary-generated URL (thumbnails, previews)
  * silently points at the wrong host for the rest of the test run. This
  * updates the config *and* purges the cached disk so it re-resolves with
  * the correct URL, but only under the `testing` environment — dev and

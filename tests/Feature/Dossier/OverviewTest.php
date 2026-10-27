@@ -75,11 +75,11 @@ class OverviewTest extends TestCase
     /**
      * The budget was originally 3 (station, coordinateSet, specification).
      * Phase 06 added a real ModuleAvailability check against the station's
-     * media, which needs its own query — 4 is the genuine floor once photo/
-     * panorama counts are real rather than hard-coded zeros, and
-     * DossierOverviewController eager-loads 'media' once so both
-     * getMedia('photos') and getFirstMedia('panoramas') reuse it in-memory
-     * rather than costing two extra queries.
+     * media, which needs its own query — 4 is the genuine floor once the photo
+     * count is real rather than a hard-coded zero, and
+     * DossierOverviewController eager-loads 'media' once so
+     * getMedia('photos') reuses it in-memory
+     * rather than costing an extra query.
      */
     public function test_overview_issues_at_most_four_queries(): void
     {

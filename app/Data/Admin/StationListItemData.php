@@ -23,7 +23,6 @@ final readonly class StationListItemData
         public bool $isPublished,
         public bool $hasCoordinates,
         public int $photoCount,
-        public bool $hasPanorama,
         public int $documentCount,
     ) {}
 
@@ -40,7 +39,6 @@ final readonly class StationListItemData
             isPublished: $station->is_published,
             hasCoordinates: $station->coordinateSet !== null,
             photoCount: $station->getMedia('photos')->count(),
-            hasPanorama: $station->getFirstMedia('panoramas') !== null,
             documentCount: $station->getMedia('documents')
                 ->filter(fn ($media) => $media->getCustomProperty('document_type') !== null)
                 ->count(),

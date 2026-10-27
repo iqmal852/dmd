@@ -20,10 +20,8 @@ final readonly class CoordinateSetFormData
         public string $ellipsoidalHeight,
         public string $easting,
         public string $northing,
-        public ?string $zone,
         public string $orthometricHeight,
         public string $geoidModel,
-        public ?string $epoch,
         public ?string $computedAt,
     ) {}
 
@@ -35,10 +33,8 @@ final readonly class CoordinateSetFormData
             ellipsoidalHeight: $coordinateSet->ellipsoidal_height,
             easting: $coordinateSet->easting,
             northing: $coordinateSet->northing,
-            zone: $coordinateSet->zone,
             orthometricHeight: $coordinateSet->orthometric_height,
             geoidModel: $coordinateSet->geoid_model,
-            epoch: $coordinateSet->epoch,
             computedAt: $coordinateSet->computed_at?->toDateString(),
         );
     }

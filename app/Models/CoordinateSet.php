@@ -22,10 +22,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $ellipsoidal_height
  * @property string $easting
  * @property string $northing
- * @property string|null $zone
  * @property string $orthometric_height
  * @property string $geoid_model
- * @property string|null $epoch
  * @property Carbon|null $computed_at
  */
 final class CoordinateSet extends Model
@@ -35,8 +33,8 @@ final class CoordinateSet extends Model
 
     protected $fillable = [
         'station_id', 'latitude', 'longitude', 'ellipsoidal_height',
-        'easting', 'northing', 'zone',
-        'orthometric_height', 'geoid_model', 'epoch', 'computed_at',
+        'easting', 'northing',
+        'orthometric_height', 'geoid_model', 'computed_at',
     ];
 
     protected function casts(): array

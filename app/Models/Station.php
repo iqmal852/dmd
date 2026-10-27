@@ -126,15 +126,13 @@ final class Station extends Model implements HasMedia
     }
 
     /**
-     * Photos and panoramas are used from Phase 06; the `documents`
-     * collection (as-built drawings) is registered now too since it costs
-     * nothing to declare and Phase 07 will use it as-is. Panoramas get
-     * no image conversions — resampling an equirectangular image breaks
-     * the projection. See plan/phases/phase-06-photos-360.md M6.1.
+     * Photos are used from Phase 06; the `documents` collection (as-built
+     * drawings) is registered now too since it costs nothing to declare and
+     * Phase 07 will use it as-is. See plan/phases/phase-06-photos-360.md M6.1.
      *
      * `documents` lives on the `local` disk (private, no `storage:link`
      * target) rather than the package default `public` disk that photos
-     * and panoramas use — as-built drawings are never publicly reachable
+     * use — as-built drawings are never publicly reachable
      * by URL; every byte is served through DownloadDocumentController /
      * PreviewDocumentController instead. See
      * plan/phases/phase-07-asbuilt-files.md M7.1/M7.4.
@@ -143,10 +141,6 @@ final class Station extends Model implements HasMedia
     {
         $this->addMediaCollection('photos')
             ->acceptsMimeTypes(['image/jpeg', 'image/png', 'image/webp']);
-
-        $this->addMediaCollection('panoramas')
-            ->singleFile()
-            ->acceptsMimeTypes(['image/jpeg', 'image/webp']);
 
         $this->addMediaCollection('documents')
             ->useDisk('local')

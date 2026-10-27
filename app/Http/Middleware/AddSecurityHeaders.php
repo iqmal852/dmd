@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * `img-src` allows the two map tile hosts (Esri, OpenStreetMap — see
  * config/dossier.php's map.* defaults) plus `data:`/`blob:` for the
- * QR/panorama/lightbox previews built from in-memory image data.
+ * QR/lightbox previews built from in-memory image data.
  * `style-src` needs `unsafe-inline` for Tailwind's arbitrary-value
  * utilities and the few inline `<style>` blocks (the print plate page).
  * `geolocation=(self)` is kept deliberately, not tightened to `()` — a

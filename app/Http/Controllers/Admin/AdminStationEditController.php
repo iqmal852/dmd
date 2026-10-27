@@ -6,7 +6,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Data\Admin\CoordinateSetFormData;
 use App\Data\Admin\DocumentFormData;
-use App\Data\Admin\PanoramaFormData;
 use App\Data\Admin\PhotoFormData;
 use App\Data\Admin\SpecificationFormData;
 use App\Data\Admin\StationFormData;
@@ -40,9 +39,6 @@ class AdminStationEditController extends Controller
             'photos' => $station->getMedia('photos')
                 ->map(fn ($media) => PhotoFormData::from($media))
                 ->values(),
-            'panorama' => $station->getFirstMedia('panoramas') !== null
-                ? PanoramaFormData::from($station->getFirstMedia('panoramas'))
-                : null,
             'documents' => $station->getMedia('documents')
                 ->filter(fn ($media) => $media->getCustomProperty('document_type') !== null)
                 ->map(fn ($media) => DocumentFormData::from($media))

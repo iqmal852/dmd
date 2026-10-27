@@ -28,10 +28,8 @@ class CoordinateSetFactory extends Factory
             'ellipsoidal_height' => $this->faker->randomFloat(3, 20, 200),
             'easting' => $this->faker->randomFloat(3, 300000, 500000),
             'northing' => $this->faker->randomFloat(3, 300000, 600000),
-            'zone' => null,
             'orthometric_height' => $this->faker->randomFloat(3, 20, 200),
             'geoid_model' => 'MyGEOID',
-            'epoch' => null,
             'computed_at' => null,
         ];
     }

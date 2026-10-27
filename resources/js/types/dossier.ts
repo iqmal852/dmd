@@ -23,7 +23,6 @@ export type ModuleAvailability = {
     hasCoordinates: boolean;
     hasSpecification: boolean;
     photoCount: number;
-    hasPanorama: boolean;
     documentCount: number;
 };
 
@@ -34,10 +33,8 @@ export type CoordinateSet = {
     ellipsoidalHeight: string;
     easting: string;
     northing: string;
-    zone: string | null;
     orthometricHeight: string;
     geoidModel: string;
-    epoch: string | null;
     latitudeRaw: string;
     longitudeRaw: string;
 };
@@ -49,9 +46,6 @@ export type Specification = {
     satelliteCount: number | null;
     pdopMax: string | null;
     elevationCutoff: string | null;
-    antennaType: string | null;
-    antennaHeight: string | null;
-    antennaReferencePoint: string | null;
     horizontalRms: string | null;
     verticalRms: string | null;
     qcStatus: string;

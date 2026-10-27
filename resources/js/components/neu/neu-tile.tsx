@@ -22,7 +22,7 @@ export type NeuTileProps = {
 
 /**
  * A module tile from Picture1.png panel 1 — Coordinates (blue), As-Built
- * (green), Site Photos (cyan), 360° View (violet). These four colours are
+ * (green), Site Photos (cyan). These colours are
  * the primary wayfinding cue and belong permanently to these four modules —
  * see plan/03-design-system.md §2.2.
  *

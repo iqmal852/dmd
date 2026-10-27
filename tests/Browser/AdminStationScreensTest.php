@@ -52,7 +52,7 @@ it('renders the station edit form with all tabs reachable', function () {
     $page->resize(1280, 900);
     $page->screenshot(filename: 'phase-08-station-edit');
 
-    foreach (['Coordinates', 'Specification', 'Photos', '360° Panorama', 'Documents'] as $tab) {
+    foreach (['Coordinates', 'Specification', 'Photos', 'Documents'] as $tab) {
         $page->click($tab);
         $page->assertNoJavaScriptErrors();
     }

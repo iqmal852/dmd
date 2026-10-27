@@ -22,7 +22,7 @@ class GuestAccessTest extends TestCase
     {
         $station = Station::factory()->create(['is_published' => true]);
 
-        foreach (['show', 'coordinates', 'map', 'photos', 'photos.360', 'files', 'unlock'] as $name) {
+        foreach (['show', 'coordinates', 'map', 'photos', 'files', 'unlock'] as $name) {
             $this->get(route("dossier.{$name}", $station))->assertRedirect(route('login'));
         }
     }

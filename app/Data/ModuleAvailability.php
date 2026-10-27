@@ -7,8 +7,8 @@ namespace App\Data;
 use App\Models\Station;
 
 /**
- * Drives the four module tiles on the Overview screen (Coordinates,
- * As-Built, Site Photos, 360° View) — whether each is enabled and, for the
+ * Drives the module tiles on the Overview screen (Coordinates,
+ * As-Built, Site Photos) — whether each is enabled and, for the
  * media-backed ones, how many items it has.
  */
 final readonly class ModuleAvailability
@@ -17,7 +17,6 @@ final readonly class ModuleAvailability
         public bool $hasCoordinates,
         public bool $hasSpecification,
         public int $photoCount,
-        public bool $hasPanorama,
         public int $documentCount,
     ) {}
 
@@ -27,7 +26,6 @@ final readonly class ModuleAvailability
             hasCoordinates: $station->coordinateSet !== null,
             hasSpecification: $station->specification !== null,
             photoCount: $station->getMedia('photos')->count(),
-            hasPanorama: $station->getFirstMedia('panoramas') !== null,
             // Excludes preview-only companion rows for a DWG/DXF original
             // (see plan/phases/phase-07-asbuilt-files.md M7.1) — those
             // aren't documents in their own right.

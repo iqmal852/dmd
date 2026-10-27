@@ -86,16 +86,6 @@ it('closes the lightbox with the close button and cycles photos with next', func
     $page->assertScript("document.querySelector('[role=\"dialog\"]') === null");
 });
 
-it('navigates to the 360 viewer from the panorama tile', function () {
-    $station = seededPhotoStation();
-
-    $page = visit(route('dossier.photos', $station));
-
-    $page->click('360°');
-
-    $page->assertPathContains('/360');
-});
-
 it('gives the carousel scroll and thumbnail controls a tap target of at least 44x44px', function () {
     $station = seededPhotoStation();
 
@@ -125,7 +115,7 @@ it('renders correctly at 1280px desktop', function () {
         ->screenshot(filename: 'phase-06-photos-desktop');
 });
 
-it('shows an empty state for a station with no photos and no panorama instead of a broken layout', function () {
+it('shows an empty state for a station with no photos instead of a broken layout', function () {
     $station = Station::factory()->create(['is_published' => true]);
 
     visit(route('dossier.photos', $station))

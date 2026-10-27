@@ -116,53 +116,6 @@ export function SpecificationTab({ stationPublicId, specification }: Props) {
                             </NeuFormField>
 
                             <NeuFormField
-                                label="Antenna Type"
-                                htmlFor="antenna_type"
-                                error={errors.antenna_type}
-                            >
-                                <NeuInput
-                                    id="antenna_type"
-                                    name="antenna_type"
-                                    defaultValue={
-                                        specification?.antennaType ?? ''
-                                    }
-                                    invalid={!!errors.antenna_type}
-                                />
-                            </NeuFormField>
-
-                            <NeuFormField
-                                label="Antenna Height (m)"
-                                htmlFor="antenna_height"
-                                error={errors.antenna_height}
-                            >
-                                <NeuInput
-                                    id="antenna_height"
-                                    name="antenna_height"
-                                    inputMode="decimal"
-                                    defaultValue={
-                                        specification?.antennaHeight ?? ''
-                                    }
-                                    invalid={!!errors.antenna_height}
-                                />
-                            </NeuFormField>
-
-                            <NeuFormField
-                                label="Antenna Reference Point"
-                                htmlFor="antenna_reference_point"
-                                error={errors.antenna_reference_point}
-                            >
-                                <NeuInput
-                                    id="antenna_reference_point"
-                                    name="antenna_reference_point"
-                                    defaultValue={
-                                        specification?.antennaReferencePoint ??
-                                        ''
-                                    }
-                                    invalid={!!errors.antenna_reference_point}
-                                />
-                            </NeuFormField>
-
-                            <NeuFormField
                                 label="Horizontal RMS (mm)"
                                 htmlFor="horizontal_rms_mm"
                                 error={errors.horizontal_rms_mm}

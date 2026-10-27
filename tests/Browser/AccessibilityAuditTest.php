@@ -20,7 +20,7 @@ uses(RefreshDatabase::class);
  * first place this app used axe-core.
  *
  * One richly-seeded reference station (LPT2-GCP-015 — coordinates,
- * specification, photos, a 360° panorama, and an as-built document) so
+ * specification, photos, and an as-built document) so
  * every route's real content — not an empty state — is what gets
  * audited.
  */
@@ -38,7 +38,6 @@ $publicRoutes = [
     'dossier coordinates' => fn (Station $station) => route('dossier.coordinates', $station),
     'dossier map' => fn (Station $station) => route('dossier.map', $station),
     'dossier photos' => fn (Station $station) => route('dossier.photos', $station),
-    'dossier 360 panorama' => fn (Station $station) => route('dossier.photos.360', $station),
     'dossier files' => fn (Station $station) => route('dossier.files', $station),
 ];
 

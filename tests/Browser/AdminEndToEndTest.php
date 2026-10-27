@@ -21,7 +21,7 @@ uses(RefreshDatabase::class);
  * be a test-harness limitation, not an application bug, by uploading a
  * photo through this exact screen in a real Chrome browser and watching
  * it appear (screenshot on file). Upload correctness (including the
- * DWG-without-preview rejection and the 2:1 panorama check) is already
+ * DWG-without-preview rejection) is already
  * exercised at the HTTP layer in tests/Feature/Admin/AdminMediaTest.php,
  * which sends real multipart requests without going through a browser at
  * all.

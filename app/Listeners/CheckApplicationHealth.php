@@ -35,7 +35,7 @@ class CheckApplicationHealth
     }
 
     /**
-     * The `local` disk is where every station's photos, panoramas, and
+     * The `local` disk is where every station's photos and
      * as-built documents live (Station::registerMediaCollections) — a
      * write/read/delete round trip confirms it is actually mounted and
      * writable, not just configured.

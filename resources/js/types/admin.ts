@@ -10,7 +10,6 @@ export type AdminStationListItem = {
     isPublished: boolean;
     hasCoordinates: boolean;
     photoCount: number;
-    hasPanorama: boolean;
     documentCount: number;
 };
 
@@ -52,10 +51,8 @@ export type AdminCoordinateSet = {
     ellipsoidalHeight: string;
     easting: string;
     northing: string;
-    zone: string | null;
     orthometricHeight: string;
     geoidModel: string;
-    epoch: string | null;
     computedAt: string | null;
 };
 
@@ -66,9 +63,6 @@ export type AdminSpecification = {
     satelliteCount: number | null;
     pdopMax: string | null;
     elevationCutoffDeg: number | null;
-    antennaType: string | null;
-    antennaHeight: string | null;
-    antennaReferencePoint: string | null;
     horizontalRmsMm: string | null;
     verticalRmsMm: string | null;
     qcStatus: string;
@@ -83,15 +77,6 @@ export type AdminPhoto = {
     bearing: number | null;
     label: string | null;
     thumbUrl: string;
-};
-
-/** Mirrors App\Data\Admin\PanoramaFormData exactly. */
-export type AdminPanorama = {
-    id: string;
-    url: string;
-    initialYaw: number;
-    initialPitch: number;
-    hfov: number;
 };
 
 /** Mirrors App\Data\Admin\DocumentFormData exactly. */

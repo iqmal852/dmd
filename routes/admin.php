@@ -5,8 +5,6 @@ declare(strict_types=1);
 use App\Http\Controllers\Admin\AdminDocumentDestroyController;
 use App\Http\Controllers\Admin\AdminDocumentStoreController;
 use App\Http\Controllers\Admin\AdminDocumentUpdateController;
-use App\Http\Controllers\Admin\AdminPanoramaDestroyController;
-use App\Http\Controllers\Admin\AdminPanoramaStoreController;
 use App\Http\Controllers\Admin\AdminPhotoDestroyController;
 use App\Http\Controllers\Admin\AdminPhotoStoreController;
 use App\Http\Controllers\Admin\AdminPhotoUpdateController;
@@ -50,9 +48,6 @@ Route::prefix('admin')
         Route::post('stations/{station}/photos', AdminPhotoStoreController::class)->name('stations.photos.store');
         Route::patch('stations/{station}/photos/{media:uuid}', AdminPhotoUpdateController::class)->scopeBindings()->name('stations.photos.update');
         Route::delete('stations/{station}/photos/{media:uuid}', AdminPhotoDestroyController::class)->scopeBindings()->name('stations.photos.destroy');
-
-        Route::post('stations/{station}/panorama', AdminPanoramaStoreController::class)->name('stations.panorama.store');
-        Route::delete('stations/{station}/panorama/{media:uuid}', AdminPanoramaDestroyController::class)->scopeBindings()->name('stations.panorama.destroy');
 
         Route::post('stations/{station}/documents', AdminDocumentStoreController::class)->name('stations.documents.store');
         Route::patch('stations/{station}/documents/{media:uuid}', AdminDocumentUpdateController::class)->scopeBindings()->name('stations.documents.update');

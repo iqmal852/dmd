@@ -152,43 +152,4 @@ class PhotosTest extends TestCase
 
         $this->get(route('dossier.photos', $station))->assertRedirect();
     }
-
-    public function test_panorama_viewer_404s_when_the_station_has_no_panorama(): void
-    {
-        $station = Station::factory()->create(['is_published' => true]);
-
-        $this->get(route('dossier.photos.360', $station))->assertNotFound();
-    }
-
-    public function test_panorama_viewer_renders_when_a_panorama_exists(): void
-    {
-        $station = Station::factory()->create(['is_published' => true]);
-        $station->addMediaFromString($this->fakeJpegBytes())
-            ->usingFileName('panorama.jpg')
-            ->withCustomProperties(['initial_yaw' => 10, 'initial_pitch' => 5, 'hfov' => 100])
-            ->toMediaCollection('panoramas');
-
-        $response = $this->get(route('dossier.photos.360', $station));
-
-        $response->assertOk();
-        $response->assertInertia(fn (AssertableInertia $page) => $page
-            ->component('dossier/panorama')
-            ->where('panorama.initialYaw', 10)
-            ->where('panorama.hfov', 100)
-        );
-    }
-
-    public function test_the_panorama_route_is_behind_the_access_gate(): void
-    {
-        config([
-            'dossier.access_mode' => AccessMode::Password,
-            'dossier.access_password' => 'secret',
-        ]);
-        $station = Station::factory()->create(['is_published' => true]);
-        $station->addMediaFromString($this->fakeJpegBytes())
-            ->usingFileName('panorama.jpg')
-            ->toMediaCollection('panoramas');
-
-        $this->get(route('dossier.photos.360', $station))->assertRedirect();
-    }
 }

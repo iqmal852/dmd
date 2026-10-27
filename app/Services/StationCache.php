@@ -70,7 +70,7 @@ final readonly class StationCache
 
     /**
      * Called at the end of every admin write to a station or anything
-     * that belongs to it (coordinates, specification, photos, panorama,
+     * that belongs to it (coordinates, specification, photos,
      * documents) — see the Admin*Controller classes.
      */
     public static function bump(Station $station): void

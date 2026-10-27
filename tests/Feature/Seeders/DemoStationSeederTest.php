@@ -51,9 +51,6 @@ class DemoStationSeederTest extends TestCase
         $this->assertSame(18, $station->specification->satellite_count);
         $this->assertSame('1.60', $station->specification->pdop_max);
         $this->assertSame(15, $station->specification->elevation_cutoff_deg);
-        $this->assertSame('Geodetic L1/L2', $station->specification->antenna_type);
-        $this->assertSame('1.532', $station->specification->antenna_height);
-        $this->assertSame('Bottom of ARP', $station->specification->antenna_reference_point);
         $this->assertSame('10.00', $station->specification->horizontal_rms_mm);
         $this->assertSame('15.00', $station->specification->vertical_rms_mm);
         $this->assertSame(QcStatus::Verified, $station->specification->qc_status);

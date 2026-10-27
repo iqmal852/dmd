@@ -155,19 +155,6 @@ export function CoordinatesTab({ stationPublicId, coordinateSet }: Props) {
                             </NeuFormField>
 
                             <NeuFormField
-                                label="Zone"
-                                htmlFor="zone"
-                                error={errors.zone}
-                            >
-                                <NeuInput
-                                    id="zone"
-                                    name="zone"
-                                    defaultValue={coordinateSet?.zone ?? ''}
-                                    invalid={!!errors.zone}
-                                />
-                            </NeuFormField>
-
-                            <NeuFormField
                                 label="Orthometric Height (MyGEOID)"
                                 htmlFor="orthometric_height"
                                 error={errors.orthometric_height}
@@ -199,19 +186,6 @@ export function CoordinatesTab({ stationPublicId, coordinateSet }: Props) {
                                     }
                                     invalid={!!errors.geoid_model}
                                     required
-                                />
-                            </NeuFormField>
-
-                            <NeuFormField
-                                label="Epoch"
-                                htmlFor="epoch"
-                                error={errors.epoch}
-                            >
-                                <NeuInput
-                                    id="epoch"
-                                    name="epoch"
-                                    defaultValue={coordinateSet?.epoch ?? ''}
-                                    invalid={!!errors.epoch}
                                 />
                             </NeuFormField>
 

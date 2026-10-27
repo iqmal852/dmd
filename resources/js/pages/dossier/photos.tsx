@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { ChevronLeft, ChevronRight, RotateCw } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { CompassRose } from '@/components/neu/compass-rose';
 import { NeuEmptyState } from '@/components/neu/neu-empty-state';
@@ -7,24 +7,21 @@ import { NeuIconButton } from '@/components/neu/neu-icon-button';
 import { PhotoLightbox } from '@/components/dossier/photo-lightbox';
 import DossierLayout from '@/layouts/dossier/dossier-layout';
 import { buildDossierNavItems } from '@/lib/dossier-nav';
-import { method360 as photos360 } from '@/routes/dossier/photos';
 import type { Photo } from '@/types/dossier';
 
 type PageProps = {
     stationPublicId: string;
     stationCode: string;
     photos: Photo[];
-    hasPanorama: boolean;
 };
 
 /**
- * Picture1.png panel 4 — Site Photos & 360° View. See
+ * Picture1.png panel 4 — Site Photos. See
  * plan/phases/phase-06-photos-360.md M6.3/M6.4/M6.6.
  */
 export default function DossierPhotos() {
     const { branding } = usePage().props;
-    const { stationPublicId, stationCode, photos, hasPanorama } =
-        usePage<PageProps>().props;
+    const { stationPublicId, stationCode, photos } = usePage<PageProps>().props;
     const carouselRef = useRef<HTMLDivElement>(null);
     const [heroIndex, setHeroIndex] = useState(0);
     const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -38,7 +35,7 @@ export default function DossierPhotos() {
         });
     }
 
-    if (photos.length === 0 && !hasPanorama) {
+    if (photos.length === 0) {
         return (
             <DossierLayout
                 operator={branding.operator}
@@ -128,19 +125,6 @@ export default function DossierPhotos() {
                             </button>
                         ))}
 
-                        {hasPanorama && (
-                            <Link
-                                href={
-                                    photos360({ station: stationPublicId }).url
-                                }
-                                className="border-neu-violet bg-neu-violet text-neu-on-violet shadow-neu-sm relative flex size-20 shrink-0 snap-start flex-col items-center justify-center gap-1 rounded-[var(--radius-neu-md)] border-2"
-                            >
-                                <RotateCw className="size-5" />
-                                <span className="text-[0.6rem] font-bold">
-                                    360°
-                                </span>
-                            </Link>
-                        )}
                     </div>
 
                     <NeuIconButton

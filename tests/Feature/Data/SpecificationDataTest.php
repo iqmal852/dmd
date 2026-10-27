@@ -22,9 +22,6 @@ class SpecificationDataTest extends TestCase
             'satellite_count' => 18,
             'pdop_max' => '1.60',
             'elevation_cutoff_deg' => 15,
-            'antenna_type' => 'Geodetic L1/L2',
-            'antenna_height' => '1.532',
-            'antenna_reference_point' => 'Bottom of ARP',
             'horizontal_rms_mm' => '10.00',
             'vertical_rms_mm' => '15.00',
             'qc_status' => 'verified',
@@ -37,9 +34,6 @@ class SpecificationDataTest extends TestCase
         $this->assertSame(18, $data->satelliteCount);
         $this->assertSame('1.6', $data->pdopMax);
         $this->assertSame('15 °', $data->elevationCutoff);
-        $this->assertSame('Geodetic L1/L2', $data->antennaType);
-        $this->assertSame('1.532 m', $data->antennaHeight);
-        $this->assertSame('Bottom of ARP', $data->antennaReferencePoint);
         $this->assertSame('≤ 10 mm', $data->horizontalRms);
         $this->assertSame('≤ 15 mm', $data->verticalRms);
         $this->assertSame('Verified', $data->qcStatus);
@@ -54,9 +48,6 @@ class SpecificationDataTest extends TestCase
             'satellite_count' => null,
             'pdop_max' => null,
             'elevation_cutoff_deg' => null,
-            'antenna_type' => null,
-            'antenna_height' => null,
-            'antenna_reference_point' => null,
             'horizontal_rms_mm' => null,
             'vertical_rms_mm' => null,
             'qc_status' => 'pending',

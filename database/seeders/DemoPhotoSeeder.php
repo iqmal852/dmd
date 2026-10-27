@@ -9,7 +9,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
 
 /**
- * Attaches placeholder site photos and a panorama to a handful of demo
+ * Attaches placeholder site photos to a handful of demo
  * stations. There is no real GCP monument photography available for this
  * project, so these are generated solid-colour JPEGs, each labelled with
  * free text — enough to exercise every path in the Photos screen (hero,
@@ -33,7 +33,6 @@ class DemoPhotoSeeder extends Seeder
             $this->attachPhoto($station, $tempDir, 'eye-level', 'Eye-Level Approach', '#2b6cb0', 145);
             $this->attachPhoto($station, $tempDir, 'top-down', 'Top-Down (Sky Visibility)', '#2f855a', null);
             $this->attachPhoto($station, $tempDir, 'close-up', 'Close-Up (Monument)', '#6b46c1', null);
-            $this->attachPanorama($station, $tempDir);
         }
 
         File::deleteDirectory($tempDir);
@@ -56,23 +55,6 @@ class DemoPhotoSeeder extends Seeder
                 'height' => $height,
             ])
             ->toMediaCollection('photos');
-    }
-
-    private function attachPanorama(Station $station, string $tempDir): void
-    {
-        $width = 2048;
-        $height = 1024;
-        $path = "{$tempDir}/{$station->code}-panorama.jpg";
-
-        $this->renderPlaceholder($path, $width, $height, '#553c9a', '360 PANORAMA');
-
-        $station->addMedia($path)
-            ->withCustomProperties([
-                'initial_yaw' => 0,
-                'initial_pitch' => 0,
-                'hfov' => 110,
-            ])
-            ->toMediaCollection('panoramas');
     }
 
     private function renderPlaceholder(string $path, int $width, int $height, string $hexColor, string $label): void
