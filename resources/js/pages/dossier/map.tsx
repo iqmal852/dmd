@@ -23,6 +23,8 @@ type PageProps = {
         streetAttribution: string;
         defaultZoom: number;
         maxZoom: number;
+        satelliteMaxNativeZoom: number;
+        streetMaxNativeZoom: number;
     };
 };
 
@@ -77,6 +79,7 @@ export default function DossierMap() {
             const leafletMap = L.map(containerRef.current, {
                 center: [station.latitude, station.longitude],
                 zoom: map.defaultZoom,
+                maxZoom: map.maxZoom,
                 scrollWheelZoom: false,
                 zoomControl: false,
                 attributionControl: true,
@@ -90,11 +93,13 @@ export default function DossierMap() {
             const satelliteLayer = L.tileLayer(map.satelliteUrl, {
                 attribution: map.satelliteAttribution,
                 maxZoom: map.maxZoom,
+                maxNativeZoom: map.satelliteMaxNativeZoom,
             }).addTo(leafletMap);
 
             const streetLayer = L.tileLayer(map.streetUrl, {
                 attribution: map.streetAttribution,
                 maxZoom: map.maxZoom,
+                maxNativeZoom: map.streetMaxNativeZoom,
             });
 
             const icon = L.divIcon({

@@ -37,6 +37,8 @@ class DossierMapController extends Controller
                 'streetAttribution' => config('dossier.map.street_attr'),
                 'defaultZoom' => config('dossier.map.default_zoom'),
                 'maxZoom' => config('dossier.map.max_zoom'),
+                'satelliteMaxNativeZoom' => config('dossier.map.satellite_max_native_zoom'),
+                'streetMaxNativeZoom' => config('dossier.map.street_max_native_zoom'),
             ],
         ]);
     }

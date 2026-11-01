@@ -69,6 +69,20 @@ class MapTest extends TestCase
         );
     }
 
+    public function test_zoom_limits_stay_within_what_the_providers_have_imagery_for(): void
+    {
+        $station = Station::factory()->create();
+        CoordinateSet::factory()->for($station)->create();
+
+        $response = $this->get(route('dossier.map', $station));
+
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->where('map.maxZoom', 19)
+            ->where('map.satelliteMaxNativeZoom', 18)
+            ->where('map.streetMaxNativeZoom', 19)
+        );
+    }
+
     public function test_the_route_is_behind_the_access_gate(): void
     {
         config([

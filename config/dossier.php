@@ -49,7 +49,14 @@ return [
         'street_url' => env('MAP_STREET_URL', 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
         'street_attr' => env('MAP_STREET_ATTRIBUTION', '© OpenStreetMap contributors'),
         'default_zoom' => (int) env('MAP_DEFAULT_ZOOM', 17),
+        // Hard cap on how far the map zooms (OSM's own limit is 19).
         'max_zoom' => (int) env('MAP_MAX_ZOOM', 19),
+        // Deepest level each provider has real imagery for. Esri World_Imagery
+        // answers 200 with a "Map data not yet available" tile beyond this over
+        // Peninsular Malaysia (z19 is patchy, z20+ is blank), so past it Leaflet
+        // stretches the last good level instead of requesting blank tiles.
+        'satellite_max_native_zoom' => (int) env('MAP_SATELLITE_MAX_NATIVE_ZOOM', 18),
+        'street_max_native_zoom' => (int) env('MAP_STREET_MAX_NATIVE_ZOOM', 19),
     ],
 
     'branding' => [
